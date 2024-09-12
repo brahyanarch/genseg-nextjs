@@ -11,9 +11,19 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        Principal: '#FFFFFF',
+        ColorPrincipal: '#F5F7FA',
         PrincipalText: '#000000',
+        AvisoColor: '#FFF6E0',
       },
+      keyframes: {
+        'slide-up': {
+          '0%': { transform: 'translateY(100%)' },
+          '100%': { transform: 'translateY(0)' },
+        }
+      },
+      animation: {
+        'slide-up': 'slide-up 0.3s ease-out',
+      }
     },
   },
   plugins: [],
