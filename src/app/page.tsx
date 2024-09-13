@@ -162,7 +162,7 @@ export function Navbar(){
 export function ObtenerCertificado() {
   return (
     <>
-      <div className="bg-gray-100 gap-4 text-gray-800 flex flex-col justify-center items-center mx-auto my-[50px] p-8 rounded-lg shadow-lg w-4/5">
+      <div className="bg-gray-300 gap-4 text-gray-800 flex flex-col justify-center items-center mx-auto my-[50px] p-8 rounded-lg shadow-lg w-4/5">
         <h2 className="text-2xl font-bold mb-4 text-gray-700">Solicitar Certificado</h2>
         <p className="text-sm bg-blue-100 text-blue-600 p-2 rounded-md w-full text-center mb-4">
           ¡Atención! Los certificados se solicitan una vez que el voluntario participante culminó con las 3 actividades designadas.
@@ -171,7 +171,7 @@ export function ObtenerCertificado() {
           <h3 className="text-lg">Digite su código de estudiante:</h3>
           <div className="flex space-x-4">
             <input
-              type="number"
+              type="text"
               className="border border-gray-300 p-2 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="201861"
             />
