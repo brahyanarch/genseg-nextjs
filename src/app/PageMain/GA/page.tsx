@@ -1,12 +1,15 @@
 import Link from 'next/link'
-import {Navbar} from '../page'
+import Navbar from '@/componentes/navbar'
+import Carrusel from "@/componentes/carrusel";
 
-export default function Segre(){
+
+export default function Gamb(){
     return(
         <div className='text-gray-950'>
             <Navbar/>
             <h1>
-                Estas en Seguimiento y Desarrollo del egresado.
+                Estas en Gestión Ambiental.
+            <Carrusel />
             </h1>
             <Link href='/'>
             Regresar al Home

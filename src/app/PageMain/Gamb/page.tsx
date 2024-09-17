@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import {Navbar} from '../page'
+import Navbar from '@/componentes/navbar'
 import Carrusel from "@/componentes/carrusel";
 
 
