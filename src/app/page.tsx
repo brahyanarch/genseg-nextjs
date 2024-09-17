@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import { Menu, X, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import Carrusel2 from "@/componentes/carrusel";
-import Navbar from "@/componentes/navbar";
+import Carrusel2 from "../components/carrusel";
+import Navbarr from "../components/navbar";
 //funcion principal que controla el Modal de aviso
 export function AvisoModal() {
   const [mostrarAviso, setMostrarAviso] = useState(false);
@@ -199,6 +199,7 @@ export function ObtenerCertificado() {
   );
 }
 
+
 export default function Home() {
   const [mostrarAlerta, setMostrarAlerta] = useState(false)
 
@@ -218,7 +219,7 @@ export default function Home() {
   return (
     <div >
     <AvisoModal />
-    <Navbar />
+    <Navbarr />
     <Carrusel2 />
     <ObtenerCertificado />
     </div>

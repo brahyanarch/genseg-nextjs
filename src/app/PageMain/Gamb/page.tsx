@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import Navbar from '@/componentes/navbar'
-import Carrusel from "@/componentes/carrusel";
+import Navbar from '@/components/navbar'
+import Carrusel from "@/components/carrusel";
 
 
 export default function Gamb(){

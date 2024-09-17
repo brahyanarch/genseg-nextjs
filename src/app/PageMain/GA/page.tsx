@@ -1,6 +1,8 @@
 import Link from 'next/link'
-import Navbar from '@/componentes/navbar'
-import Carrusel from "@/componentes/carrusel";
+import Navbar from '@/components/navbar'
+import Carrusel from '@/components/carrusel';
+import Card from '@/components/Cards';
+import Image from 'next/image'
 
 
 export default function Gamb(){
@@ -14,6 +16,7 @@ export default function Gamb(){
             <Link href='/'>
             Regresar al Home
             </Link>
+            <Card/>
         </div>
     )
 }
