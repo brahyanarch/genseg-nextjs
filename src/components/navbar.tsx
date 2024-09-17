@@ -1,18 +1,22 @@
 'use client'
-import { useState, useEffect } from "react";
-import { Menu, X, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
+import { useState } from "react";
+import { Menu, X } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 
-export default function Navbar(){
-    //inicializando el estado para controlar el menu en un teléfono
-    const [isMenuOpen, setIsMenuOpen] = useState(false)
-  
-    return(
-      <nav className="bg-white shadow-md">
-      <div className=" bg-gray-900 w-full mx-auto px-4 sm:px-6 lg:px-8 h-auto flex justify-end items-center">
+export default function Navbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [selectedLink, setSelectedLink] = useState(null); // Estado para rastrear el enlace seleccionado
+
+  const handleLinkClick = (link:any) => {
+    setSelectedLink(link); // Actualiza el estado del enlace seleccionado
+  };
+
+  return (
+    <nav className="bg-white shadow-md">
+      <div className="bg-gray-900 w-full mx-auto px-4 sm:px-6 lg:px-8 h-auto flex justify-end items-center">
         <Link href='/#' className="px-3 py-1 rounded-md text-xs font-medium text-blue-600 hover:bg-gray-900 hover:text-gray-50">
-        Intranet
+          Intranet
         </Link>
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -20,16 +24,43 @@ export default function Navbar(){
           <div className="flex-shrink-0 flex items-center">
             {/* Logo */}
             <Image src="/resources/images/genseg.png" alt="Logo" width={55} height={55} />
-            <p className='text-gray-900 text-base px-2' ><Link href='/' >Gestor de Proyectos <br/> de la DPSEC</Link></p>
+            <p className='text-gray-900 text-base px-2'>
+              <Link href='/'>Gestor de Proyectos <br /> de la DPSEC</Link>
+            </p>
           </div>
-          {/* Desktop menu */}
+
+          {/* Menú para pantallas grandes */}
           <div className="hidden sm:flex sm:items-center">
-            <a href="/PageMain/GA" className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-900 hover:text-gray-50">Gestión Ambiental</a>
-            <a href="/PageMain/SDG" className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-900 hover:text-gray-50">Seguimiento y Desarrollo del Graduado</a>
-            <a href="/PageMain/PSEC" className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-900 hover:text-gray-50">Proyección Social y Extensión Cultural</a>
+            <Link
+              href="/PageMain/GA"
+              className={`px-3 py-2 rounded-md text-sm font-medium w-52 ${
+                selectedLink === '/PageMain/GA' ? 'bg-gray-500 text-white' : 'text-gray-700 hover:bg-gray-400 hover:text-gray-800'
+              }`}
+              onClick={() => handleLinkClick('/PageMain/GA')}
+            >
+              Gestión Ambiental
+            </Link>
+            <Link
+              href="/PageMain/SDG"
+              className={`px-3 py-2 rounded-md text-sm font-medium w-52 ${
+                selectedLink === '/PageMain/SDG' ? 'bg-gray-500 text-white' : 'text-gray-700 hover:bg-gray-400 hover:text-gray-800'
+              }`}
+              onClick={() => handleLinkClick('/PageMain/SDG')}
+            >
+              Seguimiento y Desarrollo del Graduado
+            </Link>
+            <Link
+              href="/PageMain/PSEC"
+              className={`px-3 py-2 rounded-md text-sm font-medium w-52 ${
+                selectedLink === '/PageMain/PSEC' ? 'bg-gray-500 text-white' : 'text-gray-700 hover:bg-gray-400 hover:text-gray-800'
+              }`}
+              onClick={() => handleLinkClick('/PageMain/PSEC')}
+            >
+              Proyección Social y Extensión Cultural
+            </Link>
           </div>
-          
-          {/* Mobile menu button */}
+
+          {/* Botón de menú móvil */}
           <div className="sm:hidden flex items-center">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -45,18 +76,41 @@ export default function Navbar(){
           </div>
         </div>
       </div>
-  
-      {/* Mobile menu */}
+
+      {/* Menú móvil */}
       {isMenuOpen && (
         <div className="sm:hidden">
           <div className="pt-2 pb-3 space-y-1">
-            <a href="/about" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Gestión Ambiental</a>
-            <a href="/login" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Seguimiento y Desarrollo del Graduado</a>
-            <a href="/config" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Proyección Social y Extensión Cultural</a>
+            <Link
+              href="/PageMain/GA"
+              className={`block px-3 py-2 rounded-md text-base font-medium ${
+                selectedLink === '/PageMain/GA' ? 'bg-gray-500 text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+              onClick={() => handleLinkClick('/PageMain/GA')}
+            >
+              Gestión Ambiental
+            </Link>
+            <Link
+              href="/PageMain/SDG"
+              className={`block px-3 py-2 rounded-md text-base font-medium ${
+                selectedLink === '/PageMain/SDG' ? 'bg-gray-500 text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+              onClick={() => handleLinkClick('/PageMain/SDG')}
+            >
+              Seguimiento y Desarrollo del Graduado
+            </Link>
+            <Link
+              href="/PageMain/PSEC"
+              className={`block px-3 py-2 rounded-md text-base font-medium ${
+                selectedLink === '/PageMain/PSEC' ? 'bg-gray-500 text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+              onClick={() => handleLinkClick('/PageMain/PSEC')}
+            >
+              Proyección Social y Extensión Cultural
+            </Link>
           </div>
         </div>
       )}
     </nav>
-    )
-  }
-  
+  );
+}

@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Carrusel2 from "../components/carrusel";
 import Navbarr from "../components/navbar";
+import Footer from '@/components/piePagina'
 //funcion principal que controla el Modal de aviso
 export function AvisoModal() {
   const [mostrarAviso, setMostrarAviso] = useState(false);
@@ -202,6 +203,8 @@ export function ObtenerCertificado() {
 
 export default function Home() {
   const [mostrarAlerta, setMostrarAlerta] = useState(false)
+   // Estado para controlar el menú en dispositivos móviles
+   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     // Show the alert when the component mounts
@@ -222,6 +225,7 @@ export default function Home() {
     <Navbarr />
     <Carrusel2 />
     <ObtenerCertificado />
+    <Footer/>
     </div>
   )
 }
