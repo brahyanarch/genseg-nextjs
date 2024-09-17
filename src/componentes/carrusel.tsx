@@ -19,13 +19,12 @@ export default function Carrusel() {
       description: "Evidencia de la actividad de la que nosotros nos encontramos con todos",
     },
     {
-      src: "/resources/images/28.jpg",
+      src: "/resources/images/FondoP1.png",
       alt: "Third slide",
       heading: "Seguimiento al egresado",
-      description: "Evidencia de las que ya estamos presente en ese lugar",
     },
     {
-      src: "/resources/images/31.jpg",
+      src: "/resources/images/FondoP.png",
       alt: "Fourth slide",
       heading: "Proyección Social y Extensión Cultural",
       description: "Evidencia de las que no estamos, y sobre todo el respeto",
@@ -50,7 +49,7 @@ export default function Carrusel() {
     };
      
     useEffect(() => {
-      const timer = setInterval(nextSlide, 4000); // Auto-advance every 5 seconds
+      const timer = setInterval(nextSlide, 5000); // Auto-advance every 5 seconds
       console.log("solo pasa una vez");
       return () => clearInterval(timer);
     }, []);
@@ -66,8 +65,8 @@ export default function Carrusel() {
         {images.map((image, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-opacity duration-[2.3s] ease-in-out  ${
-              index === activeIndex ? "bg-opacity-50 bg-zinc-100" : "opacity-0 z-0"
+            className={`absolute inset-0 transition-opacity duration-[2.3s] ease-in-out ${
+              index === activeIndex ? "bg-opacity-5 bg-zinc-100" : "opacity-0 z-0"
             }`}
             aria-hidden={index !== activeIndex}
           >
@@ -81,7 +80,7 @@ export default function Carrusel() {
                 {image.heading}
                 
               </h5>
-              <p className="text-sm text-center mb-16">{image.description}</p>
+              <p className="text-sm text-center mb-16">{image.description ? image.description:"DPSEC" }</p>
             </div>
           </div>
         ))}

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import {Navbar} from '../page'
+import Carrusel from "@/componentes/carrusel";
 
 
 export default function Gamb(){
@@ -8,7 +9,7 @@ export default function Gamb(){
             <Navbar/>
             <h1>
                 Estas en Gestión Ambiental.
-
+            <Carrusel />
             </h1>
             <Link href='/'>
             Regresar al Home
