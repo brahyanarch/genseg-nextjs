@@ -40,7 +40,7 @@ export function Cards(){
 
 
   return(
-    <div className='flex justify-around items-center flex-wrap w-4/5 mx-auto my-10'>
+    <div className='grid grid-cols-3 gap-4 w-4/5 mx-auto my-10'>
       <Card nombre="Actividad 1" encargado="David Larota" />
       <Card nombre="Actividad 2" encargado="Bernardo Pari"/>
       <Card nombre="Actividad 3" encargado="Lennin Chura"/>

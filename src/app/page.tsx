@@ -6,7 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Carrusel2 from "../components/carrusel";
 import Navbarr from "../components/navbar";
-import Footer from '@/components/piePagina'
+import Footer from '@/components/Footer'
 //funcion principal que controla el Modal de aviso
 export function AvisoModal() {
   const [mostrarAviso, setMostrarAviso] = useState(false);
@@ -220,7 +220,7 @@ export default function Home() {
   }, [])
 
   return (
-    <div >
+    <div className='bg-ColorPrincipal' >
     <AvisoModal />
     <Navbarr />
     <Carrusel2 />

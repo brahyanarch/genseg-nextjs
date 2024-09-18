@@ -15,6 +15,7 @@ const config: Config = {
         ColorPrincipal: '#F5F7FA',
         PrincipalText: '#000000',
         AvisoColor: '#FFF6E0',
+        colorFooter: '#FDFDFD',
       },
       keyframes: {
         'slide-up': {
@@ -24,7 +25,10 @@ const config: Config = {
       },
       animation: {
         'slide-up': 'slide-up 0.3s ease-out',
-      }
+      },
+      fontFamily:{
+        nunito: ['"Nunito Sans"', 'sans-serif'],
+      },
     },
   },
   plugins: [],
