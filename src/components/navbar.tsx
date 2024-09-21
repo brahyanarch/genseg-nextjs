@@ -15,7 +15,7 @@ export default function Navbar() {
   return (
     <nav className="bg-white shadow-md">
       <div className="bg-gray-900 w-full mx-auto px-4 sm:px-6 lg:px-8 h-auto flex justify-end items-center">
-        <Link href='/#' className="px-3 py-1 rounded-md text-xs font-medium text-blue-600 hover:bg-gray-900 hover:text-gray-50">
+        <Link href='/intranet' className="px-3 py-1 rounded-md text-xs font-medium text-blue-600 hover:bg-gray-900 hover:text-gray-50">
           Intranet
         </Link>
       </div>
