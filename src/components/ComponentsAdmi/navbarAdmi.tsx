@@ -1,13 +1,14 @@
 'use client'
 import { useState } from "react";
-import { Menu, X } from 'lucide-react'
+import { Menu, X, BellDot, Search } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 
 export function Buscador(){
     return(
-        <div className="self-center">
-            <input type="search" placeholder="Buscar..." className=" p-4 rounded-[20px] w-[250px] h-[25px] border-[#9FA6BC] border-[1px] bg-[#141824]" />
+        <div className="self-center relative">
+           <Search className=" absolute left-2 top-[4px]" />
+            <input type="search" placeholder="Buscar..." className=" py-4 px-9 rounded-[20px] w-[250px] h-[25px] border-[#9FA6BC] border-[1px] bg-[#141824]" />
         </div>
     )
 }
@@ -23,22 +24,31 @@ export function Notificacion(){
 
     return(
         <div>
-            <div className="text-[28px]" onClick={toggleProfileMenu} >
-                🔔
+            <div className="text-[28px] cursor-pointer mr-3" onClick={toggleProfileMenu} >
+            <BellDot size={36} />
             </div>
             <div>
                {/* Ventana flotante de perfil */}
         {isProfileOpen && (
-          <div className="absolute text-gray-500 right-0 mt-2 w-48 bg-white rounded-lg shadow-lg">
-            <ul className="py-2 text-xs">
+          <div className="absolute text-gray-500 right-10 mt-2 w-48 bg-white rounded-lg shadow-lg h-[400px]">
+            <ul className="py-2 ">
               <li className="px-10 py-2 hover:bg-gray-100 cursor-pointer">
-                Notificación 1
+                <h3>Notificacion 1</h3>
+                <p className="text-xs">
+                  Lennin está solicitando editar ...
+                </p>
               </li>
               <li className="px-10 py-2 hover:bg-gray-100 cursor-pointer">
-                Notificación 2
+              <h3>Notificacion 2</h3>
+              <p className="text-xs">
+                  Lennin está solicitando editar ...
+                </p>
               </li>
               <li className="px-10 py-2 hover:bg-gray-100 cursor-pointer">
-                Notificación 3
+              <h3>Notificacion 3</h3>
+              <p className="text-xs">
+                  Lennin está solicitando editar ...
+                </p>
               </li>
             </ul>
           </div>
@@ -57,11 +67,11 @@ export function Perfil() {
     };
   
     return (
-      <div className="relative">
+      <div className="">
         {/* Botón de perfil */}
         <Link href="#" onClick={toggleProfileMenu}>
         <div
-          className="text-gray-600 text-[28px] text-center h-[40px] w-[40px] focus:outline-none rounded-[50%] bg-white"
+          className="text-white text-[28px] text-center h-[40px] w-[40px] focus:outline-none rounded-[50%] bg-blue-700"
         >
           B
         </div>
@@ -69,15 +79,15 @@ export function Perfil() {
   
         {/* Ventana flotante de perfil */}
         {isProfileOpen && (
-          <div className="absolute text-gray-500 right-0 mt-2 w-48 bg-white rounded-lg shadow-lg">
+          <div className="absolute text-gray-500 right-2 mt-2 w-48 bg-white rounded-lg shadow-lg h-[400px]">
             <ul className="py-2">
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+              <li className="px-10 py-2 hover:bg-gray-100 cursor-pointer">
                 Editar perfil
               </li>
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+              <li className="px-10 py-2 hover:bg-gray-100 cursor-pointer">
                 Centro de ayuda
               </li>
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+              <li className="px-10 py-2 hover:bg-gray-100 cursor-pointer">
                 Cerrar sesión
               </li>
             </ul>
@@ -105,9 +115,9 @@ export default function Navbar() {
           <div className="flex-shrink-0 flex items-center py-2">
             {/* Logo */}
             <div className="bg-white rounded-[50%]" ><Image src="/resources/images/DPSEClogo.png" alt="" width={50} height={50}/></div>
-            <p className='text-[#8A94AD] text-base px-2 self-start '>
-              <Link href='/'>Proyección Social y Extensión Cultural</Link> <br/>
-              <Link href='/'>Administrador General</Link>
+            <p className='text-[#8A94AD]  px-2 self-start '>
+              <Link href='/' className="text-sm font-semibold" >Proyección Social y Extensión Cultural</Link> <br/>
+              <Link href='/' className="text-xs" >Administrador General</Link>
             </p>
           </div>
           {/*Buscador*/}
