@@ -106,14 +106,14 @@ export function Perfil() {
               <User className="mr-2 h-4 w-4" />
               Perfil
             </Button>
-          </li>
+              </li>
           <li>
             <Button variant="ghost" className="w-full justify-start text-white">
               <HelpCircle className="mr-2 h-4 w-4" />
-              Centro de ayuda
+                Centro de ayuda
             </Button>
-          </li>
-        </ul>
+              </li>
+            </ul>
       </nav>
       <div className="mt-6">
         <Button variant="secondary" className="w-full bg-gray-800 hover:bg-gray-700 text-white">
@@ -121,7 +121,7 @@ export function Perfil() {
           Cerrar Sesión
         </Button>
       </div>
-    </div>
+          </div>
         )}
       </div>
 
