@@ -1,6 +1,6 @@
 'use client'
 import {useState} from 'react'
-import { BellIcon, MenuIcon, SearchIcon, Search, Logs } from "lucide-react"
+import { BellIcon, User, HelpCircle, LogOut , SearchIcon, Logs } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 const Icon = () => {
@@ -90,19 +90,38 @@ export function Perfil() {
       </div>
       <div>
       {isProfileOpen && (
-          <div className="absolute text-gray-500 right-2 mt-2 w-48 bg-white rounded-lg shadow-lg h-[400px]">
-            <ul className="py-2">
-              <li className="px-10 py-2 hover:bg-gray-100 cursor-pointer">
-                Editar perfil
-              </li>
-              <li className="px-10 py-2 hover:bg-gray-100 cursor-pointer">
-                Centro de ayuda
-              </li>
-              <li className="px-10 py-2 hover:bg-gray-100 cursor-pointer">
-                Cerrar sesión
-              </li>
-            </ul>
-          </div>
+        <div className=" absolute right-2 w-64 bg-gray-900 text-white p-4 rounded-lg">
+      <div className="flex items-center mb-6">
+        <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-xl font-bold mr-3">
+          M
+        </div>
+        <div>
+          <h2 className="font-semibold">Mariana artista muchacha</h2>
+        </div>
+      </div>
+      <nav>
+        <ul className="space-y-2">
+          <li>
+            <Button variant="ghost" className="w-full justify-start text-white">
+              <User className="mr-2 h-4 w-4" />
+              Perfil
+            </Button>
+          </li>
+          <li>
+            <Button variant="ghost" className="w-full justify-start text-white">
+              <HelpCircle className="mr-2 h-4 w-4" />
+              Centro de ayuda
+            </Button>
+          </li>
+        </ul>
+      </nav>
+      <div className="mt-6">
+        <Button variant="secondary" className="w-full bg-gray-800 hover:bg-gray-700 text-white">
+          <LogOut className="mr-2 h-4 w-4" />
+          Cerrar Sesión
+        </Button>
+      </div>
+    </div>
         )}
       </div>
 
