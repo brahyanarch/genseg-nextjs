@@ -1,9 +1,10 @@
 'use client'
-import {useState} from 'react'
+import {useState, useEffect, useRef} from 'react'
 import { BellIcon, User, HelpCircle, LogOut , SearchIcon, Logs } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import NavRoles from '@/components/ComponentsIntranet/roles'
+import Notificaciones from '@/components/ComponentsIntranet/notificaciones'
 
 const MenuRoles = () => {
   return (
@@ -27,137 +28,153 @@ const MenuRoles = () => {
   );
 };
 
-export function Notificacion(){
-  // Estado para controlar la visibilidad de la ventana flotante
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
+export function Notificacion() {
+  const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
+  const notificationRef = useRef<HTMLDivElement>(null);
 
-  // Función para alternar la visibilidad de la ventana flotante
+  // Alternar visibilidad de la ventana de notificación
   const toggleProfileMenu = () => {
     setIsProfileOpen(!isProfileOpen);
   };
 
- return(
-     <div>
-         <div className="text-[28px] cursor-pointer mr-3" onClick={toggleProfileMenu} >
-         <BellIcon className="h-5 w-5" />
-         </div>
-         <div>
-            {/* Ventana flotante de Notificacion */}
-     {isProfileOpen && (
-       <div className="absolute text-gray-500 right-10 mt-2 w-48 bg-white rounded-lg shadow-lg h-[400px]">
-         <ul className="py-2 ">
-           <li className="px-10 py-2 hover:bg-gray-100 cursor-pointer">
-             <h3>Notificacion 1</h3>
-             <p className="text-xs">
-               Lennin está solicitando editar ...
-             </p>
-           </li>
-           <li className="px-10 py-2 hover:bg-gray-100 cursor-pointer">
-           <h3>Notificacion 2</h3>
-           <p className="text-xs">
-               Lennin está solicitando editar ...
-             </p>
-           </li>
-           <li className="px-10 py-2 hover:bg-gray-100 cursor-pointer">
-           <h3>Notificacion 3</h3>
-           <p className="text-xs">
-               Lennin está solicitando editar ...
-             </p>
-           </li>
-         </ul>
-       </div>
-     )}
-         </div>
-     </div>
- )
-}
+  // Cerrar el menú de notificación si el usuario hace clic fuera de él
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
 
-
-export function Perfil() {
-  // Estado para controlar la visibilidad de la ventana flotante
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-
-  // Función para alternar la visibilidad de la ventana flotante
-  const toggleProfileMenu = () => {
-    setIsProfileOpen(!isProfileOpen);
-  };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
-    <div>
-      {/* Botón de perfil */}
-      <div
-        className="text-sm font-bold text-gray-500 pt-1  text-center h-[30px] w-[30px] focus:outline-none rounded-[50%] bg-white cursor-pointer" onClick={toggleProfileMenu}
-      >
-      B
+    <div ref={notificationRef} >
+      <div className="text-[28px] cursor-pointer mr-3" onClick={toggleProfileMenu}>
+        <BellIcon className="h-5 w-5" />
       </div>
-      <div>
+      {/* Ventana flotante de Notificacion */}
       {isProfileOpen && (
-        <div className=" absolute right-2 w-64 bg-gray-900 text-white p-4 rounded-lg">
-      <div className="flex items-center mb-6">
-        <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-xl font-bold mr-3">
-          M
-        </div>
-        <div>
-          <h2 className="font-semibold">Mariana artista muchacha</h2>
-        </div>
-      </div>
-      <nav>
-        <ul className="space-y-2">
-          <li>
-            <Button variant="ghost" className="w-full justify-start text-white">
-              <User className="mr-2 h-4 w-4" />
-              Perfil
-            </Button>
-              </li>
-          <li>
-            <Button variant="ghost" className="w-full justify-start text-white">
-              <HelpCircle className="mr-2 h-4 w-4" />
-                Centro de ayuda
-            </Button>
-              </li>
-            </ul>
-      </nav>
-      <div className="mt-6">
-        <Button variant="secondary" className="w-full bg-gray-800 hover:bg-gray-700 text-white">
-          <LogOut className="mr-2 h-4 w-4" />
-          Cerrar Sesión
-        </Button>
-      </div>
-          </div>
-        )}
-      </div>
-
-      
+       
+          <Notificaciones />
+        
+      )}
     </div>
   );
 }
 
-export function Roles(){
-    // Estado para controlar la visibilidad de la ventana flotante
-    const [isProfileOpen, setIsProfileOpen] = useState(false);
+export function Perfil() {
+  const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
 
-    // Función para alternar la visibilidad de la ventana flotante
-    const toggleProfileMenu = () => {
-      setIsProfileOpen(!isProfileOpen);
+  // Función para alternar la visibilidad de la ventana flotante
+  const toggleProfileMenu = () => {
+    setIsProfileOpen(!isProfileOpen);
+  };
+
+  // Cerrar el menú si el usuario hace clic fuera de él
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
     };
-  return(
-    <div >
-    <div className="cursor-pointer" onClick={toggleProfileMenu} >
-     <MenuRoles/>
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <div ref={profileMenuRef}>
+      {/* Botón de perfil */}
+      <div
+        className="text-sm font-bold text-gray-500 pt-1 text-center h-[30px] w-[30px] focus:outline-none rounded-[50%] bg-white cursor-pointer"
+        onClick={toggleProfileMenu}
+      >
+        B
+      </div>
+      <div>
+        {isProfileOpen && (
+          <div className="absolute right-2 w-64 bg-gray-900 text-white p-4 rounded-lg">
+            <div className="flex items-center mb-6">
+              <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-xl font-bold mr-3">
+                M
+              </div>
+              <div>
+                <h2 className="font-semibold">Mariana artista muchacha</h2>
+              </div>
+            </div>
+            <nav>
+              <ul className="space-y-2">
+                <li>
+                  <Button variant="ghost" className="w-full justify-start text-white">
+                    <User className="mr-2 h-4 w-4" />
+                    Perfil
+                  </Button>
+                </li>
+                <li>
+                  <Button variant="ghost" className="w-full justify-start text-white">
+                    <HelpCircle className="mr-2 h-4 w-4" />
+                    Centro de ayuda
+                  </Button>
+                </li>
+              </ul>
+            </nav>
+            <div className="mt-6">
+              <Button variant="secondary" className="w-full bg-gray-800 hover:bg-gray-700 text-white">
+                <LogOut className="mr-2 h-4 w-4" />
+                Cerrar Sesión
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
-    <div>
+  );
+}
+
+export function Roles() {
+  const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
+  const rolesMenuRef = useRef<HTMLDivElement>(null);
+
+  // Función para alternar la visibilidad de la ventana flotante
+  const toggleProfileMenu = () => {
+    setIsProfileOpen(!isProfileOpen);
+  };
+
+  // Cerrar el menú si el usuario hace clic fuera de él
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (rolesMenuRef.current && !rolesMenuRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <div ref={rolesMenuRef}>
+      {/* Botón que abre el menú de roles */}
+      <div className="cursor-pointer" onClick={toggleProfileMenu}>
+        <MenuRoles />
+      </div>
+
       {/* Ventana flotante de Roles */}
       {isProfileOpen && (
-        <div  className="absolute right-10 top-10" >
-          <NavRoles  />
-        </div>
+        
+          <NavRoles />
         
       )}
     </div>
-    </div>
-  )
+  );
 }
-
 export default function Component() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   

@@ -43,17 +43,17 @@ const notifications = [
 
 export default function NotificationsComponent() {
   return (
-    <div className="w-full max-w-md bg-gray-900 text-white rounded-lg shadow-lg">
+    <div className=" absolute right-2 top-10 w-80 max-w-md bg-gray-900 text-white rounded-lg shadow-lg ">
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
         <h2 className="text-lg font-semibold">Notificaciones</h2>
         <Button variant="link" className="text-blue-400 text-sm">
           Marcar todo como leido
         </Button>
       </div>
-      <ScrollArea className="h-[400px]">
+      <ScrollArea className="h-[400px] ">
         {notifications.map((notification) => (
-          <div key={notification.id} className="p-4 border-b border-gray-700">
-            <div className="flex items-start">
+          <div key={notification.id} className="p-3 border-b border-gray-700 ">
+            <div className="flex items-start ">
               <div
                 className={`${notification.initialColor} w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold mr-3`}
               >
