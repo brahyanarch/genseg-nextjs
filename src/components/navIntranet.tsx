@@ -3,14 +3,16 @@ import {useState} from 'react'
 import { BellIcon, User, HelpCircle, LogOut , SearchIcon, Logs } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-const Icon = () => {
+import NavRoles from '@/components/ComponentsIntranet/roles'
+
+const MenuRoles = () => {
   return (
     <svg
-      width="10"
-      height="10"
+      width="6"
+      height="6"
       viewBox="0 0 23 23"
       xmlns="http://www.w3.org/2000/svg"
-      className="w-5 h-5 fill-current text-red-500" // Controla el tamaño y el color
+      className="w-4 h-4 fill-current text-white" // Controla el tamaño y el color
     >
       <path d="M2.875 5.75C4.46282 5.75 5.75 4.46282 5.75 2.875C5.75 1.28718 4.46282 0 2.875 0C1.28718 0 0 1.28718 0 2.875C0 4.46282 1.28718 5.75 2.875 5.75Z" />
       <path d="M2.875 14.375C4.46282 14.375 5.75 13.0878 5.75 11.5C5.75 9.91218 4.46282 8.625 2.875 8.625C1.28718 8.625 0 9.91218 0 11.5C0 13.0878 1.28718 14.375 2.875 14.375Z" />
@@ -140,31 +142,16 @@ export function Roles(){
     };
   return(
     <div >
-    <div>
-    <Logs  className="h-5 w-5 cursor-pointer" onClick={toggleProfileMenu} />
+    <div className="cursor-pointer" onClick={toggleProfileMenu} >
+     <MenuRoles/>
     </div>
     <div>
       {/* Ventana flotante de Roles */}
       {isProfileOpen && (
-        <div className="absolute text-white right-2 mt-2 bg-white rounded-lg shadow-lg h-[300px] w-[200px]">
-          <ul className="flex justify-between flex-wrap  py-2">
-            <li className="px-10 py-2 hover:bg-gray-100 cursor-pointer rounded-full w-50 h-50 bg-slate-400 hidden ">
-              Administrador General
-            </li>
-            <li className="px-10 py-2 hover:bg-gray-100 cursor-pointer rounded-full  w-80 h-80 bg-slate-400 hidden">
-              Sub Administrador
-            </li>
-            <li className="px-10 py-2 hover:bg-gray-100 cursor-pointer rounded-full  w-80 h-80 bg-slate-400 hidden">
-              Coordinador
-            </li>
-            <li className="px-10 py-2 hover:bg-gray-100 cursor-pointer rounded-full  w-80 h-80 bg-slate-400 hidden">
-              Coordinador
-            </li>
-            <li className="px-10 py-2 hover:bg-gray-100 cursor-pointer rounded-full  w-80 h-80 bg-slate-400 hidden">
-              Sub Coordinador
-            </li>
-          </ul>
+        <div  className="absolute right-10 top-10" >
+          <NavRoles  />
         </div>
+        
       )}
     </div>
     </div>

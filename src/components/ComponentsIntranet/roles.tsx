@@ -10,7 +10,7 @@ const roles = [
 
 export default function Roles() {
   return (
-    <Card className="w-[300px] bg-gray-900 text-white">
+    <div className="w-[300px] bg-gray-900 text-white rounded-lg">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">Roles</CardTitle>
       </CardHeader>
@@ -26,6 +26,6 @@ export default function Roles() {
           ))}
         </div>
       </CardContent>
-    </Card>
+    </div>
   )
 }
