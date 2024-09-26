@@ -204,8 +204,7 @@ export default function Component() {
       <Notificacion/>
       
        <Roles/>
-        <Perfil/>
-        
+      <Perfil/>
       </div>
     </nav>
   )
