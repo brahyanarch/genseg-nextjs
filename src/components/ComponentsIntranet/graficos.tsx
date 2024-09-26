@@ -153,7 +153,7 @@ export default function Component() {
   })
 
   return (
-    <Card className="w-[80%] mt-14 ">
+    <Card className="w-[90%] mt-14 ">
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
         <div className="grid flex-1 gap-1 text-center sm:text-left">
           <CardTitle>Area Chart - Interactive</CardTitle>
