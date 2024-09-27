@@ -183,7 +183,7 @@ export default function Component() {
     setIsProfileOpen(!isProfileOpen);
   };
   return (
-    <nav className="bg-gray-900 text-white p-2 flex items-center justify-between relative">
+    <nav className="bg-gray-900 fixed w-full z-40 text-white p-2 flex items-center justify-between top-0 right-0">
       <div className="flex items-center space-x-2">
         <img src="/resources/images/DPSEClogo.png" alt="Logo" className="h-9 w-9 rounded-full bg-white" />
         <div className="hidden md:block">

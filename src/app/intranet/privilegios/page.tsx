@@ -11,7 +11,7 @@ export default function AdmiGeneral(){
         <NavIntranet />
         <div  className="flex justify-between items-start" >
         <MenuIntranet />
-        <div className='w-[90%] flex flex-col justify-between items-center' >
+        <div className='w-[90%] flex flex-col justify-between items-center overflow-auto h-screen' >
         <Grafica />
         <GraficoInfo/>
         </div>

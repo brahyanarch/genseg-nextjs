@@ -120,7 +120,7 @@ export default function Dashboard() {
   const totalProjects = projectStatusData.reduce((sum, item) => sum + item.value, 0)
 
   return (
-    <div className="w-[90%] mt-4 bg-gray-900 min-h-screen p-8">
+    <div className="w-[90%] mt-4 bg-gray-900 h-auto p-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <ProjectCount count={totalProjects} />
         <ProjectStatusChart data={projectStatusData} />
