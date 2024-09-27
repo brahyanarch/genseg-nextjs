@@ -10,7 +10,7 @@ const roles = [
 
 export default function Roles() {
   return (
-    <div className="absolute right-2 top-12 w-[300px] bg-gray-900 text-white rounded-lg">
+    <div className="absolute right-2 z-10 top-12 w-[300px] bg-gray-900 text-white rounded-lg">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">Roles</CardTitle>
       </CardHeader>

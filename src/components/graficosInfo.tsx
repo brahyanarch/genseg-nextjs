@@ -20,9 +20,9 @@ const projectCompletionData = [
 //Contador de proyectos
 export function ProjectCount({ count }: { count: number }) {
   return (
-    <div className="bg-gray-800 p-6 rounded-lg">
+    <div className= " relative bg-gray-800 p-6 rounded-lg">
       <h2 className="text-gray-400 text-sm font-medium mb-2">Números de Proyectos</h2>
-      <p className="text-white text-5xl font-bold">{count}</p>
+      <p className="absolute text-white text-5xl top-[47%] left-[40%] font-bold">{count}</p>
     </div>
   )
 }
@@ -64,7 +64,7 @@ export function ProjectStatusChart({ data }: { data: ProjectStatus[] }) {
             />
           </PieChart>
         </ResponsiveContainer>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+        <div className="absolute top-[45%] left-[27%] text-center">
           <p className="text-white text-4xl font-bold">{percentage}%</p>
         </div>
       </div>
@@ -120,7 +120,7 @@ export default function Dashboard() {
   const totalProjects = projectStatusData.reduce((sum, item) => sum + item.value, 0)
 
   return (
-    <div className="w-[90%] bg-gray-900 min-h-screen p-8">
+    <div className="w-[90%] mt-4 bg-gray-900 min-h-screen p-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <ProjectCount count={totalProjects} />
         <ProjectStatusChart data={projectStatusData} />

@@ -88,7 +88,7 @@ export function Perfil() {
   }, []);
 
   return (
-    <div ref={profileMenuRef}>
+    <div ref={profileMenuRef} >
       {/* Botón de perfil */}
       <div
         className="text-sm font-bold text-gray-500 pt-1 text-center h-[30px] w-[30px] focus:outline-none rounded-[50%] bg-white cursor-pointer"
@@ -98,7 +98,7 @@ export function Perfil() {
       </div>
       <div>
         {isProfileOpen && (
-          <div className="absolute right-2 w-64 bg-gray-900 text-white p-4 rounded-lg">
+          <div className="absolute z-30 right-2 w-64 bg-gray-900 text-white p-4 rounded-lg">
             <div className="flex items-center mb-6">
               <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-xl font-bold mr-3">
                 M

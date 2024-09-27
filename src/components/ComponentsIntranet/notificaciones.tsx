@@ -43,7 +43,7 @@ const notifications = [
 
 export default function NotificationsComponent() {
   return (
-    <div className=" absolute right-2 top-10 w-80 max-w-md bg-gray-900 text-white rounded-lg shadow-lg ">
+    <div className=" z-20 absolute right-2 top-10 w-80 max-w-md bg-gray-900 text-white rounded-lg shadow-lg ">
       <div className="p-4 flex justify-between items-center border-b border-gray-700">
         <h2 className="text-lg font-semibold">Notificaciones</h2>
         <Button variant="link" className="text-blue-400 text-sm">
