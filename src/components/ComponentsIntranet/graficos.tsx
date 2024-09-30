@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
 import {
   Card,
@@ -228,6 +228,14 @@ export default function Component() {
       });
     }}
   />
+   <YAxis
+    tickLine={true} // Mostrar líneas de los ticks en el eje
+    axisLine={true} // Mostrar la línea del eje
+    tickMargin={10} // Margen entre las etiquetas y el eje
+    tickFormatter={(value) => {
+      return `${value}%`; // Formato del valor, puedes ajustarlo a tus necesidades
+    }}
+  />
   <ChartTooltip
     cursor={true}
     content={
@@ -239,6 +247,7 @@ export default function Component() {
           });
         }}
         indicator="dot"
+        className="bg-white/80"
       />
     }
   />
