@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Edit, Trash2, MoreVertical } from "lucide-react"
+import { Edit, Trash2, MoreVertical, CirclePlus } from "lucide-react"
 
 const users = [
   { id: 1, nombre: "Jose Roberto Mamani Zaa", rol: "Sub administrador", abreviatura: "JRMZ", estado: "Activo" },
@@ -10,28 +10,30 @@ const users = [
 
 export default function Component() {
   return (
-    <div className=" w-[90%] m-4 p-4 space-y-4 bg-gray-900 text-white min-h-screen">
-      <div className="flex justify-between items-center">
+    <div className=" w-[90%] m-4 p-4 space-y-4 text-white min-h-screen">
+      <div >
         <h1 className="text-2xl font-bold">Usuarios</h1>
-        <Button variant="secondary" size="sm">
-          nuevo
-        </Button>
       </div>
-      <Table>
+      <Button variant="secondary" size="sm" >
+      <CirclePlus className="h-4 w-4" />
+          nuevo
+      </Button>
+      <div className="bg-[#E3E6ED] rounded-lg ">
+      <Table className="w-[90%] mx-auto my-6">
         <TableHeader>
           <TableRow>
-            <TableHead className="w-16">ID</TableHead>
+            <TableHead className="w-16 border-l border-gray-900">ID</TableHead>
             <TableHead>Nombre</TableHead>
             <TableHead>Rol</TableHead>
             <TableHead>Abreviatura</TableHead>
             <TableHead>Estado</TableHead>
-            <TableHead className="w-24">Opciones</TableHead>
+            <TableHead className="w-24 border-r border-gray-900">Opciones</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody className="text-gray-900">
           {users.map((user) => (
             <TableRow key={user.id}>
-              <TableCell>{user.id}</TableCell>
+              <TableCell className="px-4 border-l border-gray-900">{user.id}</TableCell>
               <TableCell>{user.nombre}</TableCell>
               <TableCell>{user.rol}</TableCell>
               <TableCell>{user.abreviatura}</TableCell>
@@ -40,7 +42,7 @@ export default function Component() {
                   {user.estado}
                 </span>
               </TableCell>
-              <TableCell>
+              <TableCell className="border-r border-gray-900">
                 <div className="flex space-x-2">
                   <Button variant="ghost" size="icon">
                     <Edit className="h-4 w-4" />
@@ -57,6 +59,7 @@ export default function Component() {
           ))}
         </TableBody>
       </Table>
+      </div>
       <div className="flex justify-between items-center">
         <Button variant="outline" size="sm">
           Anterior

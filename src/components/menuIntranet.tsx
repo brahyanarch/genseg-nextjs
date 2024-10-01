@@ -2,7 +2,7 @@ import { HomeIcon, BellIcon, BarChartIcon, FolderIcon, FileIcon } from "lucide-r
 
 export default function Component() {
   return (
-    <div className="w-64 bg-gray-900 text-gray-100 h-screen p-4">
+    <div className="w-64 bg-[#222834] text-gray-100 h-screen p-4">
       <nav>
         <ul className="space-y-2">
           <MenuItem icon={<HomeIcon size={20} />} text="Principal" />

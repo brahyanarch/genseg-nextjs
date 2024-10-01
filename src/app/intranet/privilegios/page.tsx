@@ -10,7 +10,7 @@ import ConfiPermisos from '@/components/ComponentsIntranet/confiPermisos'
 import ConfiSunidad from '@/components/ComponentsIntranet/confiSunidad'
 export default function AdmiGeneral(){
     return(
-        <>
+        <div className="bg-[#0F111A]" >
         {/** <NavbarAdmi/> */}
         <NavIntranet />
         <div  className="flex justify-between items-start" >
@@ -25,6 +25,6 @@ export default function AdmiGeneral(){
         </div>
         
          </div>
-        </>
+        </div>
     )
 }
