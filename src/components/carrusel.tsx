@@ -7,7 +7,7 @@ export default function Carrusel() {
     //array images que almacena las direcciones de las images que aparecerán en el carrucel
     const images = [
     {
-      src: "/resources/images/42.png",
+      src: "/resources/images/7.jpg",
       alt: "First slide",
       heading: "GENSEG",
       description: "Dpsec",

@@ -21,7 +21,7 @@ const Login: React.FC = () => {
     setError(null); // Limpiar errores previos
 
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
+      const response = await fetch("http://localhost:3000/api/auth/login", {
         method: "POST", // Cambiado a POST para enviar los datos
         headers: {
           "Content-Type": "application/json",
