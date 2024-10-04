@@ -1,31 +1,44 @@
 'use client'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { X, Edit, Trash2, List, CirclePlus, ChevronsUpDown } from "lucide-react"
-import { useState } from 'react'
-
-const roles = [
-  { id: 1, nombre: "Sub administrador", abreviatura: "SubAdm" },
-  { id: 2, nombre: "Coordinador", abreviatura: "Coord" },
-  { id: 3, nombre: "Personal de planta", abreviatura: "PP" },
-  { id: 4, nombre: "Profesor", abreviatura: "Vol" },
-  { id: 5, nombre: "Voluntario", abreviatura: "Prof" },
-]
+import { Button } from "@/components/ui/button";
+import React, { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { X, Edit, Trash2, List, CirclePlus } from "lucide-react";
 
 // Modal para agregar un nuevo Rol
-export function EditModal({ isOpen, closeModal }:any) {
-  const [name, setName] = useState('')
-  const [abbreviation, setAbbreviation] = useState('')
+export const EditModal = ({ isOpen, closeModal }:any) => {
+  const [name, setName] = useState('');
+  const [abbreviation, setAbbreviation] = useState('');
 
-  const handleSubmit = (e:any) => {
-    e.preventDefault()
-    // Manejar la lógica de envío del formulario aquí
-    console.log('Submitted:', { name, abbreviation })
-    closeModal()
-  }
+  const handleSubmit = async (e:any) => {
+    e.preventDefault();
+    const newRole = {
+      n_rol: name,
+      abrev: abbreviation
+    };
 
-  if (!isOpen) return null
+    try {
+      const response = await fetch('http://localhost:3000/api/roles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newRole)
+      });
+
+      if (response.ok) {
+        console.log('Rol agregado correctamente');
+        closeModal();
+        // Puedes actualizar la lista de roles aquí si es necesario
+      } else {
+        console.error('Error al agregar el rol');
+      }
+    } catch (error) {
+      console.error('Error al conectar con la API:', error);
+    }
+  };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -83,14 +96,45 @@ export function EditModal({ isOpen, closeModal }:any) {
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default function Component() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+const Component = () => {
+  const [roles, setRoles] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // useEffect para obtener los roles desde la API al montar el componente
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/roles');
+        if (!response.ok) {
+          throw new Error('Error al obtener los roles');
+        }
+        const data = await response.json();
+        setRoles(data);
+      } catch (err:any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRoles();
+  }, []);
 
   const toggleModal = () => {
-    setIsModalOpen(!isModalOpen)
+    setIsModalOpen(!isModalOpen);
+  };
+
+  if (loading) {
+    return <p>Cargando roles...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
   }
 
   return (
@@ -116,11 +160,11 @@ export default function Component() {
             </TableRow>
           </TableHeader>
           <TableBody className="bg-[#FFFFFF] text-[#141824]">
-            {roles.map((role) => (
-              <TableRow key={role.id}>
-                <TableCell className="px-6 border-l border-gray-900">{role.id}</TableCell>
-                <TableCell>{role.nombre}</TableCell>
-                <TableCell>{role.abreviatura}</TableCell>
+            {roles.map((role:any) => (
+              <TableRow key={role.id_rol}>
+                <TableCell className="px-6 border-l border-gray-900">{role.id_rol}</TableCell>
+                <TableCell>{role.n_rol}</TableCell>
+                <TableCell>{role.abrev}</TableCell>
                 <TableCell className="px-2 border-r border-gray-900">
                   <div className="flex space-x-2">
                     <Button variant="ghost" size="icon">
@@ -149,8 +193,9 @@ export default function Component() {
         </Button>
       </div>
 
-      {/* Modal para agregar un nuevo rol */}
       <EditModal isOpen={isModalOpen} closeModal={toggleModal} />
     </div>
-  )
-}
+  );
+};
+
+export default Component;
