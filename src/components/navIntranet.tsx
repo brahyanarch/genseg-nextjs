@@ -8,10 +8,44 @@ import NavRoles from '@/components/ComponentsIntranet/roles'
 import Notificaciones from '@/components/ComponentsIntranet/notificaciones'
 
 interface ComponentProps {
-  nombreRol?: string;
-  nombreSubUnidad?: string;
+  idRol?: number;
+  idSubUnidad?: number;
+  dni?: string;
 }
 
+interface Rol {
+  dni: string;
+  n_usu: string;
+  estado: boolean;
+  id_rol: number;
+  id_subuni: number;
+}
+
+interface Roles {
+  roles: Rol[];
+}
+interface dni {
+  dni: string;
+}
+
+interface Role {
+  id_rol: number;
+  n_rol: string;
+  abrev: string;
+}
+
+interface Subunidad {
+  id_subuni: number;
+  n_subuni: string;
+  abreviatura: string;
+}
+
+interface RolesUser {
+  idRol?: number;
+  idSubUnidad?: number;
+  dni?: string;
+  roles?: Rol[]
+}
 
 const MenuRoles = () => {
   return (
@@ -143,10 +177,17 @@ export function Perfil() {
   );
 }
 
-export function Roles() {
+const rolesprueba = [
+  { dni: "75548237", n_usu: "david", estado:true, rol_id:"1", subunidad_id_subuni: "1"  },
+  { dni: "75548237", n_usu: "david", estado:true, rol_id:"1", subunidad_id_subuni: "1"  },
+  { dni: "75548237", n_usu: "david", estado:true, rol_id:"1", subunidad_id_subuni: "1"  },
+  { dni: "75548237", n_usu: "david", estado:true, rol_id:"1", subunidad_id_subuni: "1"  },
+]
+
+export function Roles({idRol, idSubUnidad, dni, roles}:RolesUser) {
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
   const rolesMenuRef = useRef<HTMLDivElement>(null);
-
+  
   // Función para alternar la visibilidad de la ventana flotante
   const toggleProfileMenu = () => {
     setIsProfileOpen(!isProfileOpen);
@@ -154,6 +195,7 @@ export function Roles() {
 
   // Cerrar el menú si el usuario hace clic fuera de él
   useEffect(() => {
+    
     const handleClickOutside = (event: MouseEvent) => {
       if (rolesMenuRef.current && !rolesMenuRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false);
@@ -170,22 +212,76 @@ export function Roles() {
     <div ref={rolesMenuRef}>
       {/* Botón que abre el menú de roles */}
       <div className="cursor-pointer" onClick={toggleProfileMenu}>
-        <MenuRoles />
+        <MenuRoles/>
       </div>
 
       {/* Ventana flotante de Roles */}
       {isProfileOpen && (
         
-          <NavRoles />
+          <NavRoles dni={dni} id_rolActive={idRol} id_subActive={idSubUnidad}  />
         
       )}
     </div>
   );
 }
 
-const Component: React.FC<ComponentProps> = ({ nombreRol = "nombreRol", nombreSubUnidad = "nombreSubUnidad"}) => {
+const Component: React.FC<ComponentProps> = ({ idRol = 1 , idSubUnidad = 1, dni = "75548237"}) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   
+  const [nomroles, setnomroles] = useState<Role[]>([]);
+  const [subunidades, setSubunidades] = useState<Subunidad[]>([]);
+  const [roles, setroles] = useState<Rol[]>([]);
+
+  const getRoleName = (rol_id: number) => {
+    const role = nomroles.find((r) => r.id_rol === rol_id);
+    return role ? role.n_rol : `Rol ${rol_id}`;
+  };
+
+  // Obtener el nombre de la subunidad por su ID
+  const getSubunidadName = (subunidad_id: number) => {
+    const subunidad = subunidades.find((s) => s.id_subuni === subunidad_id);
+    return subunidad ? subunidad.n_subuni : `Subunidad ${subunidad_id}`;
+  };
+
+  const fetchRoles = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/roles");
+      const data: Role[] = await response.json();
+      setnomroles(data);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
+
+  const fetchSubunidades = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/subunidad");
+      const data: Subunidad[] = await response.json();
+      setSubunidades(data);
+    } catch (error) {
+      console.error("Error fetching subunidades:", error);
+    }
+  };
+
+const fetchRoleswithDNI = async () => {
+  try {
+    const response = await fetch(`http://localhost:3000/api/roles/${dni}`);
+    let data: Rol[] = await response.json();
+    
+    setroles(data);
+    console.log(data, dni);
+  } catch (error) {
+    console.error("Error fetching roles:", error);
+  }
+};
+
+
+  useEffect(() => {
+    fetchRoles();
+    fetchSubunidades();
+    fetchRoleswithDNI();
+  }, []);
+
   // Función para alternar la visibilidad de la ventana flotante
   const toggleProfileMenu = () => {
     setIsProfileOpen(!isProfileOpen);
@@ -196,7 +292,7 @@ const Component: React.FC<ComponentProps> = ({ nombreRol = "nombreRol", nombreSu
         <img src="/resources/images/DPSEClogo.png" alt="Logo" className="h-9 w-9 rounded-full bg-white" />
         <div className="hidden md:block">
           <h1 className="text-sm font-semibold">Proyección Social y Extensión Cultural</h1>
-          <p className="text-xs text-gray-400">{nombreRol} de {nombreSubUnidad}</p>
+          <p className="text-xs text-gray-400">{getRoleName(idRol)} de {getSubunidadName(idSubUnidad)}</p>
         </div>
       </div>
         <div className="relative hidden md:block ">
@@ -211,7 +307,7 @@ const Component: React.FC<ComponentProps> = ({ nombreRol = "nombreRol", nombreSu
         
       <Notificacion/>
       
-       <Roles/>
+       <Roles dni={dni} idRol={idRol} idSubUnidad={idSubUnidad}/>
       <Perfil/>
       </div>
     </nav>

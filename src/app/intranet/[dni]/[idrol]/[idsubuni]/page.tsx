@@ -80,7 +80,7 @@ const PrivilegiosPage = () => {
       <h1>Rol ID: {getRoleName(idrolInt)}</h1>
       <h1>Subunidad ID: {getSubunidadName(idsubuniInt)}</h1>
 
-      <NavIntranet nombreRol={getRoleName(idrolInt)} nombreSubUnidad={getSubunidadName(idsubuniInt)}/>
+      <NavIntranet idRol={idrolInt} idSubUnidad={idsubuniInt}/>
     </div>
   );
 };

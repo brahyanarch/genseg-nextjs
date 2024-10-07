@@ -120,10 +120,10 @@ const RoleSelectionPage: React.FC = () => {
     }
   };
 
-  const handleRoleSelection = (rol_id: number, subunidad_id_subuni: number) => {
+  const handleRoleSelection = (dni: String, rol_id: number, subunidad_id_subuni: number) => {
     // Redirigir a la página seleccionada con el rol y subunidad elegidos
     console.log(rol_id, subunidad_id_subuni)
-    router.push(`/intranet/${rol_id}/${subunidad_id_subuni}`);
+    router.push(`/intranet/${dni}/${rol_id}/${subunidad_id_subuni}`);
   };
 
   // Obtener el nombre del rol por su ID
@@ -197,7 +197,7 @@ const RoleSelectionPage: React.FC = () => {
                 key={index}
                 title={getRoleName(user.rol_id)}
                 subtitle={getSubunidadName(user.subunidad_id_subuni)}
-                onClick={() => handleRoleSelection(user.rol_id, user.subunidad_id_subuni)}
+                onClick={() => handleRoleSelection(user.dni, user.rol_id, user.subunidad_id_subuni)}
               />
             ))}
           </div>

@@ -1,31 +1,132 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { UserIcon } from "lucide-react"
+"use client"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useEffect, useState } from "react";
 
-const roles = [
-  { name: "Sub Administrador", icon: "M" },
-  { name: "Coordinador PSEC", icon: "M" },
-  { name: "Personal de planta", icon: "M" },
-  { name: "Sub Administrador PSEC", icon: "M" },
-]
+interface Rol {
+  dni: string;
+  n_usu: string;
+  estado: boolean;
+  rol_id: number; // Cambio aquí
+  subunidad_id_subuni: number; // Cambio aquí
+}
 
-export default function Roles() {
+interface RolesProps {
+  id_rolActive?: number;
+  id_subActive?: number;
+  dni?: string;
+}
+
+interface Role {
+  id_rol: number;
+  n_rol: string;
+  abrev: string;
+}
+
+interface Subunidad {
+  id_subuni: number;
+  n_subuni: string;
+  abreviatura: string;
+}
+
+const Roles: React.FC<RolesProps> = ({ id_rolActive, id_subActive, dni }: RolesProps) => {
+  const [error, setError] = useState<string | null>(null);
+  const [nombreRoles, setNombreRoles] = useState<Role[]>([]);
+  const [subunidades, setSubunidades] = useState<Subunidad[]>([]);
+  const [rolesUser, setRolesUser] = useState<Rol[]>([]);
+
+  // Obtener el nombre del rol por su ID
+  const getRoleName = (rol_id: number) => {
+    const role = nombreRoles.find((r) => r.id_rol === rol_id);
+    return role ? role.n_rol : `Rol ${rol_id}`;
+  };
+
+  // Obtener el nombre de la subunidad por su ID
+  const getSubunidadName = (subunidad_id: number | undefined) => {
+    const subunidad = subunidades.find((s) => s.id_subuni === subunidad_id);
+    return subunidad ? subunidad.n_subuni : `Subunidad ${subunidad_id}`;
+  };
+
+  const fetchRoleswithDNI = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/roles/${dni}`);
+      const data: Rol[] = await response.json();
+      setRolesUser(data);
+      console.log("Data fetched:", data);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
+
+  const fetchRoles = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/roles");
+      const data: Role[] = await response.json();
+      setNombreRoles(data);
+    } catch (error) {
+      setError("Error fetching roles");
+      console.error("Error fetching roles:", error);
+    }
+  };
+
+  const fetchSubunidades = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/subunidad");
+      const data: Subunidad[] = await response.json();
+      setSubunidades(data);
+    } catch (error) {
+      setError("Error fetching subunidades");
+      console.error("Error fetching subunidades:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRoles();
+    fetchSubunidades();
+    fetchRoleswithDNI();
+  }, []);
+
   return (
     <div className="absolute right-2 z-10 top-12 w-[300px] bg-gray-900 text-white rounded-lg">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">Roles</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 gap-2">
-          {roles.map((role, index) => (
-            <div key={index} className="flex flex-col items-center p-2 bg-gray-800 rounded-lg">
-              <div className="w-8 h-8 bg-green-700 rounded-full flex items-center justify-center mb-2">
-                <span className="text-sm font-bold">{role.icon}</span>
-              </div>
-              <span className="text-xs text-center">{role.name}</span>
-            </div>
-          ))}
-        </div>
+        {error ? (
+          <div className="text-red-500">Error: {error}</div>
+        ) : (
+          <div className="grid grid-cols-2 gap-2">
+            {rolesUser?.map((role, index) => {
+              const isActive =
+                role.rol_id === id_rolActive && role.subunidad_id_subuni === id_subActive;
+              
+              return (
+                <div
+                  key={index}
+                  className={`flex flex-col items-center p-2 ${
+                    isActive
+                      ? "bg-gray-800 hover:bg-slate-600 hover:text-slate-500 text-white cursor-default" // Estilo para el activo
+                      : "bg-gray-800 hover:bg-gray-700 cursor-pointer" // Estilo para los que se pueden hacer clic
+                  } rounded-lg`}
+                >
+                  <div
+                    className={`w-8 h-8 ${
+                      isActive ? "bg-yellow-500" : "bg-green-700"
+                    } rounded-full flex items-center justify-center mb-2`}
+                  >
+                    <span className="text-sm font-bold">M</span>
+                  </div>
+                  <span className="text-xs text-center">
+                    {getSubunidadName(role.subunidad_id_subuni)}
+                  </span>
+                  <span className="text-xs text-center">{getRoleName(role.rol_id)}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </CardContent>
     </div>
-  )
-}
+  );
+};
+
+export default Roles;
