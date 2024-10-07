@@ -7,6 +7,12 @@ import { Button } from "@/components/ui/button"
 import NavRoles from '@/components/ComponentsIntranet/roles'
 import Notificaciones from '@/components/ComponentsIntranet/notificaciones'
 
+interface ComponentProps {
+  nombreRol?: string;
+  nombreSubUnidad?: string;
+}
+
+
 const MenuRoles = () => {
   return (
     <svg
@@ -176,7 +182,8 @@ export function Roles() {
     </div>
   );
 }
-export default function Component() {
+
+const Component: React.FC<ComponentProps> = ({ nombreRol = "nombreRol", nombreSubUnidad = "nombreSubUnidad"}) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   
   // Función para alternar la visibilidad de la ventana flotante
@@ -189,7 +196,7 @@ export default function Component() {
         <img src="/resources/images/DPSEClogo.png" alt="Logo" className="h-9 w-9 rounded-full bg-white" />
         <div className="hidden md:block">
           <h1 className="text-sm font-semibold">Proyección Social y Extensión Cultural</h1>
-          <p className="text-xs text-gray-400">Coordinador</p>
+          <p className="text-xs text-gray-400">{nombreRol} de {nombreSubUnidad}</p>
         </div>
       </div>
         <div className="relative hidden md:block ">
@@ -210,3 +217,5 @@ export default function Component() {
     </nav>
   )
 }
+
+export default Component;

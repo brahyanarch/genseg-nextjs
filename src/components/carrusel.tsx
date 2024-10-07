@@ -7,24 +7,24 @@ export default function Carrusel() {
     //array images que almacena las direcciones de las images que aparecerán en el carrucel
     const images = [
     {
-      src: "/resources/images/7.jpg",
+      src: "/resources/images/fb1.jpg",
       alt: "First slide",
       heading: "GENSEG",
       description: "Dpsec",
     },
     {
-      src: "/resources/images/9.jpg",
+      src: "/resources/images/fb2.jpg",
       alt: "Second slide",
       heading: "Gestion Ambiental",
       description: "Evidencia de la actividad de la que nosotros nos encontramos con todos",
     },
     {
-      src: "/resources/images/FondoP1.png",
+      src: "/resources/images/fb3.jpg",
       alt: "Third slide",
       heading: "Seguimiento al egresado",
     },
     {
-      src: "/resources/images/FondoP.png",
+      src: "/resources/images/fb4.jpg",
       alt: "Fourth slide",
       heading: "Proyección Social y Extensión Cultural",
       description: "Evidencia de las que no estamos, y sobre todo el respeto",

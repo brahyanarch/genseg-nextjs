@@ -1,49 +1,117 @@
 "use client";
-import React, { useState, FormEvent } from "react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { LockIcon, UserIcon } from "lucide-react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+
+interface User {
+  dni: string;
+  rol_id: number;
+  subunidad_id_subuni: number;
+}
 
 interface LoginResponse {
   token: string;
+  users: User[];
+  message: string;
   error?: string;
 }
 
-const Login: React.FC = () => {
+interface Role {
+  id_rol: number;
+  n_rol: string;
+  abrev: string;
+}
+
+interface Subunidad {
+  id_subuni: number;
+  n_subuni: string;
+  abreviatura: string;
+}
+
+interface RoleProps {
+  title: string;
+  subtitle: string;
+  onClick: () => void; // Añadir esta propiedad
+}
+
+function RoleCard({ title, subtitle, onClick }: RoleProps) {
+  return (
+    <Card
+      className="w-48 h-48 bg-gray-900 text-white flex flex-col items-center justify-center cursor-pointer hover:bg-slate-700"
+      onClick={onClick} // Maneja el evento onClick
+    >
+      <CardContent className="text-center p-4">
+        <div className="text-4xl font-bold text-green-500 mb-4">M</div>
+        <div className="text-sm">{title}</div>
+        <div className="text-blue-400 text-xs mt-1">{subtitle}</div>
+      </CardContent>
+    </Card>
+  );
+}
+
+const RoleSelectionPage: React.FC = () => {
   const [usuario, setUsuario] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter(); // Inicializar el hook useRouter
-  const handleSubmit = async (e: FormEvent) => {
+  const [userRoles, setUserRoles] = useState<User[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [subunidades, setSubunidades] = useState<Subunidad[]>([]);
+  const router = useRouter();
+
+  // Fetch roles y subunidades cuando se carga la página
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/roles");
+        const data: Role[] = await response.json();
+        setRoles(data);
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+      }
+    };
+
+    const fetchSubunidades = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/subunidad");
+        const data: Subunidad[] = await response.json();
+        setSubunidades(data);
+      } catch (error) {
+        console.error("Error fetching subunidades:", error);
+      }
+    };
+
+    fetchRoles();
+    fetchSubunidades();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null); // Limpiar errores previos
 
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
-        method: "POST", // Cambiado a POST para enviar los datos
+      const response = await fetch("http://localhost:3000/api/auth/login", {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           usuario: usuario,
           password: password,
-        }), // Aquí se envían el usuario y la contraseña
+        }),
       });
 
       const data: LoginResponse = await response.json();
       console.log(data.token);
 
       if (response.ok) {
-        // Si el inicio de sesión es exitoso, guarda el token en localStorage
+        // Guarda el token en localStorage
         localStorage.setItem("token", data.token);
         console.log("Inicio de sesión exitoso");
 
-        // Redirigir a otra página después del inicio de sesión exitoso
-        router.push("/intranet/privilegios"); // Reemplaza '/dashboard' con la ruta que desees
+        // Actualiza la lista de roles y subunidades del usuario
+        setUserRoles(data.users);
       } else {
-        // Manejar errores de respuesta
         setError(data.error || "Error al iniciar sesión");
       }
     } catch (error) {
@@ -52,85 +120,91 @@ const Login: React.FC = () => {
     }
   };
 
+  const handleRoleSelection = (rol_id: number, subunidad_id_subuni: number) => {
+    // Redirigir a la página seleccionada con el rol y subunidad elegidos
+    console.log(rol_id, subunidad_id_subuni)
+    router.push(`/intranet/${rol_id}/${subunidad_id_subuni}`);
+  };
+
+  // Obtener el nombre del rol por su ID
+  const getRoleName = (rol_id: number) => {
+    const role = roles.find((r) => r.id_rol === rol_id);
+    return role ? role.n_rol : `Rol ${rol_id}`;
+  };
+
+  // Obtener el nombre de la subunidad por su ID
+  const getSubunidadName = (subunidad_id: number) => {
+    const subunidad = subunidades.find((s) => s.id_subuni === subunidad_id);
+    return subunidad ? subunidad.n_subuni : `Subunidad ${subunidad_id}`;
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-gray-300">
-      <div className="w-full max-w-md space-y-8">
-        <div className="flex flex-col items-center ">
-          <div className="bg-white rounded-full">
-            <img
-              alt="Logo"
-              className="h-24 w-24"
-              src="/resources/images/DPSEClogo.png"
-            />
+      {userRoles.length === 0 ? (
+        // Si no hay roles todavía, mostrar el formulario de inicio de sesión
+        <div className="w-full max-w-md space-y-8">
+          <div className="flex flex-col items-center ">
+            <div className="bg-white rounded-full">
+              <img
+                alt="Logo"
+                className="h-24 w-24"
+                src="/resources/images/DPSEClogo.png"
+              />
+            </div>
+            <h2 className="mt-6 text-3xl font-bold">INICIAR SESIÓN</h2>
           </div>
-
-          <h2 className="mt-6 text-3xl font-bold">INICIAR SESIÓN</h2>
+          <hr />
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-4 rounded-md shadow-sm">
+              <div>
+                <label htmlFor="cuenta" className="sr-only">Cuenta</label>
+                <div className="relative">
+                  <input
+                    id="cuenta"
+                    type="text"
+                    required
+                    onChange={(e) => setUsuario(e.target.value)}
+                    className="appearance-none rounded-md w-full px-3 py-2 pl-10 border border-gray-700 placeholder-gray-500 text-white bg-gray-800"
+                    placeholder="Nombre de usuario"
+                  />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="password" className="sr-only">Contraseña</label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type="password"
+                    required
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="appearance-none rounded-md w-full px-3 py-2 pl-10 border border-gray-700 placeholder-gray-500 text-white bg-gray-800"
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
+            </div>
+            <Button type="submit" className="w-full py-2 bg-blue-600">Iniciar Sesión</Button>
+          </form>
+          {error && <p style={{ color: "red" }}>{error}</p>}
         </div>
-        <hr />
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4 rounded-md shadow-sm">
-            <div>
-              <label htmlFor="cuenta" className="sr-only">
-                Cuenta
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <UserIcon className="h-5 w-5 text-gray-400" />
-                </div>
-                <Input
-                  id="cuenta"
-                  name="cuenta"
-                  type="text"
-                  required
-                  onChange={(e) => setUsuario(e.target.value)}
-                  className="appearance-none rounded-md relative block w-full px-3 py-2 pl-10 border border-gray-700 placeholder-gray-500 text-white bg-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                  placeholder="Annette Black"
-                />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Contraseña
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <LockIcon className="h-5 w-5 text-gray-400" />
-                </div>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="appearance-none rounded-md relative block w-full px-3 py-2 pl-10 border border-gray-700 placeholder-gray-500 text-white bg-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                  placeholder="••••••••"
-                />
-              </div>
-            </div>
+      ) : (
+        // Si ya hay roles disponibles, mostrar las opciones en RoleCard
+        <div className="w-full max-w-md space-y-8">
+          <h2 className="text-2xl font-bold">Selecciona un Rol y Subunidad</h2>
+          <div className="grid grid-cols-3 gap-4 m-[-80px]">
+            {userRoles.map((user, index) => (
+              <RoleCard
+                key={index}
+                title={getRoleName(user.rol_id)}
+                subtitle={getSubunidadName(user.subunidad_id_subuni)}
+                onClick={() => handleRoleSelection(user.rol_id, user.subunidad_id_subuni)}
+              />
+            ))}
           </div>
-          <div className="flex items-center">
-            <Checkbox
-              id="remember"
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-700 rounded bg-gray-800"
-            />
-            <label
-              htmlFor="remember"
-              className="ml-2 block text-sm text-gray-400"
-            >
-              Recordar contraseña
-            </label>
-          </div>
-          <Button
-            type="submit"
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            Iniciar Sesión
-          </Button>
-        </form>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-      </div>
+        </div>
+      )}
     </div>
   );
-}
+};
 
-export default Login;
+export default RoleSelectionPage;
