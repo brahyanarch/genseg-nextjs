@@ -1,6 +1,8 @@
-"use client"
+"use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React, { useEffect, useState } from "react";
+//import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface Rol {
   dni: string;
@@ -28,12 +30,16 @@ interface Subunidad {
   abreviatura: string;
 }
 
-const Roles: React.FC<RolesProps> = ({ id_rolActive, id_subActive, dni }: RolesProps) => {
+const Roles: React.FC<RolesProps> = ({
+  id_rolActive,
+  id_subActive,
+  dni,
+}: RolesProps) => {
   const [error, setError] = useState<string | null>(null);
   const [nombreRoles, setNombreRoles] = useState<Role[]>([]);
   const [subunidades, setSubunidades] = useState<Subunidad[]>([]);
   const [rolesUser, setRolesUser] = useState<Rol[]>([]);
-
+  const router = useRouter();
   // Obtener el nombre del rol por su ID
   const getRoleName = (rol_id: number) => {
     const role = nombreRoles.find((r) => r.id_rol === rol_id);
@@ -78,6 +84,16 @@ const Roles: React.FC<RolesProps> = ({ id_rolActive, id_subActive, dni }: RolesP
       console.error("Error fetching subunidades:", error);
     }
   };
+  // Función para manejar el clic en los roles (excepto el activo)
+  const handleClick = (role: Rol) => {
+    if (
+      role.rol_id === id_rolActive &&
+      role.subunidad_id_subuni === id_subActive
+    )
+      return;
+    // Redirigir a otra página (puedes ajustar la ruta según tu estructura)
+    router.push(`/intranet/${dni}/${role.rol_id}/${role.subunidad_id_subuni}`);
+  };
 
   useEffect(() => {
     fetchRoles();
@@ -97,11 +113,13 @@ const Roles: React.FC<RolesProps> = ({ id_rolActive, id_subActive, dni }: RolesP
           <div className="grid grid-cols-2 gap-2">
             {rolesUser?.map((role, index) => {
               const isActive =
-                role.rol_id === id_rolActive && role.subunidad_id_subuni === id_subActive;
-              
+                role.rol_id === id_rolActive &&
+                role.subunidad_id_subuni === id_subActive;
+
               return (
                 <div
                   key={index}
+                  onClick={() => handleClick(role)}
                   className={`flex flex-col items-center p-2 ${
                     isActive
                       ? "bg-gray-800 hover:bg-slate-600 hover:text-slate-500 text-white cursor-default" // Estilo para el activo
@@ -115,10 +133,12 @@ const Roles: React.FC<RolesProps> = ({ id_rolActive, id_subActive, dni }: RolesP
                   >
                     <span className="text-sm font-bold">M</span>
                   </div>
-                  <span className="text-xs text-center">
+                  <span className="text-xs text-center text-blue-700">
                     {getSubunidadName(role.subunidad_id_subuni)}
                   </span>
-                  <span className="text-xs text-center">{getRoleName(role.rol_id)}</span>
+                  <span className="text-xs text-center">
+                    {getRoleName(role.rol_id)}
+                  </span>
                 </div>
               );
             })}

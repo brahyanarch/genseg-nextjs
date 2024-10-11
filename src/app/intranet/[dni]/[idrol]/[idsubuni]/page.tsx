@@ -9,13 +9,13 @@ interface Role {
     id_rol: number;
     n_rol: string;
     abrev: string;
-  }
+}
   
-  interface Subunidad {
+interface Subunidad {
     id_subuni: number;
     n_subuni: string;
     abreviatura: string;
-  }
+}
 
 const PrivilegiosPage = () => {
   const [error, setError] = useState<string | null>(null);
@@ -23,9 +23,9 @@ const PrivilegiosPage = () => {
   const [subunidades, setSubunidades] = useState<Subunidad[]>([]);
   const router = useRouter();
   // Obtener los parámetros de la URL: idrol e idsubuni
-  const { idrol, idsubuni } = useParams();
+  const { idrol, idsubuni, dni } = useParams();
   const [isClient, setIsClient] = useState(false);
-
+  
   const getRoleName = (rol_id: number) => {
     const role = roles.find((r) => r.id_rol === rol_id);
     return role ? role.n_rol : `Rol ${rol_id}`;
@@ -80,7 +80,7 @@ const PrivilegiosPage = () => {
       <h1>Rol ID: {getRoleName(idrolInt)}</h1>
       <h1>Subunidad ID: {getSubunidadName(idsubuniInt)}</h1>
 
-      <NavIntranet idRol={idrolInt} idSubUnidad={idsubuniInt}/>
+      <NavIntranet idRol={idrolInt} idSubUnidad={idsubuniInt} dni={dni.toString()} />
     </div>
   );
 };
