@@ -3,29 +3,30 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from 'next/navigation';
 import NavIntranet from "@/components/navIntranet";
-
+import { API_ROLES, API_SUBUNIDADES } from "@/config/apiconfig";
 
 interface Role {
-    id_rol: number;
-    n_rol: string;
-    abrev: string;
+  id_rol: number;
+  n_rol: string;
+  abrev: string;
 }
-  
+
 interface Subunidad {
-    id_subuni: number;
-    n_subuni: string;
-    abreviatura: string;
+  id_subuni: number;
+  n_subuni: string;
+  abreviatura: string;
 }
 
 const PrivilegiosPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
   const [subunidades, setSubunidades] = useState<Subunidad[]>([]);
-  const router = useRouter();
-  // Obtener los parámetros de la URL: idrol e idsubuni
-  const { idrol, idsubuni, dni } = useParams();
   const [isClient, setIsClient] = useState(false);
   
+  // Obtener los parámetros de la URL: idrol, idsubuni, dni
+  const { idrol, idsubuni, dni } = useParams();
+
+  // Obtener el nombre del rol por su ID
   const getRoleName = (rol_id: number) => {
     const role = roles.find((r) => r.id_rol === rol_id);
     return role ? role.n_rol : `Rol ${rol_id}`;
@@ -36,30 +37,33 @@ const PrivilegiosPage = () => {
     const subunidad = subunidades.find((s) => s.id_subuni === subunidad_id);
     return subunidad ? subunidad.n_subuni : `Subunidad ${subunidad_id}`;
   };
-  
+
+  // Fetch de roles y subunidades
   useEffect(() => {
-    const fetchRoles = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/roles");
-        const data: Role[] = await response.json();
-        setRoles(data);
+        // Fetch roles
+        const [rolesResponse, subunidadesResponse] = await Promise.all([
+          fetch(API_ROLES),
+          fetch(API_SUBUNIDADES),
+        ]);
+
+        if (!rolesResponse.ok || !subunidadesResponse.ok) {
+          throw new Error("Error fetching data");
+        }
+
+        const rolesData: Role[] = await rolesResponse.json();
+        const subunidadesData: Subunidad[] = await subunidadesResponse.json();
+
+        setRoles(rolesData);
+        setSubunidades(subunidadesData);
       } catch (error) {
-        console.error("Error fetching roles:", error);
+        setError("Ocurrió un error al cargar los datos. Por favor, intenta de nuevo.");
+        console.error("Error fetching data:", error);
       }
     };
 
-    const fetchSubunidades = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/api/subunidad");
-        const data: Subunidad[] = await response.json();
-        setSubunidades(data);
-      } catch (error) {
-        console.error("Error fetching subunidades:", error);
-      }
-    };
-
-    fetchRoles();
-    fetchSubunidades();
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -67,20 +71,24 @@ const PrivilegiosPage = () => {
     setIsClient(true);
   }, []);
 
-  if (!isClient) {
-    return null; // No renderiza nada en el servidor
+  // Validación de cliente para evitar el renderizado en el servidor
+  if (!isClient) return null;
+
+  // Validar que DNI esté disponible antes de usarlo
+  if (!dni) {
+    setError("El DNI no está disponible.");
+    return <p>{error}</p>;
   }
-  const idrolInt = +idrol;
-  const idsubuniInt = +idsubuni;
 
   return (
     <div>
-      <h1>Privilegios</h1>
-      {/* Imprimir idrol y idsubuni en h1 */}
-      <h1>Rol ID: {getRoleName(idrolInt)}</h1>
-      <h1>Subunidad ID: {getSubunidadName(idsubuniInt)}</h1>
-
-      <NavIntranet idRol={idrolInt} idSubUnidad={idsubuniInt} dni={dni.toString()} />
+      {error ? (
+        <p>{error}</p>
+      ) : (
+        <>
+          <NavIntranet idRol={Number(idrol)} idSubUnidad={Number(idsubuni)} dni={dni.toString()} />
+        </>
+      )}
     </div>
   );
 };

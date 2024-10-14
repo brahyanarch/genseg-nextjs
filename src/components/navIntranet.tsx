@@ -4,8 +4,11 @@ import Link from 'next/link'
 import { BellIcon, User, HelpCircle, LogOut , SearchIcon, Logs } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton";
 import NavRoles from '@/components/ComponentsIntranet/roles'
 import Notificaciones from '@/components/ComponentsIntranet/notificaciones'
+import { API_ROLES, API_SUBUNIDADES, apiRolesWithDni, API_ROLES_WITH_DNI } from "@/config/apiconfig";
+
 
 interface ComponentProps {
   idRol?: number;
@@ -234,18 +237,29 @@ const Component: React.FC<ComponentProps> = ({ idRol = 1 , idSubUnidad = 1, dni 
 
   const getRoleName = (rol_id: number) => {
     const role = nomroles.find((r) => r.id_rol === rol_id);
-    return role ? role.n_rol : `Rol ${rol_id}`;
-  };
+    //return role ? role.n_rol : `Rol ${rol_id}`; // poner esqueleton
+    return role ? role.n_rol : (
+
+      <div className="flex">
+              <Skeleton className="h-4 w-full bg-slate-700 " />
+      </div>
+    );
+  }; 
 
   // Obtener el nombre de la subunidad por su ID
   const getSubunidadName = (subunidad_id: number) => {
     const subunidad = subunidades.find((s) => s.id_subuni === subunidad_id);
-    return subunidad ? subunidad.n_subuni : `Subunidad ${subunidad_id}`;
+    //return subunidad ? subunidad.n_subuni : `Subunidad ${subunidad_id}`;
+    return subunidad ? subunidad.n_subuni : (
+      <div className="flex-auto">
+        <Skeleton className="h-4 w-full bg-slate-700" />
+      </div>
+    );
   };
 
   const fetchRoles = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/roles");
+      const response = await fetch(API_ROLES);
       const data: Role[] = await response.json();
       setnomroles(data);
     } catch (error) {
@@ -255,7 +269,7 @@ const Component: React.FC<ComponentProps> = ({ idRol = 1 , idSubUnidad = 1, dni 
 
   const fetchSubunidades = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/subunidad");
+      const response = await fetch(API_SUBUNIDADES);
       const data: Subunidad[] = await response.json();
       setSubunidades(data);
     } catch (error) {
@@ -265,7 +279,8 @@ const Component: React.FC<ComponentProps> = ({ idRol = 1 , idSubUnidad = 1, dni 
 
 const fetchRoleswithDNI = async () => {
   try {
-    const response = await fetch(`http://localhost:3000/api/roles/${dni}`);
+    //const response = await fetch(`http://localhost:3000/api/roles/${dni}`);
+    const response = await fetch(apiRolesWithDni(API_ROLES_WITH_DNI, dni));
     let data: Rol[] = await response.json();
     
     setroles(data);
@@ -292,7 +307,7 @@ const fetchRoleswithDNI = async () => {
         <img src="/resources/images/DPSEClogo.png" alt="Logo" className="h-9 w-9 rounded-full bg-white" />
         <div className="hidden md:block">
           <h1 className="text-sm font-semibold">Proyección Social y Extensión Cultural</h1>
-          <p className="text-xs text-gray-400">{getRoleName(idRol)} de {getSubunidadName(idSubUnidad)}</p>
+          <p className="text-xs text-gray-400 flex-row">{getRoleName(idRol)} de {getSubunidadName(idSubUnidad)}</p>
         </div>
       </div>
         <div className="relative hidden md:block ">

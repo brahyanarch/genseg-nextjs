@@ -1,8 +1,15 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React, { useEffect, useState } from "react";
+import {Skeleton} from "@/components/ui/skeleton"
 //import { useRouter } from "next/router";
 import { useRouter } from "next/navigation";
+import {
+  API_ROLES_WITH_DNI,
+  apiRolesWithDni,
+  API_ROLES,
+  API_SUBUNIDADES,
+} from "@/config/apiconfig";
 
 interface Rol {
   dni: string;
@@ -43,7 +50,10 @@ const Roles: React.FC<RolesProps> = ({
   // Obtener el nombre del rol por su ID
   const getRoleName = (rol_id: number) => {
     const role = nombreRoles.find((r) => r.id_rol === rol_id);
-    return role ? role.n_rol : `Rol ${rol_id}`;
+    //return role ? role.n_rol : `Rol ${rol_id}`;
+    return role ? role?.n_rol : (<div className="">
+              <Skeleton className="h-4 w-full bg-slate-700" />
+    </div>)
   };
 
   // Obtener el nombre de la subunidad por su ID
@@ -51,10 +61,11 @@ const Roles: React.FC<RolesProps> = ({
     const subunidad = subunidades.find((s) => s.id_subuni === subunidad_id);
     return subunidad ? subunidad.n_subuni : `Subunidad ${subunidad_id}`;
   };
-
+  console.log(dni);
   const fetchRoleswithDNI = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/roles/${dni}`);
+      console.log(apiRolesWithDni(API_ROLES_WITH_DNI, dni));
+      const response = await fetch(apiRolesWithDni(API_ROLES_WITH_DNI, dni));
       const data: Rol[] = await response.json();
       setRolesUser(data);
       console.log("Data fetched:", data);
@@ -65,7 +76,7 @@ const Roles: React.FC<RolesProps> = ({
 
   const fetchRoles = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/roles");
+      const response = await fetch(API_ROLES);
       const data: Role[] = await response.json();
       setNombreRoles(data);
     } catch (error) {
@@ -76,7 +87,7 @@ const Roles: React.FC<RolesProps> = ({
 
   const fetchSubunidades = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/subunidad");
+      const response = await fetch(API_SUBUNIDADES);
       const data: Subunidad[] = await response.json();
       setSubunidades(data);
     } catch (error) {

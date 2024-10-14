@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { API_ROLES, API_SUBUNIDADES,API_LOGIN } from "@/config/apiconfig";
 
 interface User {
   dni: string;
@@ -63,7 +64,7 @@ const RoleSelectionPage: React.FC = () => {
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/roles");
+        const response = await fetch(API_ROLES);
         const data: Role[] = await response.json();
         setRoles(data);
       } catch (error) {
@@ -73,7 +74,7 @@ const RoleSelectionPage: React.FC = () => {
 
     const fetchSubunidades = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/subunidad");
+        const response = await fetch(API_SUBUNIDADES);
         const data: Subunidad[] = await response.json();
         setSubunidades(data);
       } catch (error) {
@@ -90,7 +91,7 @@ const RoleSelectionPage: React.FC = () => {
     setError(null); // Limpiar errores previos
 
     try {
-      const response = await fetch("http://localhost:3000/api/auth/login", {
+      const response = await fetch(API_LOGIN, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
