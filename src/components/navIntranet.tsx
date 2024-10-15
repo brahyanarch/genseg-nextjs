@@ -170,7 +170,7 @@ export function Perfil() {
             <div className="mt-6">
               <Button variant="secondary" className="w-full bg-gray-800 hover:bg-gray-700 text-white">
                 <LogOut className="mr-2 h-4 w-4" />
-                <Link href='/intranet/'>Cerrar Sesión</Link> 
+                <Link href='/'>Cerrar Sesión</Link> 
               </Button>
             </div>
           </div>

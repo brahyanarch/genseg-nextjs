@@ -1,59 +1,87 @@
 //importando recursos
 
+"use client"
 import { useState } from 'react';
+//import * as React from "react"
+import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
-export function Dropdown(){
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState('Select an option');
+interface comboValores {
+  value: String;
+  label: String;
+}
+interface vectorComboValores {
+  data: comboValores[];
+}
 
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const handleOptionClick = (option:any) => {
-    setSelectedOption(option);
-    setIsOpen(false);
-  };
+// Componente de demostración de Combobox
+function ComboboxDemo({data}:vectorComboValores) {
+  const [open, setOpen] = useState(false)
+  const [value, setValue] = useState("")
 
   return (
-    <div className="relative w-60 mx-5 my-5">
-      {/* Dropdown Button */}
-      <div
-        onClick={toggleDropdown}
-        className="px-4 py-2 border text-sm text-gray-400 border-gray-300 rounded-md cursor-pointer bg-white"
-      >
-        {selectedOption}
-      </div>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-[200px] justify-between"
+        >
+          {value
+            ? data.find((data) => data.value === value)?.label
+            : data[0].label.toString() }
+          <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[200px] p-0">
+        <Command>
+          <CommandList>
+            
+            <CommandEmpty>No se encontró ningún framework.</CommandEmpty>
+            <CommandGroup>
+              {data.map((framework, index) => (
+                <CommandItem
+                  key={index}
+                  value={framework.value.toString()}
+                  onSelect={(currentValue) => {
+                    setValue(currentValue === value ? "" : currentValue)
+                    setOpen(false)
+                  }}
+                >
+                  {framework.label}
+                  <CheckIcon
+                    className={cn(
+                      "ml-auto h-4 w-4",
+                      value === framework.value ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  )
+}
 
-      {/* Dropdown Options */}
-      {isOpen && (
-        <ul className="absolute left-0 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg z-10 max-h-40 overflow-y-auto text-sm">
-          <li
-            onClick={() => handleOptionClick('Gestión Ambiental')}
-            className="px-4 py-2 cursor-pointer hover:bg-gray-100"
-          >
-            Gestión Ambiental
-          </li>
-          <li
-            onClick={() => handleOptionClick('Seguimiento al Egresado')}
-            className="px-4 py-2 cursor-pointer hover:bg-gray-100"
-          >
-            Seguimiento al Egresado
-          </li>
-          <li
-            onClick={() => handleOptionClick('Proyección Social y Extensión Cultural')}
-            className="px-4 py-2 cursor-pointer hover:bg-gray-100 "
-          >
-            Proyección Social y Extensión Cultural
-          </li>
-        </ul>
-      )}
-    </div>
-  );
-};
-
-
-export default function ObtenerCertificado() {
+//const PrivilegiosPage = () => {
+const ObtenerCertificado = ({data}:vectorComboValores) => {
     return (
       <>
         <div className="bg-gray-300 gap-4 text-gray-800 flex flex-col justify-center items-center mx-auto my-[50px] p-8 rounded-lg shadow-lg w-4/5">
@@ -63,7 +91,8 @@ export default function ObtenerCertificado() {
           </p>
           <div className="flex justify-between items-center w-[90%]  mb-4">
             <h3 className="text-lg">Digite su código de estudiante:</h3>
-            <Dropdown/>
+            {/*<ComboboxDemo {data} />*/}
+            <ComboboxDemo data={data} />
             <div className="flex space-x-4">
               <input
                 type="text"
@@ -87,3 +116,4 @@ export default function ObtenerCertificado() {
     );
   }
   
+export default ObtenerCertificado;
