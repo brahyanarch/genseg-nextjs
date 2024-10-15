@@ -1,4 +1,5 @@
 import Image  from "next/image";
+import { Facebook, Twitter, NotepadText } from "lucide-react";
 
 // components/Footer.js
 export default function Footer() {
@@ -33,10 +34,10 @@ export default function Footer() {
             {/* Mantente Conectado */}
             <div className="w-auto md:w-[15%] mb-6 md:mb-0">
               <h4 className="font-bold text-lg mb-2 text-gray-800">Mantente Conectado</h4>
-              <ul className="text-sm text-gray-500 font-medium">
-                <li className="mb-1"><a href="#" className="hover:text-blue-500">Blogs</a></li>
-                <li className="mb-1"><a href="https://www.facebook.com/profile.php?id=100071137256988" className="hover:text-blue-500">Facebook</a></li>
-                <li><a href="#" className="hover:text-blue-500">Twitter</a></li>
+              <ul className="text-sm text-gray-500 font-medium ">
+                <li className="mb-1"><a href="#" className="hover:text-blue-500 flex"><NotepadText />Blogs</a></li>
+                <li className="mb-1"><a href="https://www.facebook.com/profile.php?id=100071137256988" className="hover:text-blue-500 flex "> <Facebook /> Facebook</a></li>
+                <li><a href="#" className="hover:text-blue-500 flex"> <Twitter />Twitter</a></li>
               </ul>
             </div>
   

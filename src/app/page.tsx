@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import { Menu, X, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import Carrusel from "../components/carrusel";
-import Navbarr from "../components/navbar";
-import Footer from "@/components/Footer";
-import ObtenerCertificado from "@/components/getCertificate";
+import Carrusel from "../components/comPageMain/carrusel";
+import Navbarr from "../components/comPageMain/navbar";
+import Footer from "@/components/comPageMain/Footer";
+import ObtenerCertificado from "@/components/comPageMain/getCertificate";
 import AvisoModal from "@/components/comPageMain/avisoModal";
 //funcion principal que controla el Modal de aviso
 

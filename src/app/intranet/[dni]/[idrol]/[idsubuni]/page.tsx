@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from 'next/navigation';
-import NavIntranet from "@/components/navIntranet";
+import NavIntranet from "@/components/ComponentsIntranet/navIntranet";
 import { API_ROLES, API_SUBUNIDADES } from "@/config/apiconfig";
 
 interface Role {

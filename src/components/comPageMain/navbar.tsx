@@ -13,21 +13,23 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-md">
+    <nav className="bg-white shadow-md ">
       <div className="bg-gray-900 w-full mx-auto px-4 sm:px-6 lg:px-8 h-auto flex justify-end items-center">
         <Link href='/intranet' className="px-3 py-1 rounded-md text-xs font-medium text-blue-600 hover:bg-gray-900 hover:text-gray-50">
           Intranet
         </Link>
       </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <Link href='/'>
           <div className="flex-shrink-0 flex items-center">
             {/* Logo */}
             <Image src="/resources/images/genseg.png" alt="Logo" width={55} height={55} />
             <p className='text-gray-900 text-base px-2'>
-              <Link href='/'>Gestor de Proyectos <br /> de la DPSEC</Link>
+              Gestor de Proyectos <br /> de la DPSEC
             </p>
           </div>
+          </Link>
 
           {/* Menú para pantallas grandes */}
           <div className="hidden sm:flex sm:items-center">

@@ -40,7 +40,7 @@ function ComboboxDemo({data}:vectorComboValores) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between"
+          className="w-[300px] justify-between"
         >
           {value
             ? data.find((data) => data.value === value)?.label
@@ -52,7 +52,7 @@ function ComboboxDemo({data}:vectorComboValores) {
         <Command>
           <CommandList>
             
-            <CommandEmpty>No se encontró ningún framework.</CommandEmpty>
+            <CommandEmpty>No se encontró ningúna sub unidad.</CommandEmpty>
             <CommandGroup>
               {data.map((framework, index) => (
                 <CommandItem
@@ -88,16 +88,17 @@ const ObtenerCertificado = ({data}:vectorComboValores) => {
           <h2 className="text-2xl font-bold mb-4 text-gray-700">Solicitar Certificado</h2>
           <p className="text-sm bg-blue-100 text-blue-600 p-2 rounded-md w-[90%] text-center mb-4">
             ¡Atención! Los certificados se solicitan una vez que el voluntario participante culminó con las 3 actividades designadas.
+            <br/> seleccione la subunidad y  luego ingrese su número de DNI
           </p>
           <div className="flex justify-between items-center w-[90%]  mb-4">
-            <h3 className="text-lg">Digite su código de estudiante:</h3>
+            <h3 className="text-lg"></h3>
             {/*<ComboboxDemo {data} />*/}
             <ComboboxDemo data={data} />
             <div className="flex space-x-4">
               <input
                 type="text"
                 className="border border-gray-300 p-2 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-                placeholder="201861"
+                placeholder="DNI"
               />
               <button
                 type="submit"
