@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Navbar from '@/components/comPageMain/navbar'
 import Carrusel from '@/components/comPageMain/carrusel';
-import {Cards} from '@/components/Cards';
+import {Cards} from '@/components/comPageMain/Cards';
 import Image from 'next/image'
 import Footer from '@/components/comPageMain/Footer'
 

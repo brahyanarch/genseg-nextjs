@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { API_ROLES, API_SUBUNIDADES,API_LOGIN } from "@/config/apiconfig";
+import { devNull } from "os";
 
 interface User {
   dni: string;
@@ -130,7 +131,7 @@ const RoleSelectionPage: React.FC = () => {
   // Obtener el nombre del rol por su ID
   const getRoleName = (rol_id: number) => {
     const role = roles.find((r) => r.id_rol === rol_id);
-    return role ? role.n_rol : `Rol ${rol_id}`;
+    return role ? role.n_rol : devNull;
   };
 
   // Obtener el nombre de la subunidad por su ID
