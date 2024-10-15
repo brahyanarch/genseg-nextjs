@@ -9,6 +9,7 @@ import Navbarr from "../components/comPageMain/navbar";
 import Footer from "@/components/comPageMain/Footer";
 import ObtenerCertificado from "@/components/comPageMain/getCertificate";
 import AvisoModal from "@/components/comPageMain/avisoModal";
+import Aviso from '@/components/aviso';
 //funcion principal que controla el Modal de aviso
 
 const datos = [
@@ -84,6 +85,7 @@ export default function Home() {
       <Carrusel data={datos}/>
       {/*<ObtenerCertificado key={frameworks} />*/}
       <ObtenerCertificado data={frameworks} />
+      <Aviso type={"succefull"} content={"Este aviso es warning!"} />
       <Footer />
     </div>
   );
