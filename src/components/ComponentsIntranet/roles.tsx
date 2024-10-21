@@ -50,16 +50,13 @@ const Roles: React.FC<RolesProps> = ({
   // Obtener el nombre del rol por su ID
   const getRoleName = (rol_id: number) => {
     const role = nombreRoles.find((r) => r.id_rol === rol_id);
-    //return role ? role.n_rol : `Rol ${rol_id}`;
-    return role ? role?.n_rol : (<div className="">
-              <Skeleton className="h-4 w-full bg-slate-700" />
-    </div>)
+    return role ? role?.n_rol : null;
   };
 
   // Obtener el nombre de la subunidad por su ID
-  const getSubunidadName = (subunidad_id: number | undefined) => {
+  const getSubunidadName = (subunidad_id: number) => {
     const subunidad = subunidades.find((s) => s.id_subuni === subunidad_id);
-    return subunidad ? subunidad.n_subuni : `Subunidad ${subunidad_id}`;
+    return subunidad ? subunidad.n_subuni : null;
   };
   console.log(dni);
   const fetchRoleswithDNI = async () => {
@@ -120,13 +117,19 @@ const Roles: React.FC<RolesProps> = ({
       <CardContent>
         {error ? (
           <div className="text-red-500">Error: {error}</div>
+        ) : rolesUser.length <1 ? ( // Mostrar Skeleton si rolesUser es null o undefined
+          <div className="grid grid-cols-2 gap-2">
+            {[1, 2, 3, 4].map((item) => ( // Renderizar 4 skeletons como placeholders
+              <div key={item} className="flex flex-col items-center p-2 bg-gray-800 rounded-lg animate-pulse">
+                <Skeleton className="h-4 w-full bg-slate-700 " />
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="grid grid-cols-2 gap-2">
-            {rolesUser?.map((role, index) => {
-              const isActive =
-                role.rol_id === id_rolActive &&
-                role.subunidad_id_subuni === id_subActive;
-
+            {rolesUser.map((role, index) => {
+              const isActive = role.rol_id === id_rolActive && role.subunidad_id_subuni === id_subActive;
+  
               return (
                 <div
                   key={index}
@@ -158,6 +161,7 @@ const Roles: React.FC<RolesProps> = ({
       </CardContent>
     </div>
   );
+  
 };
 
 export default Roles;

@@ -1,14 +1,26 @@
-'use client'
-import {useState, useEffect, useRef} from 'react'
-import Link from 'next/link'
-import { BellIcon, User, HelpCircle, LogOut , SearchIcon, Logs } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+"use client";
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import {
+  BellIcon,
+  User,
+  HelpCircle,
+  LogOut,
+  SearchIcon,
+  Logs,
+} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import NavRoles from '@/components/ComponentsIntranet/roles'
-import Notificaciones from '@/components/ComponentsIntranet/notificaciones'
-import { API_ROLES, API_SUBUNIDADES, apiRolesWithDni, API_ROLES_WITH_DNI } from "@/config/apiconfig";
-
+import NavRoles from "@/components/ComponentsIntranet/roles";
+import Notificaciones from "@/components/ComponentsIntranet/notificaciones";
+import {
+  API_ROLES,
+  API_SUBUNIDADES,
+  apiRolesWithDni,
+  API_ROLES_WITH_DNI,
+} from "@/config/apiconfig";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface ComponentProps {
   idRol?: number;
@@ -47,7 +59,7 @@ interface RolesUser {
   idRol?: number;
   idSubUnidad?: number;
   dni?: string;
-  roles?: Rol[]
+  roles?: Rol[];
 }
 
 const MenuRoles = () => {
@@ -84,26 +96,28 @@ export function Notificacion() {
   // Cerrar el menú de notificación si el usuario hace clic fuera de él
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target as Node)
+      ) {
         setIsProfileOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
-    <div ref={notificationRef} >
-      <div className="text-[28px] cursor-pointer mr-3" onClick={toggleProfileMenu}>
+    <div ref={notificationRef}>
+      <div
+        className="text-[28px] cursor-pointer mr-3"
+        onClick={toggleProfileMenu}
+      >
         <BellIcon className="h-5 w-5" />
       </div>
       {/* Ventana flotante de Notificacion */}
-      {isProfileOpen && (
-       
-          <Notificaciones />
-        
-      )}
+      {isProfileOpen && <Notificaciones />}
     </div>
   );
 }
@@ -120,26 +134,29 @@ export function Perfil() {
   // Cerrar el menú si el usuario hace clic fuera de él
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+      if (
+        profileMenuRef.current &&
+        !profileMenuRef.current.contains(event.target as Node)
+      ) {
         setIsProfileOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   return (
-    <div ref={profileMenuRef} >
+    <div ref={profileMenuRef}>
       {/* Botón de perfil */}
-      <div
-        className="text-sm font-bold text-gray-500 pt-1 text-center h-[30px] w-[30px] focus:outline-none rounded-[50%] bg-white cursor-pointer"
-        onClick={toggleProfileMenu}
-      >
-        B
-      </div>
+        
+        <Avatar onClick={toggleProfileMenu} className="cursor-pointer">
+                <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
+                <AvatarFallback>U</AvatarFallback>
+              </Avatar>
+      
       <div>
         {isProfileOpen && (
           <div className="absolute z-30 right-2 w-64 bg-gray-900 text-white p-4 rounded-lg">
@@ -154,13 +171,19 @@ export function Perfil() {
             <nav>
               <ul className="space-y-2">
                 <li>
-                  <Button variant="ghost" className="w-full justify-start text-white">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-white"
+                  >
                     <User className="mr-2 h-4 w-4" />
                     Perfil
                   </Button>
                 </li>
                 <li>
-                  <Button variant="ghost" className="w-full justify-start text-white">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-white"
+                  >
                     <HelpCircle className="mr-2 h-4 w-4" />
                     Centro de ayuda
                   </Button>
@@ -168,9 +191,12 @@ export function Perfil() {
               </ul>
             </nav>
             <div className="mt-6">
-              <Button variant="secondary" className="w-full bg-gray-800 hover:bg-gray-700 text-white">
+              <Button
+                variant="secondary"
+                className="w-full bg-gray-800 hover:bg-gray-700 text-white"
+              >
                 <LogOut className="mr-2 h-4 w-4" />
-                <Link href='/'>Cerrar Sesión</Link> 
+                <Link href="/">Cerrar Sesión</Link>
               </Button>
             </div>
           </div>
@@ -181,16 +207,40 @@ export function Perfil() {
 }
 
 const rolesprueba = [
-  { dni: "75548237", n_usu: "david", estado:true, rol_id:"1", subunidad_id_subuni: "1"  },
-  { dni: "75548237", n_usu: "david", estado:true, rol_id:"1", subunidad_id_subuni: "1"  },
-  { dni: "75548237", n_usu: "david", estado:true, rol_id:"1", subunidad_id_subuni: "1"  },
-  { dni: "75548237", n_usu: "david", estado:true, rol_id:"1", subunidad_id_subuni: "1"  },
-]
+  {
+    dni: "75548237",
+    n_usu: "david",
+    estado: true,
+    rol_id: "1",
+    subunidad_id_subuni: "1",
+  },
+  {
+    dni: "75548237",
+    n_usu: "david",
+    estado: true,
+    rol_id: "1",
+    subunidad_id_subuni: "1",
+  },
+  {
+    dni: "75548237",
+    n_usu: "david",
+    estado: true,
+    rol_id: "1",
+    subunidad_id_subuni: "1",
+  },
+  {
+    dni: "75548237",
+    n_usu: "david",
+    estado: true,
+    rol_id: "1",
+    subunidad_id_subuni: "1",
+  },
+];
 
-export function Roles({idRol, idSubUnidad, dni, roles}:RolesUser) {
+export function Roles({ idRol, idSubUnidad, dni, roles }: RolesUser) {
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
   const rolesMenuRef = useRef<HTMLDivElement>(null);
-  
+
   // Función para alternar la visibilidad de la ventana flotante
   const toggleProfileMenu = () => {
     setIsProfileOpen(!isProfileOpen);
@@ -198,39 +248,43 @@ export function Roles({idRol, idSubUnidad, dni, roles}:RolesUser) {
 
   // Cerrar el menú si el usuario hace clic fuera de él
   useEffect(() => {
-    
     const handleClickOutside = (event: MouseEvent) => {
-      if (rolesMenuRef.current && !rolesMenuRef.current.contains(event.target as Node)) {
+      if (
+        rolesMenuRef.current &&
+        !rolesMenuRef.current.contains(event.target as Node)
+      ) {
         setIsProfileOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   return (
     <div ref={rolesMenuRef}>
-      {/* Botón que abre el menú de roles */}
+      {/* Botón que abre el menú de roles iconos*/}
       <div className="cursor-pointer" onClick={toggleProfileMenu}>
-        <MenuRoles/>
+        <MenuRoles />
       </div>
 
       {/* Ventana flotante de Roles */}
       {isProfileOpen && (
-        
-          <NavRoles dni={dni} id_rolActive={idRol} id_subActive={idSubUnidad}  />
-        
+        <NavRoles dni={dni} id_rolActive={idRol} id_subActive={idSubUnidad} />
       )}
     </div>
   );
 }
 
-const Component: React.FC<ComponentProps> = ({ idRol = 1 , idSubUnidad = 1, dni = ""}) => {
+const Component: React.FC<ComponentProps> = ({
+  idRol = 1,
+  idSubUnidad = 1,
+  dni = "",
+}) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  
+
   const [nomroles, setnomroles] = useState<Role[]>([]);
   const [subunidades, setSubunidades] = useState<Subunidad[]>([]);
   const [roles, setroles] = useState<Rol[]>([]);
@@ -238,19 +292,22 @@ const Component: React.FC<ComponentProps> = ({ idRol = 1 , idSubUnidad = 1, dni 
   const getRoleName = (rol_id: number) => {
     const role = nomroles.find((r) => r.id_rol === rol_id);
     //return role ? role.n_rol : `Rol ${rol_id}`; // poner esqueleton
-    return role ? role.n_rol : (
-
+    return role ? (
+      role.n_rol
+    ) : (
       <div className="flex">
-              <Skeleton className="h-4 w-full bg-slate-700 " />
+        <Skeleton className="h-4 w-full bg-slate-700 " />
       </div>
     );
-  }; 
+  };
 
   // Obtener el nombre de la subunidad por su ID
   const getSubunidadName = (subunidad_id: number) => {
     const subunidad = subunidades.find((s) => s.id_subuni === subunidad_id);
     //return subunidad ? subunidad.n_subuni : `Subunidad ${subunidad_id}`;
-    return subunidad ? subunidad.n_subuni : (
+    return subunidad ? (
+      subunidad.n_subuni
+    ) : (
       <div className="flex-auto">
         <Skeleton className="h-4 w-full bg-slate-700" />
       </div>
@@ -277,19 +334,18 @@ const Component: React.FC<ComponentProps> = ({ idRol = 1 , idSubUnidad = 1, dni 
     }
   };
 
-const fetchRoleswithDNI = async () => {
-  try {
-    //const response = await fetch(`http://localhost:3000/api/roles/${dni}`);
-    const response = await fetch(apiRolesWithDni(API_ROLES_WITH_DNI, dni));
-    let data: Rol[] = await response.json();
-    
-    setroles(data);
-    console.log(data, dni);
-  } catch (error) {
-    console.error("Error fetching roles:", error);
-  }
-};
+  const fetchRoleswithDNI = async () => {
+    try {
+      //const response = await fetch(`http://localhost:3000/api/roles/${dni}`);
+      const response = await fetch(apiRolesWithDni(API_ROLES_WITH_DNI, dni));
+      let data: Rol[] = await response.json();
 
+      setroles(data);
+      console.log(data, dni);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
 
   useEffect(() => {
     fetchRoles();
@@ -304,29 +360,36 @@ const fetchRoleswithDNI = async () => {
   return (
     <nav className="bg-gray-900 fixed w-full z-40 text-white p-2 flex items-center justify-between top-0 right-0">
       <div className="flex items-center space-x-2">
-        <img src="/resources/images/DPSEClogo.png" alt="Logo" className="h-9 w-9 rounded-full bg-white" />
+        <img
+          src="/resources/images/DPSEClogo.png"
+          alt="Logo"
+          className="h-9 w-9 rounded-full bg-white"
+        />
         <div className="hidden md:block">
-          <h1 className="text-sm font-semibold">Proyección Social y Extensión Cultural</h1>
-          <p className="text-xs text-gray-400 flex-row">{getRoleName(idRol)} de {getSubunidadName(idSubUnidad)}</p>
+          <h1 className="text-sm font-semibold">
+            Proyección Social y Extensión Cultural
+          </h1>
+          <p className="text-xs text-gray-400 flex-row">
+            {getRoleName(idRol)} de {getSubunidadName(idSubUnidad)}
+          </p>
         </div>
       </div>
-        <div className="relative hidden md:block ">
-          <SearchIcon className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <Input
-            type="search"
-            placeholder="Buscar..." 
-            className="pl-8 bg-gray-800 border-gray-700 text-white placeholder-gray-400 w-64 rounded-3xl"
-          />
-        </div>
+      <div className="relative hidden md:block ">
+        <SearchIcon className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+        <Input
+          type="search"
+          placeholder="Buscar..."
+          className="pl-8 bg-gray-800 border-gray-700 text-white placeholder-gray-400 w-64 rounded-3xl"
+        />
+      </div>
       <div className="flex items-center space-x-4">
-        
-      <Notificacion/>
-      
-       <Roles dni={dni} idRol={idRol} idSubUnidad={idSubUnidad}/>
-      <Perfil/>
+        <Notificacion />
+
+        <Roles dni={dni} idRol={idRol} idSubUnidad={idSubUnidad} />
+        <Perfil />
       </div>
     </nav>
-  )
-}
+  );
+};
 
 export default Component;
