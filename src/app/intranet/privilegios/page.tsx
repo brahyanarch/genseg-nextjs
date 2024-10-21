@@ -8,6 +8,7 @@ import ConfiRoles from '@/components/ComponentsIntranet/confiRoles'
 import ConfiUsers from '@/components/ComponentsIntranet/confiUsers'
 import ConfiPermisos from '@/components/ComponentsIntranet/confiPermisos'
 import ConfiSunidad from '@/components/ComponentsIntranet/confiSunidad'
+import ConfiProyectos from '@/components/ComponentsIntranet/confiProyectos'
 export default function AdmiGeneral(){
     return(
         <div className="bg-[#0F111A]" >
@@ -22,6 +23,7 @@ export default function AdmiGeneral(){
         <ConfiUsers/>
         <ConfiPermisos/>
         <ConfiSunidad/>
+        <ConfiProyectos/>
         </div>
         
          </div>
