@@ -1,0 +1,46 @@
+d72b278 Merge branch 'Componentes' of https://github.com/brahyanarch/genseg-nextjs into Componentes traaa
+af2941d mi primera chamba
+3b44714 Agregando alertas
+4c5b22c agregando avisos
+5f3dc24 arreglando la pagina principal
+a6f7749 skeleton agregado
+86771b2 Merge branch 'Componentes' of https://github.com/brahyanarch/genseg-nextjs into Componentes fxg#
+f2790b7 Arreglando los roles
+469deaf Agregando Context
+b234e77 conectando con la base de datos navbar
+1e46faa conectando a la base de datos
+3a3baa0 Conectando con el Backend
+4c1334b imagen de carrusel
+b7da04d mejorando Componentes Crud's
+288ebf7 Avance componentes Admi
+fc30f44 graficos got y cambios pequenos en intranet
+cdc5887 posicionamiento de componentes
+b802941 las zetas
+5c1ccea arreglando los graficos generales
+450e931 mas graficos
+9d6ada0 grafico
+36cad8d Estados
+8c6bcce Menu Roles implementado
+d608ab9 Agregando el componente notificaciones
+1ad1bdf agregando el card de roles
+12abd61 perfil
+12f1808 agregando el icono menu roles
+794ce23 Cambios 24/09/24
+f4fd776 modificando NavBar
+72c4f31 creando el menu y navar de la intranet
+2f6fee2 Cambios en administrador general
+0a69355 Cambios en Obtener certificado
+5e439e5 Inicio de sesion en curso
+7ba172b Cambios 18/09/24
+7a57893 Cambios de Berning 17
+7de74c2 cambios importantes
+d0d174d componentes separados
+d54f990 detallitos en el carrusel
+e68a09e tudo bem imagenes y carrusel
+f3f5786 corregido
+0355613 Otro Avance mas
+24ec477 Creando rutas y mas..
+7d0839f Avance Pagina Principal
+a753434 Navegacion echa
+43dd0a5 first commit
+7834ea9 Initial commit from Create Next App
