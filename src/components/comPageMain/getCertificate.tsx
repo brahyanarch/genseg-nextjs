@@ -3,9 +3,13 @@
 "use client"
 import { useState } from 'react';
 //import * as React from "react"
-import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
+import { CaretSortIcon } from "@radix-ui/react-icons"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { CheckIcon, XIcon } from "lucide-react"
 import {
   Command,
   CommandEmpty,
@@ -19,6 +23,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+
+
 
 interface comboValores {
   value: String;
@@ -80,8 +86,83 @@ function ComboboxDemo({data}:vectorComboValores) {
   )
 }
 
+///informacion del certificado
+const activities = [
+  { id: 1, name: "Limpieza en el bosque", completed: true },
+  { id: 2, name: "Capacitación para primeros auxilios", completed: false },
+  { id: 3, name: "Mantenimiento de las áreas verdes", completed: true },
+  { id: 4, name: "Control de bolas dentro del campus universitario", completed: true },
+]
+///componente Modal Obtener certificado
+export const ObtenerCertificadoModal = ({isOpen, setIsOpen}:any) => {
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent className="sm:max-w-[530px] max-w-[350px] bg-white  text-black">
+        <DialogHeader>
+          <DialogTitle>Estado del Certificado</DialogTitle>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="nombres" className="text-right">
+              Nombres
+            </Label>
+            <Input id="nombres" defaultValue="David Brahyan" className="col-span-3" />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="apellidos" className="text-right">
+              Apellidos
+            </Label>
+            <Input id="apellidos" defaultValue="Larota pilco" className="col-span-3" />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="codigo" className="text-right">
+              Código
+            </Label>
+            <Input id="codigo" defaultValue="201861" className="col-span-3" />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="escuela" className="text-right">
+              Escuela Profesional
+            </Label>
+            <Input id="escuela" defaultValue="Ing. Sistemas" className="col-span-3" />
+          </div>
+        </div>
+        <div className="mt-4 ">
+          <h3 className="mb-2 font-semibold">Actividades</h3>
+          <ul className="space-y-2 h-[150px] p-2 border-black border-[2px] border-opacity-30 rounded-[5px] overflow-auto">
+            {activities.map((activity) => (
+              <li
+                key={activity.id}
+                className={`flex items-center justify-between p-2 rounded ${
+                  activity.completed ? 'bg-green-100' : 'bg-red-100'
+                }`}
+              >
+                <span>{activity.name}</span>
+                {activity.completed ? (
+                  <CheckIcon className="h-5 w-5 text-green-600" />
+                ) : (
+                  <XIcon className="h-5 w-5 text-red-600" />
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <Button className="mt-4 w-full " onClick={() => setIsOpen(false)}>
+          Solicitar
+        </Button>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 //const PrivilegiosPage = () => {
 const ObtenerCertificado = ({data}:vectorComboValores) => {
+    //estado para manejar el el valor de activo e inactivo del modal obtener certificado.
+    const [isOpen, setIsOpen] = useState(false)
+    //funcion para cambiar el esatao(valor) del modal obtener certificado
+    function changeModalObCertificado(){
+      setIsOpen(!isOpen);
+    }
     return (
       <>
         <div className="bg-gray-300 gap-4 text-gray-800 flex flex-col justify-center items-center mx-auto my-[50px] p-8 rounded-lg shadow-lg w-4/5">
@@ -103,6 +184,7 @@ const ObtenerCertificado = ({data}:vectorComboValores) => {
               <button
                 type="submit"
                 className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition duration-300"
+                onClick={changeModalObCertificado}
               >
                 Consultar
               </button>
@@ -113,6 +195,7 @@ const ObtenerCertificado = ({data}:vectorComboValores) => {
             Los certificados se entregarán de manera digital a su correo institucional, si requiere en físico apersonarse a la oficina de la DPSEC.
           </p>
         </div>
+        <ObtenerCertificadoModal isOpen={isOpen} setIsOpen={setIsOpen}/>
       </>
     );
   }
