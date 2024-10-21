@@ -85,7 +85,7 @@ export default function Home() {
       <Carrusel data={datos}/>
       {/*<ObtenerCertificado key={frameworks} />*/}
       <ObtenerCertificado data={frameworks} />
-      <Aviso type={"succefull"} content={"Este aviso es warning!"} />
+      <Aviso type={"important"} content={"Hola mundo"} />
       <Footer />
     </div>
   );

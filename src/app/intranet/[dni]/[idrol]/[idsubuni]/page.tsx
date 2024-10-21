@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from 'next/navigation';
 import NavIntranet from "@/components/ComponentsIntranet/navIntranet";
 import { API_ROLES, API_SUBUNIDADES } from "@/config/apiconfig";
-
+import MenuBody from "@/components/ComponentsIntranet/menuBody";
 interface Role {
   id_rol: number;
   n_rol: string;
@@ -63,7 +63,7 @@ const PrivilegiosPage = () => {
       }
     };
 
-    fetchData();
+    //fetchData();
   }, []);
 
   useEffect(() => {
@@ -86,7 +86,9 @@ const PrivilegiosPage = () => {
         <p>{error}</p>
       ) : (
         <>
-          <NavIntranet idRol={Number(idrol)} idSubUnidad={Number(idsubuni)} dni={dni.toString()} />
+          {/*<NavIntranet idRol={Number(idrol)} idSubUnidad={Number(idsubuni)} dni={dni.toString()} />*/}
+          <MenuBody idrol={Number(idrol)} idsubuni={Number(idsubuni)} dni={dni.toString()}/> 
+
         </>
       )}
     </div>

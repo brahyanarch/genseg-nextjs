@@ -1,0 +1,279 @@
+commit d72b27800f779a0116e61fd841e33636f6817909
+Merge: af2941d 3b44714
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Tue Oct 15 12:07:56 2024 -0500
+
+    Merge branch 'Componentes' of https://github.com/brahyanarch/genseg-nextjs into Componentes
+    traaa
+
+commit af2941dba967eb5056270b8f3d74557b61cbb6f6
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Tue Oct 15 12:07:38 2024 -0500
+
+    mi primera chamba
+
+commit 3b44714f2fb36f5ba0208fbb8a0fd1dc582720a2
+Author: berning <bernardpari2002@gmail.com>
+Date:   Tue Oct 15 12:06:39 2024 -0500
+
+    Agregando alertas
+
+commit 4c5b22c189b53d01c06341f754bef5e13879a818
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Tue Oct 15 11:12:55 2024 -0500
+
+    agregando avisos
+
+commit 5f3dc24701a26d95f0952456582ef9e0303ff137
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Tue Oct 15 09:47:56 2024 -0500
+
+    arreglando la pagina principal
+
+commit a6f774989e798dceccd5b4c119146b3aac570963
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Mon Oct 14 10:15:50 2024 -0500
+
+    skeleton agregado
+
+commit 86771b2a5fcfe6eef8687741d9f4f38237984cb7
+Merge: f2790b7 469deaf
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Fri Oct 11 14:28:35 2024 -0500
+
+    Merge branch 'Componentes' of https://github.com/brahyanarch/genseg-nextjs into Componentes
+    fxg#
+
+commit f2790b7e37cb05acd22ad444b93390c7690b67f4
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Fri Oct 11 14:28:29 2024 -0500
+
+    Arreglando los roles
+
+commit 469deaf268526c40c90d016dae294912411c2db1
+Author: berning <bernardpari2002@gmail.com>
+Date:   Fri Oct 11 12:06:34 2024 -0500
+
+    Agregando Context
+
+commit b234e7747db1ecdf7faf0fe8e4b88c61003fd69e
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Mon Oct 7 12:01:59 2024 -0500
+
+    conectando con la base de datos navbar
+
+commit 1e46faa1a503ddb101e05e97561eb6108f5a14f1
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Sun Oct 6 20:43:39 2024 -0500
+
+    conectando a la base de datos
+
+commit 3a3baa0ad36ee3839465723c9fbd57a643339c0f
+Author: berning <bernardpari2002@gmail.com>
+Date:   Fri Oct 4 13:27:47 2024 -0500
+
+    Conectando con el Backend
+
+commit 4c1334b2072f4ace987cf25541a295aac7497e2b
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Tue Oct 1 18:58:34 2024 -0500
+
+    imagen de carrusel
+
+commit b7da04de6af1ae38782f1625ac395dad9f7366ef
+Author: berning <bernardpari2002@gmail.com>
+Date:   Tue Oct 1 12:15:34 2024 -0500
+
+    mejorando Componentes Crud's
+
+commit 288ebf71db9a9ea5da5222f8fbcd792f7effdb61
+Author: berning <bernardpari2002@gmail.com>
+Date:   Mon Sep 30 12:12:45 2024 -0500
+
+    Avance componentes Admi
+
+commit fc30f4414d2a61d4c9aa1a264f20ba33822bb2fe
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Sun Sep 29 22:16:24 2024 -0500
+
+    graficos got y cambios pequeños en intranet
+
+commit cdc58873ff79216de1b91411d3f03a2a9f11d8a6
+Author: berning <bernardpari2002@gmail.com>
+Date:   Fri Sep 27 11:42:31 2024 -0500
+
+    posicionamiento de componentes
+
+commit b80294111242ac567f7e27b5f134ce03051d4cc9
+Author: berning <bernardpari2002@gmail.com>
+Date:   Fri Sep 27 11:29:07 2024 -0500
+
+    las zetas
+
+commit 5c1cceac3e3bf038dd8e1e67b44b77d7099df60a
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Fri Sep 27 11:01:40 2024 -0500
+
+    arreglando los graficos generales
+
+commit 450e93136966a908e886be08223ab9ef90027282
+Author: berning <bernardpari2002@gmail.com>
+Date:   Thu Sep 26 12:16:54 2024 -0500
+
+    mas gráficos
+
+commit 9d6ada0aace6bfa88d8dcc5ac02fed01ca027394
+Author: berning <bernardpari2002@gmail.com>
+Date:   Thu Sep 26 11:22:44 2024 -0500
+
+    grafico
+
+commit 36cad8d08dfd49cf00c3be14d43e74068675eb2b
+Author: berning <bernardpari2002@gmail.com>
+Date:   Wed Sep 25 11:32:58 2024 -0500
+
+    Estados
+
+commit 8c6bccee781f7ab75a4bbe7a3fbadc0a62f4a5d1
+Author: berning <bernardpari2002@gmail.com>
+Date:   Wed Sep 25 10:01:05 2024 -0500
+
+    Menu Roles implementado
+
+commit d608ab9768e474c5f2c39d98adf9eb2a16afc2e3
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Wed Sep 25 09:49:40 2024 -0500
+
+    Agregando el componente notificaciones
+
+commit 1ad1bdf9b08337e3975d5aa444e1c2d77ae4c951
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Wed Sep 25 09:36:55 2024 -0500
+
+    agregando el card de roles
+
+commit 12abd617859d1ff56c951b94a4982ca0ee0823be
+Author: berning <bernardpari2002@gmail.com>
+Date:   Wed Sep 25 09:30:57 2024 -0500
+
+    perfil
+
+commit 12f18086f2e010342243de72c9149cee2f31f9b7
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Tue Sep 24 12:27:33 2024 -0500
+
+    agregando el icono menu roles
+
+commit 794ce23e812e1e94e303d301af7d16319aa90f83
+Author: berning <bernardpari2002@gmail.com>
+Date:   Tue Sep 24 12:25:55 2024 -0500
+
+    Cambios 24/09/24
+
+commit f4fd77639df1d7248064f18d0a0a0213b0baa559
+Author: berning <bernardpari2002@gmail.com>
+Date:   Tue Sep 24 11:18:44 2024 -0500
+
+    modificando NavBar
+
+commit 72c4f3118208b59837cc48229874c27a0d2bd518
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Tue Sep 24 11:17:44 2024 -0500
+
+    creando el menu y navar de la intranet
+
+commit 2f6fee2c183f43ab8ff6c6e5bbdf260f08e2de76
+Author: berning <bernardpari2002@gmail.com>
+Date:   Tue Sep 24 09:59:27 2024 -0500
+
+    Cambios en administrador general
+
+commit 0a6935541a9c33fdc32dd0260aa1c4d3c1cf3433
+Author: berning <bernardpari2002@gmail.com>
+Date:   Sun Sep 22 09:02:00 2024 -0500
+
+    Cambios en Obtener certificado
+
+commit 5e439e5a33da3a83760249dc38fbaee640b54f89
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Fri Sep 20 20:48:12 2024 -0500
+
+    Inicio de sesion en curso
+
+commit 7ba172b0408eb2cc7f14a805871214fcae2b1b68
+Author: berning <bernardpari2002@gmail.com>
+Date:   Wed Sep 18 12:20:59 2024 -0500
+
+    Cambios 18/09/24
+
+commit 7a57893695840d95be1863f6f09a9137d3814666
+Author: berning <bernardpari2002@gmail.com>
+Date:   Tue Sep 17 12:19:52 2024 -0500
+
+    Cambios de Berning 17
+
+commit 7de74c21c13b492a42322d2c8e8a68879a6994f0
+Author: berning <bernardpari2002@gmail.com>
+Date:   Tue Sep 17 10:28:21 2024 -0500
+
+    cambios importantes
+
+commit d0d174d88bf60dce2bd47b1ebd2cfbe40a55d12d
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Tue Sep 17 09:15:19 2024 -0500
+
+    componentes separados
+
+commit d54f990000656e2b052c11bf04aba2e3bc98697d
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Tue Sep 17 08:56:57 2024 -0500
+
+    detallitos en el carrusel
+
+commit e68a09ef1dce6ce0e97b31eafb5ebfb7c70fc759
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Mon Sep 16 12:30:17 2024 -0500
+
+    tudo bem imagenes y carrusel
+
+commit f3f57868cc83720fe1895f5b5e3b63ddda32609e
+Author: berning <bernardpari2002@gmail.com>
+Date:   Fri Sep 13 12:19:52 2024 -0500
+
+    corregido
+
+commit 0355613e34eb4a9ef30556f87afeada22ae6fad6
+Author: berning <bernardpari2002@gmail.com>
+Date:   Fri Sep 13 12:02:18 2024 -0500
+
+    Otro Avance más
+
+commit 24ec4770f0b0d198007de96e5b11219e5e31da07
+Author: berning <bernardpari2002@gmail.com>
+Date:   Thu Sep 12 03:20:36 2024 -0500
+
+    Creando rutas y mas..
+
+commit 7d0839f274d7020eaed9b64da014ef062136337b
+Author: berning <bernardpari2002@gmail.com>
+Date:   Thu Sep 12 02:26:24 2024 -0500
+
+    Avance Pagina Principal
+
+commit a7534348b22f9cae58f64b9f0d5ea245d96bebd4
+Author: berning <bernardpari2002@gmail.com>
+Date:   Tue Sep 10 12:39:58 2024 -0500
+
+    Navegación echa
+
+commit 43dd0a55fe8a9220b6ce8e1f2dfdd410ce8926d1
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Tue Sep 10 10:34:22 2024 -0500
+
+    first commit
+
+commit 7834ea92675fd09f035187d92d5b99e43996cf8a
+Author: davidefqon <davidlarotapilco@gmail.com>
+Date:   Tue Sep 10 10:10:27 2024 -0500
+
+    Initial commit from Create Next App
