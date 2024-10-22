@@ -30,6 +30,22 @@ import {
   Perfil,
   Notificacion,
 } from "@/components/ComponentsIntranet/navIntranet";
+import {
+  Breadcrumb,
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 interface Role {
   id_rol: number;
   n_rol: string;
@@ -172,7 +188,7 @@ const Component = ({
               </Button>
               <Notificacion />
 
-              <Roles idRol={idrol} idSubUnidad={idsubuni} dni={dni}  />
+              <Roles idRol={idrol} idSubUnidad={idsubuni} dni={dni} />
               <Perfil />
             </div>
           </div>
@@ -256,6 +272,22 @@ const Component = ({
         </aside>
         <main className="flex-1 p-6 overflow-auto">
           <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="">Inicio</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink
+                    href=""
+                    className="text-blue-600 font-bold"
+                  >
+                    Principal
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
             <h1 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-white">
               {activeContent}
             </h1>
