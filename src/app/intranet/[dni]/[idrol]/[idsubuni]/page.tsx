@@ -81,7 +81,7 @@ const PrivilegiosPage = () => {
   }
 
   return (
-    <div>
+    <div className="w-full">
       {error ? (
         <p>{error}</p>
       ) : (

@@ -144,9 +144,9 @@ const Component = ({
     fetchSubunidades();
   }, []);
   return (
-    <div className="flex flex-col h-screen bg-gray-100 dark:bg-gray-900">
-      <nav className="bg-white dark:bg-gray-800 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col h-screen w-full bg-gray-100 dark:bg-gray-900 ">
+      <nav className="bg-white dark:text-white w-full dark:bg-gray-800 shadow-md">
+        <div className=" mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <img
@@ -154,9 +154,11 @@ const Component = ({
                 alt="Logo"
                 className="h-9 w-9 rounded-full bg-white"
               />
-              <span className="text-sm font-semibold text-gray-800 dark:text-white">
+              <div className="flex flex-col pl-3" >
+              <span className="text-sm font-semibold text-gray-800 dark:text-white ">
                 Proyección Social y Extensión Cultural
               </span>
+             
               {/*<p className="text-xs text-gray-400 flex-row">{getRoleName(idrol)} de {getSubunidadName(idsubuni)}</p>*/}
               {getRoleName(idrol) && getSubunidadName(idsubuni) ? (
                 <p className="text-xs text-gray-400 flex-row">
@@ -167,6 +169,7 @@ const Component = ({
               ) : (
                 <Skeleton className="h-4 w-full bg-slate-700 " />
               )}
+              </div>
             </div>
             <div className="flex items-center space-x-4">
               <Input
@@ -181,9 +184,9 @@ const Component = ({
                 aria-label="Toggle theme"
               >
                 {darkMode ? (
-                  <Sun className="h-5 w-5" />
+                  <Sun className="h-5 w-5 text-black dark:text-white" />
                 ) : (
-                  <Moon className="h-5 w-5" />
+                  <Moon className="h-5 w-5 text-black dark:text-white" />
                 )}
               </Button>
               <Notificacion />
@@ -194,9 +197,9 @@ const Component = ({
           </div>
         </div>
       </nav>
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden ">
         <aside
-          className={`bg-white dark:bg-gray-800 ${
+          className={`bg-white text-black dark:bg-gray-800 dark:text-white ${
             isCollapsed ? "w-16" : "w-64"
           } transition-all duration-300 ease-in-out`}
         >

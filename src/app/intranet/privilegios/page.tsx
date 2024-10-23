@@ -11,12 +11,12 @@ import ConfiSunidad from '@/components/ComponentsIntranet/confiSunidad'
 import ConfiProyectos from '@/components/ComponentsIntranet/confiProyectos'
 export default function AdmiGeneral(){
     return(
-        <div className="bg-[#0F111A]" >
+        <div className="bg-[#0F111A] flex flex-col h-screen " >
         {/** <NavbarAdmi/> */}
         <NavIntranet />
-        <div  className="flex justify-between items-start" >
+        <div  className=" flex-1 flex " >
         <MenuIntranet />
-        <div className='w-[90%] flex flex-col justify-between items-center overflow-auto h-screen' >
+        <div className='flex-grow flex flex-col justify-between items-center overflow-auto h-full' >
         <Grafica />
         <GraficoInfo/>
         <ConfiRoles/>
