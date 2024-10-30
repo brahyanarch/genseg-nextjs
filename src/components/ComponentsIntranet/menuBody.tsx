@@ -4,47 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Bell,
-  Settings,
-  Users,
-  FileText,
-  LayoutDashboard,
-  ChevronDown,
-  Search,
-  Moon,
-  Sun,
-} from "lucide-react";
+import {  ChevronLeft,  ChevronRight,  Bell,  Settings,  Users,  FileText,  LayoutDashboard,  ChevronDown,  Search,  Moon,  Sun,} from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
-import {
-  API_ROLES,
-  API_SUBUNIDADES,
-  apiRolesWithDni,
-  API_ROLES_WITH_DNI,
-} from "@/config/apiconfig";
+import {  API_ROLES,  API_SUBUNIDADES,  apiRolesWithDni,  API_ROLES_WITH_DNI,} from "@/config/apiconfig";
 import { MenuRoles } from "@/components/iconsPlus";
-import {
-  Roles,
-  Perfil,
-  Notificacion,
-} from "@/components/ComponentsIntranet/navIntranet";
-import {
-  Breadcrumb,
-  BreadcrumbEllipsis,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import {  Roles,  Perfil,  Notificacion,} from "@/components/ComponentsIntranet/navIntranet";
+import {  Breadcrumb,  BreadcrumbEllipsis,  BreadcrumbItem,  BreadcrumbLink,  BreadcrumbList,  BreadcrumbPage,  BreadcrumbSeparator,} from "@/components/ui/breadcrumb";
+import {  DropdownMenu,  DropdownMenuContent,  DropdownMenuItem,  DropdownMenuTrigger,} from "@/components/ui/dropdown-menu";
+import Principal from "@/components/ComponentsIntranet/principal"
+
 
 interface Role {
   id_rol: number;
@@ -56,6 +24,16 @@ interface Subunidad {
   n_subuni: string;
   abreviatura: string;
 }
+
+// Define los posibles valores para `activeContent`
+type ContentType = "Principal" | "roles" | "configuracion";
+
+// Define el tipo del mapeo de contenido
+const contentMap: Record<ContentType, JSX.Element> = {
+  Principal: <Principal />,
+  roles: <Principal />,
+  configuracion: <Principal />,
+};
 
 const Component = ({
   idrol,
@@ -88,7 +66,10 @@ const Component = ({
     },
     { icon: FileText, label: "Monitoreo" },
     { icon: Users, label: "Pagina" },
+    { icon: Users, label: "Config" },
   ];
+
+
 
   const getRoleName = (rol_id: number) => {
     const role = nomroles.find((r) => r.id_rol === rol_id);
@@ -275,28 +256,15 @@ const Component = ({
         </aside>
         <main className="flex-1 p-6 overflow-auto">
           <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="">Inicio</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink
-                    href=""
-                    className="text-blue-600 font-bold"
-                  >
-                    Principal
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+            
             <h1 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-white">
-              {activeContent}
+              {/*activeContent*/}
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
-              Este es el contenido de la sección {activeContent}. Aquí se
-              mostraría la información relevante para esta área.
+              {/*Este es el contenido de la sección {activeContent}. Aquí se
+              mostraría la información relevante para esta área.*/}
+              
+              {activeContent === "Principal" ?<Principal /> : null }
             </p>
           </div>
         </main>
