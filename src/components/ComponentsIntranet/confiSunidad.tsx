@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Edit, Trash2, CirclePlus, X } from "lucide-react";
+import { API_SUBUNIDADES } from "@/config/apiconfig";
 
 const subUnidades = [
   { id: 1, nombre: "Proyeccion social y extension Universitaria", abreviatura: "PSEU" },
@@ -22,7 +23,7 @@ function AddSubUnidadModal({ isOpen, closeModal, addSubUnidad }: any) {
     };
 
     try {
-      const response = await fetch('http://localhost:3000/api/subunidad', {
+      const response = await fetch(API_SUBUNIDADES, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -113,7 +114,7 @@ export default function Component() {
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/subunidad');
+        const response = await fetch(API_SUBUNIDADES);
         if (!response.ok) {
           throw new Error('Error al obtener las Sub Unidades');
         }

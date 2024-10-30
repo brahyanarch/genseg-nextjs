@@ -6,7 +6,7 @@ import Dona from "@/components/ComponentsIntranet/graficoDona"
 export default function Principal (){
     return(
         <>
-        <BreadcrumbItems items={["Inicio", "Configuración"]} />
+        <BreadcrumbItems items={["Inicio", "Principal"]} />
         <div className="flex items-center space-x-4">
 
         <Completado />

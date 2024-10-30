@@ -5,14 +5,17 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {  ChevronLeft,  ChevronRight,  Bell,  Settings,  Users,  FileText,  LayoutDashboard,  ChevronDown,  Search,  Moon,  Sun,} from "lucide-react";
-import { Skeleton } from "../ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import {  API_ROLES,  API_SUBUNIDADES,  apiRolesWithDni,  API_ROLES_WITH_DNI,} from "@/config/apiconfig";
 import { MenuRoles } from "@/components/iconsPlus";
 import {  Roles,  Perfil,  Notificacion,} from "@/components/ComponentsIntranet/navIntranet";
 import {  Breadcrumb,  BreadcrumbEllipsis,  BreadcrumbItem,  BreadcrumbLink,  BreadcrumbList,  BreadcrumbPage,  BreadcrumbSeparator,} from "@/components/ui/breadcrumb";
 import {  DropdownMenu,  DropdownMenuContent,  DropdownMenuItem,  DropdownMenuTrigger,} from "@/components/ui/dropdown-menu";
 import Principal from "@/components/ComponentsIntranet/principal"
-
+import ConfiRoles from "@/components/ComponentsIntranet/confiRoles"
+import ConfiPermisos from '@/components/ComponentsIntranet/confiPermisos'
+import ConfiUsers from '@/components/ComponentsIntranet/confiUsers'
+import ConfiSunidad from '@/components/ComponentsIntranet/confiSunidad'
 
 interface Role {
   id_rol: number;
@@ -26,13 +29,16 @@ interface Subunidad {
 }
 
 // Define los posibles valores para `activeContent`
-type ContentType = "Principal" | "roles" | "configuracion";
+type ContentType = "Principal" | "Roles" | "Configuracion" | "Permisos" | "Usuarios" | "Sub unidad";
 
 // Define el tipo del mapeo de contenido
 const contentMap: Record<ContentType, JSX.Element> = {
   Principal: <Principal />,
-  roles: <Principal />,
-  configuracion: <Principal />,
+  Configuracion: <Principal />,
+  Roles: <ConfiRoles/>,
+  Permisos: <ConfiPermisos/>,
+  Usuarios: <ConfiUsers/>,
+  "Sub unidad": <ConfiSunidad/>,
 };
 
 const Component = ({
@@ -46,7 +52,7 @@ const Component = ({
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
-  const [activeContent, setActiveContent] = useState("Principal");
+  const [activeContent, setActiveContent] = useState<ContentType>("Principal");
   const [nomroles, setnomroles] = useState<Role[]>([]);
   const [subunidades, setSubunidades] = useState<Subunidad[]>([]);
   const [nombreRol, setNombreRol] = useState<String>();
@@ -83,7 +89,7 @@ const Component = ({
     return subunidad ? subunidad.n_subuni : null;
   };
 
-  const handleMenuClick = (label: string) => {
+  const handleMenuClick = (label: ContentType) => {
     setActiveContent(label);
     if (label !== "Configuracion") {
       setIsConfigOpen(false);
@@ -116,7 +122,7 @@ const Component = ({
       document.documentElement.classList.remove("dark");
     }
   };
-  const handleSubItemClick = (subItem: string) => {
+  const handleSubItemClick = (subItem: ContentType) => {
     setActiveContent(subItem);
   };
 
@@ -213,7 +219,7 @@ const Component = ({
                       isCollapsed ? "px-2" : "px-4"
                     }`}
                     onClick={() => {
-                      handleMenuClick(item.label);
+                      handleMenuClick(item.label as ContentType);
                       item.onClick?.();
                     }}
                     aria-expanded={
@@ -242,7 +248,7 @@ const Component = ({
                           variant="ghost"
                           size="sm"
                           className="w-full justify-start"
-                          onClick={() => handleSubItemClick(subItem)}
+                          onClick={() => handleSubItemClick(subItem as ContentType)}
                         >
                           {subItem}
                         </Button>
@@ -264,7 +270,7 @@ const Component = ({
               {/*Este es el contenido de la sección {activeContent}. Aquí se
               mostraría la información relevante para esta área.*/}
               
-              {activeContent === "Principal" ?<Principal /> : null }
+              {contentMap[activeContent] || null}
             </p>
           </div>
         </main>

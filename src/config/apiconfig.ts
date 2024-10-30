@@ -16,6 +16,7 @@ export const API_ROLES_WITH_DNI = `${API_URL}/api/roles/:dni`;  // Corrige el no
 export const API_ROLES = `${API_URL}/api/roles`;
 export const API_SUBUNIDADES = `${API_URL}/api/subunidad`;
 export const API_LOGIN = `${API_URL}/api/auth/login`;
+export const API_PERMISOS = `${API_URL}/api/permisos`;
 
 //https://2nlfx0w1-3000.brs.devtunnels.mshttps//2nlfx0w1-3000.brs.devtunnels.ms/api/roles/75548237
 //https://2nlfx0w1-3000.brs.devtunnels.ms/api/roles/75548237
