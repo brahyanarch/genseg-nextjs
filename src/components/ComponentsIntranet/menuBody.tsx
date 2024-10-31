@@ -68,13 +68,19 @@ const Component = ({
     { icon: Bell, label: "Notificación" },
     {
       icon: Settings,
-      label: "Configuracion",
+      label: "Configuracion General",
       subItems: ["Roles", "Permisos", "Usuarios", "Sub unidad"],
       onClick: toggleConfig,
     },
     { icon: FileText, label: "Monitoreo" },
     { icon: Users, label: "Pagina" },
     { icon: FolderKanban, label: "Proyectos" },
+    {
+      icon: Settings,
+      label: "Configuracion",
+      subItems: ["Roles", "Usuarios", "Formularios"],
+      onClick: toggleConfig,
+    },
   ];
 
 

@@ -1,4 +1,4 @@
-export const EnCurso = () => {
+
 export const EnCurso = () => {
     return (
       <div>
@@ -12,7 +12,6 @@ export const EnCurso = () => {
     );
   };
 
- export const Archivado = () => {
 export const Archivado = () => {
     return (
       <div>
@@ -25,7 +24,6 @@ export const Archivado = () => {
     );
   };
 export const Pendiente = () => {
-export const Pendiente = () => {
     return (
       <div>
         <svg width="51" height="53" viewBox="0 0 51 53" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -37,7 +35,6 @@ export const Pendiente = () => {
       </div>
     );
   };
-  export const Completado = () => {
 export const Completado = () => {
     return (
       <div>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Edit, Trash2, CirclePlus, X } from "lucide-react";
 import { API_SUBUNIDADES } from "@/config/apiconfig";
+import {Skeleton} from "@/components/ui/skeleton"
 
 const subUnidades = [
   { id: 1, nombre: "Proyeccion social y extension Universitaria", abreviatura: "PSEU" },
@@ -135,7 +136,59 @@ export default function Component() {
   };
 
   if (loading) {
-    return <p>Cargando la Lista de Sub Unidades...</p>;
+    return (
+      <>
+      <div className="p-6 space-y-6">
+      {/* Breadcrumb skeleton */}
+      <div className="flex items-center gap-2 text-sm">
+        <Skeleton className="h-4 w-12" />
+        <Skeleton className="h-4 w-4" />
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-4 w-4" />
+        <Skeleton className="h-4 w-16" />
+      </div>
+
+      {/* Title skeleton */}
+      <div className="space-y-4">
+        <Skeleton className="h-8 w-32" />
+        
+        {/* New button skeleton */}
+        <Button variant="outline" disabled className="gap-2">
+          <Skeleton className="h-4 w-12" />
+        </Button>
+      </div>
+
+      {/* Table skeleton */}
+      <div className="rounded-lg border">
+        {/* Header */}
+        <div className="grid grid-cols-[100px_1fr_100px] bg-muted p-4 gap-4">
+          <Skeleton className="h-4 w-8" />
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-4 w-20" />
+        </div>
+
+        {/* Table row */}
+        <div className="grid grid-cols-[100px_1fr_100px] p-4 gap-4 items-center">
+          <Skeleton className="h-4 w-6" />
+          <Skeleton className="h-4 w-32" />
+          <div className="flex gap-2">
+            <Skeleton className="h-8 w-8" />
+            <Skeleton className="h-8 w-8" />
+          </div>
+        </div>
+      </div>
+
+      {/* Pagination skeleton */}
+      <div className="flex justify-center gap-2 mt-4">
+        <Skeleton className="h-8 w-8" />
+        <Skeleton className="h-8 w-8" />
+        <Skeleton className="h-8 w-8" />
+        <Skeleton className="h-8 w-8" />
+        <Skeleton className="h-8 w-8" />
+      </div>
+    </div>
+      </>
+    );
   }
 
   if (error) {

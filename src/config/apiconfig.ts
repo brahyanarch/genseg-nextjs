@@ -10,9 +10,13 @@ const API_URL = "https://2nlfx0w1-3000.brs.devtunnels.ms";
 export const apiRolesWithDni = (path: string, dni: string=""): string => {
     return `${path.replace(':dni', dni)}`;
   };
+export const apipermisos_id = (path: string, id: number): string => {
+  return `${path.replace(':id', id.toString())}`;
+};
 
 // Rutas estáticas de ejemplo:
 export const API_ROLES_WITH_DNI = `${API_URL}/api/roles/:dni`;  // Corrige el nombre para evitar errores
+export const API_PERMISOS_ID = `${API_URL}/api/permisos/:id`;  // Corrige el nombre para evitar errores
 export const API_ROLES = `${API_URL}/api/roles`;
 export const API_SUBUNIDADES = `${API_URL}/api/subunidad`;
 export const API_LOGIN = `${API_URL}/api/auth/login`;
