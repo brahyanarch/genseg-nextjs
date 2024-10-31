@@ -46,14 +46,3 @@ export const Completado = () => {
       </div> 
     );
   };
-
-
-const Proyectos = () => {
-  return (
-    <>
-    asdsa
-    </>
-  );
-}
-
-export default Proyectos;

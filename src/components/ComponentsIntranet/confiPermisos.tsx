@@ -1,28 +1,18 @@
-'use client'
-import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { X,Edit, Trash2, CirclePlus, Plus } from "lucide-react"
-import {useState, useEffect} from 'react'
+'use client';
+import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { X, Edit, Trash2, CirclePlus } from "lucide-react";
+import { useState, useEffect } from 'react';
 import { API_PERMISOS } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
 import BreadcrumbItems from "@/components/breadcrumb";
 
-
-const permissions = [
-  { id: 1, nombre: "Insertar Proyecto" },
-  { id: 2, nombre: "Editar Proyecto" },
-  { id: 3, nombre: "Eliminar Proyecto" },
-  { id: 1, nombre: "habilitación de solicitud para modificación" },
-  { id: 2, nombre: "aceptar solicitud para eliminación" },
-  { id: 3, nombre: "Crear formulario para la inserción de proyectos" },
-]
-
 // Modal para agregar un nuevo Permiso
-export const EditModal = ({ isOpen, closeModal }:any) => {
+export const EditModal = ({ isOpen, closeModal, onAddPermission }: any) => {
   const [name, setName] = useState('');
   const [abbreviation, setAbbreviation] = useState('');
 
-  const handleSubmit = async (e:any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     const newPer = {
       n_per: name,
@@ -30,7 +20,6 @@ export const EditModal = ({ isOpen, closeModal }:any) => {
     };
 
     try {
-      //Haciendo la Solicitud
       const response = await fetch(API_PERMISOS, {
         method: 'POST',
         headers: {
@@ -40,9 +29,10 @@ export const EditModal = ({ isOpen, closeModal }:any) => {
       });
 
       if (response.ok) {
+        const addedPermission = await response.json();
         console.log('Permiso agregado correctamente');
+        onAddPermission(addedPermission);
         closeModal();
-        // Puedes actualizar la lista de roles aquí si es necesario
       } else {
         console.error('Error al agregar el permiso');
       }
@@ -63,7 +53,7 @@ export const EditModal = ({ isOpen, closeModal }:any) => {
         >
           <X size={24} />
         </button>
-        <h2 className="text-2xl font-bold mb-4 text-white">Editar</h2>
+        <h2 className="text-2xl font-bold mb-4 text-white">Agregar Permiso</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
@@ -118,9 +108,9 @@ export default function Component() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // useEffect para obtener los roles desde la API al montar el componente
+  // useEffect para obtener los permisos desde la API al montar el componente
   useEffect(() => {
-    const fetchRoles = async () => {
+    const fetchPermisos = async () => {
       try {
         const response = await fetch(API_PERMISOS);
         if (!response.ok) {
@@ -128,135 +118,117 @@ export default function Component() {
         }
         const data = await response.json();
         setPermisos(data);
-      } catch (err:any) {
+      } catch (err: any) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRoles();
+    fetchPermisos();
   }, []);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
 
+  const addPermission = (newPermission: any) => {
+    const fetchPermisos = async () => {
+      try {
+        const response = await fetch(API_PERMISOS);
+        if (!response.ok) {
+          throw new Error('Error al obtener los Permisos');
+        }
+        const data = await response.json();
+        setPermisos(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPermisos();
+    // Agregar el nuevo permiso al estado
+  };
+
+  const deletePermission = async (id: number) => {
+    try {
+      const response = await fetch(`${API_PERMISOS}/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        // Actualiza la lista de permisos eliminando el permiso
+        setPermisos((prevPermisos) => prevPermisos.filter((permiso:any) => permiso.id_per !== id));
+        console.log('Permiso eliminado correctamente');
+      } else {
+        console.error('Error al eliminar el permiso');
+      }
+    } catch (error) {
+      console.error('Error al conectar con la API:', error);
+    }
+  };
+
   if (loading) {
-    return <>
-    <div className="p-6 space-y-6">
-      {/* Breadcrumb skeleton */}
-      <div className="flex items-center gap-2 text-sm">
+    return (
+      <div className="p-6 space-y-6">
         <Skeleton className="h-4 w-12" />
-        <Skeleton className="h-4 w-4" />
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-4 w-4" />
-        <Skeleton className="h-4 w-16" />
       </div>
-
-      {/* Title skeleton */}
-      <div className="space-y-4">
-        <Skeleton className="h-8 w-32" />
-        
-        {/* New button skeleton */}
-        <Button variant="outline" disabled className="gap-2">
-          <Plus className="h-4 w-4" />
-          <Skeleton className="h-4 w-12" />
-        </Button>
-      </div>
-
-      {/* Table skeleton */}
-      <div className="rounded-lg border">
-        {/* Header */}
-        <div className="grid grid-cols-[100px_1fr_100px] bg-muted p-4 gap-4">
-          <Skeleton className="h-4 w-8" />
-          <Skeleton className="h-4 w-16" />
-          <Skeleton className="h-4 w-20" />
-        </div>
-
-        {/* Table row */}
-        <div className="grid grid-cols-[100px_1fr_100px] p-4 gap-4 items-center">
-          <Skeleton className="h-4 w-6" />
-          <Skeleton className="h-4 w-32" />
-          <div className="flex gap-2">
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-          </div>
-        </div>
-      </div>
-
-      {/* Pagination skeleton */}
-      <div className="flex justify-center gap-2 mt-4">
-        <Skeleton className="h-8 w-8" />
-        <Skeleton className="h-8 w-8" />
-        <Skeleton className="h-8 w-8" />
-        <Skeleton className="h-8 w-8" />
-        <Skeleton className="h-8 w-8" />
-      </div>
-    </div>
-    </>;
+    );
   }
 
   if (error) {
     return <p>Error: {error}</p>;
   }
+
   return (
-    <div className=" w-[90%] m-4 p-4 space-y-4 text-white min-h-screen">
+    <div className="w-[90%] m-4 p-4 space-y-4 text-white min-h-screen">
       <BreadcrumbItems items={["Inicio", "Configuración", "Permisos"]} />
-      <div >
+      <div>
         <h1 className="text-2xl font-bold text-black dark:text-white">Permisos</h1>
       </div>
       <Button variant="secondary" size="sm" onClick={toggleModal}>
-      <CirclePlus className="h-4 w-4"  />
-          nuevo
+        <CirclePlus className="h-4 w-4" />
+        Nuevo
       </Button>
       <div className="bg-[#E3E6ED] rounded-lg">
-      <Table className="w-[90%] mx-auto my-6">
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-16 border-l border-gray-900">ID</TableHead>
-            <TableHead>Nombre</TableHead>
-            <TableHead className="w-24 border-r border-gray-900">Opciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody className="text-gray-900">
-          {Permisos.map((permission:any) => (
-            <TableRow key={`${permission.id_per}-${permission.n_per}`}>
-              <TableCell className=" px-4 border-l border-gray-900">{permission.id_per}</TableCell>
-              <TableCell>{permission.n_per}</TableCell>
-              <TableCell className="border-r border-gray-900">
-                <div className="flex space-x-2">
-                  <Button variant="ghost" size="icon">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
+        <Table className="w-[90%] mx-auto my-6">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-16 border-l border-gray-900">ID</TableHead>
+              <TableHead>Nombre</TableHead>
+              <TableHead className="w-24 border-r border-gray-900">Opciones</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody className="text-gray-900">
+            {Permisos.map((permission: any) => (
+              <TableRow key={permission.id_per}>
+                <TableCell className="px-4 border-l border-gray-900">{permission.id_per}</TableCell>
+                <TableCell>{permission.n_per}</TableCell>
+                <TableCell className="border-r border-gray-900">
+                  <div className="flex space-x-2">
+                    <Button variant="ghost" size="icon">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => deletePermission(permission.id_per)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
       <div className="flex justify-center items-center space-x-2">
-        <Button variant="outline" size="sm">
-          Anterior
-        </Button>
-        <Button variant="outline" size="sm">
-          1
-        </Button>
-        <Button variant="outline" size="sm">
-          2
-        </Button>
-        <Button variant="outline" size="sm">
-          3
-        </Button>
-        <Button variant="outline" size="sm">
-          Siguiente
-        </Button>
+        <Button variant="outline" size="sm">Anterior</Button>
+        <Button variant="outline" size="sm">1</Button>
+        <Button variant="outline" size="sm">2</Button>
+        <Button variant="outline" size="sm">3</Button>
+        <Button variant="outline" size="sm">Siguiente</Button>
       </div>
-      <EditModal isOpen={isModalOpen} closeModal={toggleModal} />
+      <EditModal isOpen={isModalOpen} closeModal={toggleModal} onAddPermission={addPermission} />
     </div>
-  )
+  );
 }
