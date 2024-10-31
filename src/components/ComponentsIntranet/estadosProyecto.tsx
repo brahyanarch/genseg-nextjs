@@ -35,7 +35,6 @@ export const Pendiente = () => {
       </div>
     );
   };
-  export const Completado = () => {
 export const Completado = () => {
     return (
       <div>
