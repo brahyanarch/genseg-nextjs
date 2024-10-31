@@ -1,4 +1,4 @@
-export const EnCurso = () => {
+
 export const EnCurso = () => {
     return (
       <div>
@@ -12,7 +12,6 @@ export const EnCurso = () => {
     );
   };
 
- export const Archivado = () => {
 export const Archivado = () => {
     return (
       <div>
@@ -24,7 +23,6 @@ export const Archivado = () => {
       </div>
     );
   };
-export const Pendiente = () => {
 export const Pendiente = () => {
     return (
       <div>
@@ -49,4 +47,3 @@ export const Completado = () => {
       </div> 
     );
   };
-
