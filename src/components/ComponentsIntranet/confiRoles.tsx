@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { X, Edit, Trash2, List, CirclePlus } from "lucide-react";
 import BreadcrumbItems from "@/components/breadcrumb";
+import { API_ROLES } from "@/config/apiconfig";
 // Modal para agregar un nuevo Rol
 export const EditModal = ({ isOpen, closeModal }:any) => {
   const [name, setName] = useState('');
@@ -18,7 +19,7 @@ export const EditModal = ({ isOpen, closeModal }:any) => {
     };
 
     try {
-      const response = await fetch('http://localhost:3000/api/roles', {
+      const response = await fetch(API_ROLES, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -109,7 +110,7 @@ const Component = () => {
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/roles');
+        const response = await fetch(API_ROLES);
         if (!response.ok) {
           throw new Error('Error al obtener los roles');
         }

@@ -12,17 +12,29 @@ interface Project {
   
   const proyectos: Project[] = [
     { id: 1, nombre: "Proyecto campos verdes", escuelaProfesional: "EPIS", fecha: "11/02/24 - 26/11/24", estado: "PENDIENTE" },
-    { id: 2, nombre: "Nombre del proyecto", escuelaProfesional: "EPIME", fecha: "11/02/24 - 26/11/24", estado: "ARCHIVADO" },
+    { id: 2, nombre: "Limpieza en el bosque", escuelaProfesional: "EPIME", fecha: "11/02/24 - 26/11/24", estado: "ARCHIVADO" },
     { id: 3, nombre: "Nombre del proyecto", escuelaProfesional: "EPEE", fecha: "11/02/24 - 26/11/24", estado: "COMPLETADO" },
     { id: 1, nombre: "Nombre del proyecto", escuelaProfesional: "EPE", fecha: "11/02/24 - 26/11/24", estado: "EN CURSO" },
     { id: 2, nombre: "Nombre del proyecto", escuelaProfesional: "EPN", fecha: "11/02/24 - 26/11/24", estado: "PENDIENTE" },
     { id: 3, nombre: "Nombre del proyecto", escuelaProfesional: "EPMH", fecha: "11/02/24 - 26/11/24", estado: "PENDIENTE" },
   ]
 export default function Component() {
+  const getStatusClass = (status: Project["estado"]) => {
+    switch (status) {
+      case "PENDIENTE":
+        return "bg-orange-100 text-orange-800 border-2 border-orange-300 dark:bg-orange-900 dark:text-orange-200 "
+      case "ARCHIVADO":
+        return "bg-red-100 text-red-800 border-2 border-red-300 dark:bg-red-900 dark:text-red-200"
+      case "COMPLETADO":
+        return "bg-green-100 text-green-800 border-2 border-green-300 dark:bg-green-900 dark:text-green-200"
+      case "EN CURSO":
+        return "bg-blue-100 text-blue-800 border-2 border-blue-300 dark:bg-blue-900 dark:text-blue-200"
+    }
+  }
   return (
     <div className=" w-[90%] m-4 p-4 space-y-4 text-white min-h-screen">
       <div >
-        <h1 className="text-2xl font-bold">Proyectos</h1>
+        <h1 className="text-2xl font-bold text-black dark:text-white">Proyectos</h1>
       </div>
       <Button variant="secondary" size="sm" >
       <CirclePlus className="h-4 w-4" />
@@ -48,8 +60,8 @@ export default function Component() {
               <TableCell>{proyect.escuelaProfesional}</TableCell>
               <TableCell>{proyect.fecha}</TableCell>
               <TableCell>
-                <span className="px-2 py-1 bg-green-500 text-white rounded-full text-xs">
-                  {proyect.estado}
+                <span className={`px-2 py-1 rounded-md text-xs font-medium ${getStatusClass(proyect.estado)}`}>
+                    {proyect.estado}
                 </span>
               </TableCell>
               <TableCell className="border-r border-gray-900">

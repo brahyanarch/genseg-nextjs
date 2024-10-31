@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {  ChevronLeft,  ChevronRight,  Bell,  Settings,  Users,  FileText,  LayoutDashboard,  ChevronDown,  Search,  Moon,  Sun,} from "lucide-react";
+import {  ChevronLeft,  ChevronRight,  Bell,  Settings,  Users,  FileText,  LayoutDashboard,  ChevronDown,  Search,  Moon,  Sun, FolderKanban} from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {  API_ROLES,  API_SUBUNIDADES,  apiRolesWithDni,  API_ROLES_WITH_DNI,} from "@/config/apiconfig";
 import { MenuRoles } from "@/components/iconsPlus";
@@ -16,6 +16,7 @@ import ConfiRoles from "@/components/ComponentsIntranet/confiRoles"
 import ConfiPermisos from '@/components/ComponentsIntranet/confiPermisos'
 import ConfiUsers from '@/components/ComponentsIntranet/confiUsers'
 import ConfiSunidad from '@/components/ComponentsIntranet/confiSunidad'
+import Proyectos from "@/components/ComponentsIntranet/confiProyectos"
 
 interface Role {
   id_rol: number;
@@ -29,7 +30,7 @@ interface Subunidad {
 }
 
 // Define los posibles valores para `activeContent`
-type ContentType = "Principal" | "Roles" | "Configuracion" | "Permisos" | "Usuarios" | "Sub unidad";
+type ContentType = "Principal" | "Roles" | "Configuracion" | "Permisos" | "Usuarios" | "Sub unidad" | "Proyectos";
 
 // Define el tipo del mapeo de contenido
 const contentMap: Record<ContentType, JSX.Element> = {
@@ -39,6 +40,7 @@ const contentMap: Record<ContentType, JSX.Element> = {
   Permisos: <ConfiPermisos/>,
   Usuarios: <ConfiUsers/>,
   "Sub unidad": <ConfiSunidad/>,
+  Proyectos: <Proyectos/>,
 };
 
 const Component = ({
@@ -72,7 +74,7 @@ const Component = ({
     },
     { icon: FileText, label: "Monitoreo" },
     { icon: Users, label: "Pagina" },
-    { icon: Users, label: "Config" },
+    { icon: FolderKanban, label: "Proyectos" },
   ];
 
 
@@ -270,7 +272,7 @@ const Component = ({
               {/*Este es el contenido de la sección {activeContent}. Aquí se
               mostraría la información relevante para esta área.*/}
               
-              {contentMap[activeContent] || null}
+              {contentMap[activeContent] || <>Componentes de por defecto</>}
             </p>
           </div>
         </main>
