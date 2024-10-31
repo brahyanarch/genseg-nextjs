@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { X, Edit, Trash2, List, CirclePlus } from "lucide-react";
-
+import BreadcrumbItems from "@/components/breadcrumb";
 // Modal para agregar un nuevo Rol
 export const EditModal = ({ isOpen, closeModal }:any) => {
   const [name, setName] = useState('');
@@ -139,8 +139,9 @@ const Component = () => {
 
   return (
     <div className="p-4 m-4 space-y-4 w-[90%] mt-4 text-white min-h-screen">
+      <BreadcrumbItems items={["Inicio", "Administracion", "Roles"]} />
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Roles</h1>
+        <h1 className="text-2xl font-bold text-black dark:text-white">Roles</h1>
       </div>
       <div className="flex justify-between">
         <Button variant="secondary" size="sm" onClick={toggleModal}>
