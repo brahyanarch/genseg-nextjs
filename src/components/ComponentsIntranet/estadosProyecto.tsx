@@ -41,3 +41,13 @@ export const Completado = () => {
     );
   };
 
+
+const Proyectos = () => {
+  return (
+    <>
+    asdsa
+    </>
+  );
+}
+
+export default Proyectos;
