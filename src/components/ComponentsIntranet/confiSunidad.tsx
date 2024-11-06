@@ -1,24 +1,20 @@
-'use client' 
-import { useState, useEffect } from "react";
+'use client';
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Edit, Trash2, CirclePlus, X } from "lucide-react";
+import { X, Edit, Trash2, CirclePlus } from "lucide-react";
+import { useState, useEffect } from 'react';
 import { API_SUBUNIDADES } from "@/config/apiconfig";
-import {Skeleton} from "@/components/ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton";
+import BreadcrumbItems from "@/components/breadcrumb";
 
-const subUnidades = [
-  { id: 1, nombre: "Proyeccion social y extension Universitaria", abreviatura: "PSEU" },
-  { id: 2, nombre: "Seguimiento y Desarrollo del Graduado", abreviatura: "SDG" },
-  { id: 3, nombre: "Gestion Ambiental", abreviatura: "GA" },
-];
+// Modal para agregar un nuevo Permiso
+export const EditModal = ({ isOpen, closeModal, onAddPermission }: any) => {
+  const [name, setName] = useState('');
+  const [abbreviation, setAbbreviation] = useState('');
 
-// Modal para agregar una nueva Sub Unidad
-function AddSubUnidadModal({ isOpen, closeModal, addSubUnidad }: any) {
-  const [name, setName] = useState("");
-  const [abbreviation, setAbbreviation] = useState("");
-  const handleSubmit = async (e:any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    const newRole = {
+    const newPer = {
       nombre: name,
       abreviatura: abbreviation
     };
@@ -29,15 +25,16 @@ function AddSubUnidadModal({ isOpen, closeModal, addSubUnidad }: any) {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(newRole)
+        body: JSON.stringify(newPer)
       });
 
       if (response.ok) {
-        console.log('Rol agregado correctamente');
+        const addedPermission = await response.json();
+        console.log('Permiso agregado correctamente');
+        onAddPermission(addedPermission);
         closeModal();
-        // Puedes actualizar la lista de roles aquí si es necesario
       } else {
-        console.error('Error al agregar el rol');
+        console.error('Error al agregar el permiso');
       }
     } catch (error) {
       console.error('Error al conectar con la API:', error);
@@ -56,7 +53,7 @@ function AddSubUnidadModal({ isOpen, closeModal, addSubUnidad }: any) {
         >
           <X size={24} />
         </button>
-        <h2 className="text-2xl font-bold mb-4 text-white">Agregar Sub Unidad</h2>
+        <h2 className="text-2xl font-bold mb-4 text-white">Agregar Permiso</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
@@ -67,7 +64,7 @@ function AddSubUnidadModal({ isOpen, closeModal, addSubUnidad }: any) {
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Nombre de la sub unidad"
+              placeholder="Permiso"
               className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
             />
           </div>
@@ -80,7 +77,7 @@ function AddSubUnidadModal({ isOpen, closeModal, addSubUnidad }: any) {
               id="abbreviation"
               value={abbreviation}
               onChange={(e) => setAbbreviation(e.target.value)}
-              placeholder="Abreviatura"
+              placeholder="Ins o Vacío"
               className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
             />
           </div>
@@ -103,91 +100,81 @@ function AddSubUnidadModal({ isOpen, closeModal, addSubUnidad }: any) {
       </div>
     </div>
   );
-}
+};
 
 export default function Component() {
-  const [SubUnidad, setSubUnidad] = useState([]);
+  const [Permisos, setPermisos] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // useEffect para obtener los roles desde la API al montar el componente
+  // useEffect para obtener los permisos desde la API al montar el componente
   useEffect(() => {
-    const fetchRoles = async () => {
+    const fetchPermisos = async () => {
       try {
         const response = await fetch(API_SUBUNIDADES);
         if (!response.ok) {
-          throw new Error('Error al obtener las Sub Unidades');
+          throw new Error('Error al obtener los Permisos');
         }
         const data = await response.json();
-        setSubUnidad(data);
-      } catch (err:any) {
+        setPermisos(data);
+      } catch (err: any) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRoles();
+    fetchPermisos();
   }, []);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
 
+  const addPermission = (newPermission: any) => {
+    const fetchPermisos = async () => {
+      try {
+        const response = await fetch(API_SUBUNIDADES);
+        if (!response.ok) {
+          throw new Error('Error al obtener los Permisos');
+        }
+        const data = await response.json();
+        setPermisos(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPermisos();
+    // Agregar el nuevo permiso al estado
+  };
+
+  const deletePermission = async (id: number) => {
+    try {
+      const response = await fetch(`${API_SUBUNIDADES}/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        // Actualiza la lista de permisos eliminando el permiso
+        setPermisos((prevPermisos) => prevPermisos.filter((permiso:any) => permiso.id_per !== id));
+        console.log('Permiso eliminado correctamente');
+      } else {
+        console.error('Error al eliminar el permiso');
+      }
+    } catch (error) {
+      console.error('Error al conectar con la API:', error);
+    }
+  };
+
   if (loading) {
     return (
-      <>
       <div className="p-6 space-y-6">
-      {/* Breadcrumb skeleton */}
-      <div className="flex items-center gap-2 text-sm">
         <Skeleton className="h-4 w-12" />
-        <Skeleton className="h-4 w-4" />
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-4 w-4" />
-        <Skeleton className="h-4 w-16" />
       </div>
-
-      {/* Title skeleton */}
-      <div className="space-y-4">
-        <Skeleton className="h-8 w-32" />
-        
-        {/* New button skeleton */}
-        <Button variant="outline" disabled className="gap-2">
-          <Skeleton className="h-4 w-12" />
-        </Button>
-      </div>
-
-      {/* Table skeleton */}
-      <div className="rounded-lg border">
-        {/* Header */}
-        <div className="grid grid-cols-[100px_1fr_100px] bg-muted p-4 gap-4">
-          <Skeleton className="h-4 w-8" />
-          <Skeleton className="h-4 w-16" />
-          <Skeleton className="h-4 w-20" />
-        </div>
-
-        {/* Table row */}
-        <div className="grid grid-cols-[100px_1fr_100px] p-4 gap-4 items-center">
-          <Skeleton className="h-4 w-6" />
-          <Skeleton className="h-4 w-32" />
-          <div className="flex gap-2">
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-          </div>
-        </div>
-      </div>
-
-      {/* Pagination skeleton */}
-      <div className="flex justify-center gap-2 mt-4">
-        <Skeleton className="h-8 w-8" />
-        <Skeleton className="h-8 w-8" />
-        <Skeleton className="h-8 w-8" />
-        <Skeleton className="h-8 w-8" />
-        <Skeleton className="h-8 w-8" />
-      </div>
-    </div>
-      </>
     );
   }
 
@@ -197,8 +184,9 @@ export default function Component() {
 
   return (
     <div className="w-[90%] m-4 p-4 space-y-4 text-white min-h-screen">
+      <BreadcrumbItems items={["Inicio", "Configuración", "Sub Unidad"]} />
       <div>
-        <h1 className="text-2xl font-bold">Sub Unidad</h1>
+        <h1 className="text-2xl font-bold text-black dark:text-white">Sub Unidad</h1>
       </div>
       <Button variant="secondary" size="sm" onClick={toggleModal}>
         <CirclePlus className="h-4 w-4" />
@@ -210,22 +198,20 @@ export default function Component() {
             <TableRow>
               <TableHead className="w-16 border-l border-gray-900">ID</TableHead>
               <TableHead>Nombre</TableHead>
-              <TableHead>Abreviatura</TableHead>
               <TableHead className="w-24 border-r border-gray-900">Opciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className="text-gray-900">
-            {SubUnidad.map((subUnidad:any) => (
-              <TableRow key={subUnidad.id_subUni}>
-                <TableCell className="px-4 border-l border-gray-900">{subUnidad.id_subUni}</TableCell>
-                <TableCell>{subUnidad.n_subUni}</TableCell>
-                <TableCell>{subUnidad.abrev}</TableCell>
+            {Permisos.map((permission: any, index) => (
+              <TableRow key={permission.id_subuni}>
+                <TableCell className="px-4 border-l border-gray-900">{index+1}</TableCell>
+                <TableCell>{permission.n_subuni}</TableCell>
                 <TableCell className="border-r border-gray-900">
                   <div className="flex space-x-2">
                     <Button variant="ghost" size="icon">
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" onClick={() => deletePermission(permission.id_subuni)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -235,17 +221,14 @@ export default function Component() {
           </TableBody>
         </Table>
       </div>
-      <div className="flex justify-between items-center">
-        <Button variant="outline" size="sm">
-          Anterior
-        </Button>
-        <Button variant="outline" size="sm">
-          Siguiente
-        </Button>
+      <div className="flex justify-center items-center space-x-2">
+        <Button variant="outline" size="sm">Anterior</Button>
+        <Button variant="outline" size="sm">1</Button>
+        <Button variant="outline" size="sm">2</Button>
+        <Button variant="outline" size="sm">3</Button>
+        <Button variant="outline" size="sm">Siguiente</Button>
       </div>
-
-      {/* Modal para agregar una nueva sub unidad */}
-      <AddSubUnidadModal isOpen={isModalOpen} closeModal={toggleModal}  />
+      <EditModal isOpen={isModalOpen} closeModal={toggleModal} onAddPermission={addPermission} />
     </div>
   );
 }

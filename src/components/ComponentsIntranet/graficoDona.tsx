@@ -22,10 +22,10 @@ import {
 export const description = "A donut chart with text"
 
 const chartData = [
-  { browser: "Completado", visitors: 26, fill: "var(--color-chrome)" },
-  { browser: "Pendiente", visitors: 20, fill: "var(--color-safari)" },
-  { browser: "Archivado", visitors: 10, fill: "var(--color-firefox)" },
-  { browser: "EnCurso", visitors: 8, fill: "var(--color-edge)" },
+  { browser: "Completado", visitors: 5, fill: "var(--color-chrome)" },
+  { browser: "Pendiente", visitors: 3, fill: "var(--color-safari)" },
+  { browser: "Archivado", visitors: 1, fill: "var(--color-firefox)" },
+  { browser: "EnCurso", visitors: 2, fill: "var(--color-edge)" },
 ]
 
 const chartConfig = {
@@ -94,7 +94,7 @@ export default function Component() {
                           className="fill-foreground text-3xl font-bold "
                         >
                           {totalVisitors.toLocaleString()}
-                          %
+                          
                         </tspan>
                         <tspan
                           x={viewBox.cx}
