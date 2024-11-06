@@ -3,11 +3,14 @@ import { useState } from "react";
 import { Menu, X } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
+import {usePathname, useRouter} from 'next/navigation'
+import {clsx} from 'clsx'
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedLink, setSelectedLink] = useState(null); // Estado para rastrear el enlace seleccionado
-
+  ///rastreando el enlace Actual
+  const linkCurrent = usePathname();
   const handleLinkClick = (link:any) => {
     setSelectedLink(link); // Actualiza el estado del enlace seleccionado
   };
@@ -35,28 +38,32 @@ export default function Navbar() {
           <div className="hidden sm:flex sm:items-center">
             <Link
               href="/PageMain/GA"
-              className={`px-3 py-2 rounded-md text-sm font-medium w-52 ${
-                selectedLink === '/PageMain/GA' ? 'bg-gray-500 text-white' : 'text-gray-700 hover:bg-gray-400 hover:text-gray-800'
-              }`}
-              onClick={() => handleLinkClick('/PageMain/GA')}
+              className={clsx(
+                'px-3 py-4 rounded-md text-sm font-medium w-52  text-gray-700 hover:bg-gray-400 hover:text-gray-700',{
+                  'bg-gray-600 text-white': '/PageMain/GA' === usePathname(),
+                }
+              )}
+              
             >
               Gestión Ambiental
             </Link>
             <Link
               href="/PageMain/SDG"
-              className={`px-3 py-2 rounded-md text-sm font-medium w-52 ${
-                selectedLink === '/PageMain/SDG' ? 'bg-gray-500 text-white' : 'text-gray-700 hover:bg-gray-400 hover:text-gray-800'
-              }`}
-              onClick={() => handleLinkClick('/PageMain/SDG')}
+              className={clsx(
+                'px-3 py-2 rounded-md text-sm font-medium w-52 h-30 text-gray-700 hover:bg-gray-400 hover:text-gray-700',{
+                  'bg-gray-600 text-white': '/PageMain/SDG' === usePathname(),
+                }
+              )}
             >
               Seguimiento y Desarrollo del Graduado
             </Link>
             <Link
               href="/PageMain/PSEC"
-              className={`px-3 py-2 rounded-md text-sm font-medium w-52 ${
-                selectedLink === '/PageMain/PSEC' ? 'bg-gray-500 text-white' : 'text-gray-700 hover:bg-gray-400 hover:text-gray-800'
-              }`}
-              onClick={() => handleLinkClick('/PageMain/PSEC')}
+              className={clsx(
+                'px-3 py-2 rounded-md text-sm font-medium w-52 text-gray-700 hover:bg-gray-400 hover:text-gray-700',{
+                  'bg-gray-600 text-white': '/PageMain/PSEC' === usePathname(),
+                }
+              )}
             >
               Proyección Social y Extensión Cultural
             </Link>
