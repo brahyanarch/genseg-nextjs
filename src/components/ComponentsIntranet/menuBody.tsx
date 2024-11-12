@@ -52,6 +52,7 @@ import ConfiPermisos from "@/components/ComponentsIntranet/confiPermisos";
 import ConfiUsers from "@/components/ComponentsIntranet/confiUsers";
 import ConfiSunidad from "@/components/ComponentsIntranet/confiSunidad";
 import Proyectos from "@/components/ComponentsIntranet/confiProyectos";
+import Formulario from "@/components/ComponentsIntranet/formularios";
 
 interface Role {
   id_rol: number;
@@ -75,7 +76,10 @@ type ContentType =
   | "Proyectos"
   | "Monitoreo"
   | "Estadísticas"
+  | "Sub configuracion"
+  | "Formularios"
   | "Logs";
+
 
 // Define el tipo del mapeo de contenido
 const contentMap: Record<ContentType, JSX.Element> = {
@@ -89,6 +93,8 @@ const contentMap: Record<ContentType, JSX.Element> = {
   Monitoreo: <>Componente de Monitoreo</>,
   Estadísticas: <>Componente de Estadísticas</>,
   Logs: <>Componente de Logs</>,
+  "Sub configuracion": <>sdf</>,
+  "Formularios": <Formulario />,
 };
 
 const Component = ({
@@ -103,6 +109,7 @@ const Component = ({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isMonitorOpen, setIsMonitorOpen] = useState(false); // Para el segundo submenú
+  const [isSubConfigOpen, setisSubConfigOpen] = useState(false); // Para el tercer submenú
   const [activeContent, setActiveContent] = useState<ContentType>("Principal");
   const [nomroles, setnomroles] = useState<Role[]>([]);
   const [subunidades, setSubunidades] = useState<Subunidad[]>([]);
@@ -112,6 +119,7 @@ const Component = ({
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
   const toggleConfig = () => setIsConfigOpen(!isConfigOpen);
   const toggleMonitor = () => setIsMonitorOpen(!isMonitorOpen);
+  const toggleSubConfig = () => setisSubConfigOpen(!isSubConfigOpen);
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Principal" },
@@ -130,6 +138,12 @@ const Component = ({
     },
     { icon: Users, label: "Pagina" },
     { icon: FolderKanban, label: "Proyectos" },
+    {
+      icon: Settings,
+      label: "Sub configuracion",
+      subItems: ["Formularios", "Usuarios"],
+      onClick: toggleSubConfig,
+    },
   ];
 
   const getRoleName = (rol_id: number) => {
@@ -151,6 +165,9 @@ const Component = ({
     }
     if (label !== "Monitoreo") {
       setIsMonitorOpen(false);
+    }
+    if (label !== "Sub configuracion") {
+      setisSubConfigOpen(false);
     }
   };
 
@@ -290,14 +307,15 @@ const Component = ({
                       <ChevronDown
                         className={`h-4 w-4 transition-transform ${
                           (label === "Configuracion" && isConfigOpen) ||
-                          (label === "Monitoreo" && isMonitorOpen)
+                          (label === "Monitoreo" && isMonitorOpen) || 
+                          (label === "Sub configuracion" && isSubConfigOpen)
                             ? "rotate-180"
                             : ""
                         }`}
                       />
                     )}
                   </Button>
-                  {!isCollapsed && subItems && ((label === "Configuracion" && isConfigOpen) || (label === "Monitoreo" && isMonitorOpen)) && (
+                  {!isCollapsed && subItems && ((label === "Configuracion" && isConfigOpen) || (label === "Monitoreo" && isMonitorOpen) || (label === "Sub configuracion" && isSubConfigOpen)) && (
                     <ul className="pl-6 space-y-1">
                       {subItems.map((subItem) => (
                         <li key={subItem}>
