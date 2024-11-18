@@ -15,7 +15,7 @@ export const EditModal = ({ isOpen, closeModal, onSavePermission, editingPermiss
   useEffect(() => {
     if (editingPermission) {
       setName(editingPermission.n_per);
-      setAbbreviation(editingPermission.abrev);
+      setAbbreviation(editingPermission.abreviatura);
     }
   }, [editingPermission]);
 
@@ -23,7 +23,7 @@ export const EditModal = ({ isOpen, closeModal, onSavePermission, editingPermiss
     e.preventDefault();
     const updatedPermission = {
       n_per: name,
-      abrev: abbreviation
+      abreviatura: abbreviation
     };
 
     try {

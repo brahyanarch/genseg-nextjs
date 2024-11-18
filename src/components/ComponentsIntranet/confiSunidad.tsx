@@ -13,8 +13,8 @@ export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnida
   const [abbreviation, setAbbreviation] = useState('');
   useEffect(() => {
     if (editingSubUnidad) {
-      setName(editingSubUnidad.n_per);
-      setAbbreviation(editingSubUnidad.abrev);
+      setName(editingSubUnidad.n_subuni);
+      setAbbreviation(editingSubUnidad.abreviatura);
     }
   }, [editingSubUnidad]);
   const handleSubmit = async (e: any) => {
@@ -25,7 +25,7 @@ export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnida
     };
 
     try {
-      const response = await fetch(editingSubUnidad ? `${API_SUBUNIDADES}/${editingSubUnidad.id_per}` : API_SUBUNIDADES, {
+      const response = await fetch(editingSubUnidad ? `${API_SUBUNIDADES}/${editingSubUnidad.id_subuni}` : API_SUBUNIDADES, {
         method: editingSubUnidad ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -144,7 +144,7 @@ export default function Component() {
     setSubUnidad((prevSubUnidad:any) => {
       if (editingSubUnidad) {
         return prevSubUnidad.map((subUnidad: any) => 
-          subUnidad.id_per === savedSubUnidad.id_per ? savedSubUnidad : subUnidad
+          subUnidad.id_subuni === savedSubUnidad.id_subuni ? savedSubUnidad : subUnidad
         );
       } else {
         return [...prevSubUnidad, savedSubUnidad];
@@ -163,7 +163,7 @@ export default function Component() {
 
       if (response.ok) {
         // Actualiza la lista de permisos eliminando el permiso
-        setSubUnidad((prevSubUnidad) => prevSubUnidad.filter((subUnidad:any) => subUnidad.id_per !== id));
+        setSubUnidad((prevSubUnidad) => prevSubUnidad.filter((subUnidad:any) => subUnidad.id_subuni !== id));
         console.log('Permiso eliminado correctamente');
       } else {
         console.error('Error al eliminar el permiso');
