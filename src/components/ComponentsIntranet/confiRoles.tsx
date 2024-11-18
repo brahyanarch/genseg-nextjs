@@ -9,32 +9,40 @@ import { API_ROLES } from "@/config/apiconfig";
 import {Skeleton} from "@/components/ui/skeleton"
 
 // Modal para agregar un nuevo Rol
-export const EditModal = ({ isOpen, closeModal }:any) => {
+export const EditModal = ({ isOpen, closeModal, onSaveRole, editingRole }:any) => {
   const [name, setName] = useState('');
   const [abbreviation, setAbbreviation] = useState('');
 
+  useEffect(() => {
+    if (editingRole) {
+      setName(editingRole.n_rol);
+      setAbbreviation(editingRole.abrev);
+    }
+  }, [editingRole]);
+
   const handleSubmit = async (e:any) => {
     e.preventDefault();
-    const newRole = {
+    const updatedRole = {
       n_rol: name,
       abrev: abbreviation
     };
 
     try {
-      const response = await fetch(API_ROLES, {
-        method: 'POST',
+      const response = await fetch(editingRole ? `${API_ROLES}/${editingRole.id_rol}` : API_ROLES, {
+        method: editingRole ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(newRole)
+        body: JSON.stringify(updatedRole)
       });
 
       if (response.ok) {
-        console.log('Rol agregado correctamente');
+        const savedRole = await response.json();
+        console.log('Rol guardado correctamente');
+        onSaveRole(savedRole);
         closeModal();
-        // Puedes actualizar la lista de roles aquí si es necesario
       } else {
-        console.error('Error al agregar el rol');
+        console.error('Error al guardar el Rol');
       }
     } catch (error) {
       console.error('Error al conectar con la API:', error);
@@ -53,7 +61,7 @@ export const EditModal = ({ isOpen, closeModal }:any) => {
         >
           <X size={24} />
         </button>
-        <h2 className="text-2xl font-bold mb-4 text-white">Editar</h2>
+        <h2 className="text-2xl font-bold mb-4 text-white">{editingRole ? 'Editar Rol' : 'Agregar Rol'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
@@ -93,7 +101,7 @@ export const EditModal = ({ isOpen, closeModal }:any) => {
               type="submit"
               className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
             >
-              Guardar
+              {editingRole ? 'Actualizar' : 'Guardar'}
             </button>
           </div>
         </form>
@@ -105,32 +113,71 @@ export const EditModal = ({ isOpen, closeModal }:any) => {
 const Component = () => {
   const [roles, setRoles] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingRole, setEditingRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  //función para obtener datos desde la API
+  const fetchRoles = async () => {
+    try {
+      const response = await fetch(API_ROLES);
+      if (!response.ok) {
+        throw new Error('Error al obtener los roles');
+      }
+      const data = await response.json();
+      setRoles(data);
+    } catch (err:any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // useEffect para obtener los roles desde la API al montar el componente
   useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const response = await fetch(API_ROLES);
-        if (!response.ok) {
-          throw new Error('Error al obtener los roles');
-        }
-        const data = await response.json();
-        setRoles(data);
-      } catch (err:any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchRoles();
   }, []);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
+  const openEditModal = (role: any) => {
+    setEditingRole(role);
+    setIsModalOpen(true);
+  };
+  //funcion para editar un Rol
+  const saveRole = (savedRole: any) => {
+    setRoles((prevRoles:any) => {
+      if (editingRole) {
+        return prevRoles.map((permiso: any) => 
+          permiso.id_per === savedRole.id_per ? savedRole : permiso
+        );
+      } else {
+        return [...prevRoles, savedRole];
+      }
+    });
+    setEditingRole(null);
+    fetchRoles();
+    
+  };
+  //función para eliminar un Rol
+  const deleteRoles = async (id: number) => {
+    try {
+      const response = await fetch(`${API_ROLES}/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setRoles((prevRoles) => prevRoles.filter((rol:any) => rol.id_rol !== id));
+        console.log('Permiso eliminado correctamente');
+      } else {
+        console.error('Error al eliminar el permiso');
+      }
+    } catch (error) {
+      console.error('Error al conectar con la API:', error);
+    }
+  };
+
 
   if (loading) {
     return (<>
@@ -197,7 +244,7 @@ const Component = () => {
         <h1 className="text-2xl font-bold text-black dark:text-white">Roles</h1>
       </div>
       <div className="flex justify-between">
-        <Button variant="secondary" size="sm" onClick={toggleModal}>
+        <Button variant="secondary" size="sm" onClick={() => { setEditingRole(null); toggleModal(); }}>
           <CirclePlus className="h-4 w-4" />
           Nuevo
         </Button>
@@ -221,10 +268,10 @@ const Component = () => {
                 <TableCell>{role.abrev}</TableCell>
                 <TableCell className="px-2 border-r border-gray-900">
                   <div className="flex space-x-2">
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" onClick={() => openEditModal(role)}>
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" onClick={() => deleteRoles(role.id_rol)} >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="icon">
@@ -247,7 +294,7 @@ const Component = () => {
         </Button>
       </div>
 
-      <EditModal isOpen={isModalOpen} closeModal={toggleModal} />
+      <EditModal isOpen={isModalOpen} closeModal={toggleModal} onSaveRole={saveRole} editingRole={editingRole} />
     </div>
   );
 };
