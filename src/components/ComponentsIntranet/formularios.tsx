@@ -101,7 +101,7 @@ export default function Component() {
         <Button variant="outline" className="px-4">
           1
         </Button>
-        <Button variant="outline">
+        <Button variant="outline"> 
           Siguiente
         </Button>
       </div>

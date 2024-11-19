@@ -1,56 +1,74 @@
-'use client'
+"use client";
 import { Button } from "@/components/ui/button";
 import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { X, Edit, Trash2, List, CirclePlus } from "lucide-react";
 import BreadcrumbItems from "@/components/breadcrumb";
 import { API_ROLES } from "@/config/apiconfig";
-import {Skeleton} from "@/components/ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton";
+import DynamicTable from "@/components/DynamicTable";
+import {Rol} from "@/tipos/typos"
 
 // Modal para agregar un nuevo Rol
-export const EditModal = ({ isOpen, closeModal, onSaveRole, editingRole }:any) => {
-  const [name, setName] = useState('');
-  const [abbreviation, setAbbreviation] = useState('');
 
+export const EditModal = ({
+  isOpen,
+  closeModal,
+  onSaveRole,
+  editingRole,
+}: any) => {
+  const [name, setName] = useState("");
+  const [abbreviation, setAbbreviation] = useState("");
+  
   useEffect(() => {
     if (editingRole) {
       setName(editingRole.n_rol);
       setAbbreviation(editingRole.abrev);
     }
   }, [editingRole]);
-
-  const handleSubmit = async (e:any) => {
+  
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     const updatedRole = {
       n_rol: name,
-      abrev: abbreviation
+      abrev: abbreviation,
     };
-
+    
     try {
-      const response = await fetch(editingRole ? `${API_ROLES}/${editingRole.id_rol}` : API_ROLES, {
-        method: editingRole ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updatedRole)
-      });
-
+      const response = await fetch(
+        editingRole ? `${API_ROLES}/${editingRole.id_rol}` : API_ROLES,
+        {
+          method: editingRole ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedRole),
+        }
+      );
+      
       if (response.ok) {
         const savedRole = await response.json();
-        console.log('Rol guardado correctamente');
+        console.log("Rol guardado correctamente");
         onSaveRole(savedRole);
         closeModal();
       } else {
-        console.error('Error al guardar el Rol');
+        console.error("Error al guardar el Rol");
       }
     } catch (error) {
-      console.error('Error al conectar con la API:', error);
+      console.error("Error al conectar con la API:", error);
     }
   };
-
+  
   if (!isOpen) return null;
-
+  
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="absolute inset-0 bg-black opacity-50"></div>
@@ -58,13 +76,18 @@ export const EditModal = ({ isOpen, closeModal, onSaveRole, editingRole }:any) =
         <button
           onClick={closeModal}
           className="absolute top-2 right-2 text-gray-400 hover:text-white"
-        >
+          >
           <X size={24} />
         </button>
-        <h2 className="text-2xl font-bold mb-4 text-white">{editingRole ? 'Editar Rol' : 'Agregar Rol'}</h2>
+        <h2 className="text-2xl font-bold mb-4 text-white">
+          {editingRole ? "Editar Rol" : "Agregar Rol"}
+        </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-300 mb-1"
+              >
               Nombre
             </label>
             <input
@@ -74,10 +97,13 @@ export const EditModal = ({ isOpen, closeModal, onSaveRole, editingRole }:any) =
               onChange={(e) => setName(e.target.value)}
               placeholder="Sub administrador"
               className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
-            />
+              />
           </div>
           <div className="mb-8">
-            <label htmlFor="abbreviation" className="block text-sm font-medium text-gray-300 mb-1">
+            <label
+              htmlFor="abbreviation"
+              className="block text-sm font-medium text-gray-300 mb-1"
+              >
               Abreviatura
             </label>
             <input
@@ -87,21 +113,21 @@ export const EditModal = ({ isOpen, closeModal, onSaveRole, editingRole }:any) =
               onChange={(e) => setAbbreviation(e.target.value)}
               placeholder="SubAdm"
               className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
-            />
+              />
           </div>
           <div className="flex justify-end space-x-4">
             <button
               type="button"
               onClick={closeModal}
               className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-            >
+              >
               Cancelar
             </button>
             <button
               type="submit"
               className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-            >
-              {editingRole ? 'Actualizar' : 'Guardar'}
+              >
+              {editingRole ? "Actualizar" : "Guardar"}
             </button>
           </div>
         </form>
@@ -111,22 +137,196 @@ export const EditModal = ({ isOpen, closeModal, onSaveRole, editingRole }:any) =
 };
 
 const Component = () => {
+  const [Data, setData] = useState<Rol[]>([]);
   const [roles, setRoles] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRole, setEditingRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [itemsPerPage] = useState(1);
+  const totalPages = Math.ceil(Data.length / itemsPerPage);
+  
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+  // Función para acceder a propiedades anidadas
+  const getNestedProperty = (obj: any, key: string) => {
+    return key.split('.').reduce((value, part) => value && value[part], obj);
+  };
 
+  const getSortedData = () => {
+    if (!sortColumn) return Data;
+    
+    return [...Data].sort((a, b) => {
+      const fieldA = getNestedProperty(a, sortColumn);
+      const fieldB = getNestedProperty(b, sortColumn);
+      
+      if (fieldA === undefined || fieldB === undefined) return 0;
+      
+      if (typeof fieldA === "string" && typeof fieldB === "string") {
+        return sortDirection === "asc"
+        ? fieldA.localeCompare(fieldB)
+        : fieldB.localeCompare(fieldA);
+      }
+      
+      if (typeof fieldA === "number" && typeof fieldB === "number") {
+        return sortDirection === "asc" ? fieldA - fieldB : fieldB - fieldA;
+      }
+      
+      return 0;
+    });
+  };
+  const sortedUsers = getSortedData();
+
+  const handleSort = (column: string) => {
+    setSortColumn(column);
+    setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+  };
+
+  const renderPaginationButtons = () => {
+    const pageButtons = [];
+
+    // Botón de "Anterior"
+    pageButtons.push(
+      <Button
+        key="prev"
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="text-black dark:text-white"
+      >
+        Anterior
+      </Button>
+    );
+
+    // Mostrar la primera página siempre
+    if (currentPage > 3) {
+      pageButtons.push(
+        <Button
+          key={1}
+          variant="outline"
+          size="sm"
+          onClick={() => handlePageChange(1)}
+          className=""
+        >
+          <p className="text-black dark:text-white">1</p>
+        </Button>
+      );
+      pageButtons.push(<span key="start-ellipsis" className="px-2">...</span>);
+    }
+
+    // Rango de páginas cercanas a la actual
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, currentPage + Math.floor(maxVisiblePages / 2));
+
+    if (endPage - startPage < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageButtons.push(
+        <Button
+          key={i}
+          variant="outline"
+          size="sm"
+          onClick={() => handlePageChange(i)}
+          className={currentPage === i ? "bg-blue-500 text-white" : "text-black dark:text-white"}
+        >
+          {i}
+        </Button>
+      );
+    }
+
+    // Mostrar la última página siempre
+    if (currentPage < totalPages - 2) {
+      pageButtons.push(<span key="end-ellipsis" className="px-2">...</span>);
+      pageButtons.push(
+        <Button
+          key={totalPages}
+          variant="outline"
+          size="sm"
+          onClick={() => handlePageChange(totalPages)}
+        >
+          <p className="text-black dark:text-white">{totalPages}</p>
+        </Button>
+      );
+    }
+
+    // Botón de "Siguiente"
+    pageButtons.push(
+      <Button
+        key="next"
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="text-black dark:text-white "
+      >
+        Siguiente
+      </Button>
+    );
+
+    return pageButtons;
+  };
+
+  const configurationUser = [
+    {
+      key: "index",
+      label: "ID",
+      render: (item: Rol) => <>{Data.indexOf(item) + 1}</>,
+    },
+    {
+      key: "n_usu",
+      label: "Nombre",
+      render: (item: Rol) => item.n_rol,
+      sortable: true,
+    },
+    {
+      key: "rol.n_rol",
+      label: "Rol",
+      render: (item: Rol) => item.abrev,
+      sortable: true,
+    },
+    {
+      key: "opciones",
+      label: "Opciones",
+      render: (item: Rol) => (
+        <>
+          <Button variant="ghost" size="icon" onClick={() => openEditModal(item)}>
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => deleteRoles(item.id_rol)}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </>
+      ),
+    },
+  ];
+
+  // Paginación
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = sortedUsers.slice(indexOfFirstItem, indexOfLastItem);
   //función para obtener datos desde la API
   const fetchRoles = async () => {
     try {
       const response = await fetch(API_ROLES);
       if (!response.ok) {
-        throw new Error('Error al obtener los roles');
+        throw new Error("Error al obtener los roles");
       }
       const data = await response.json();
-      setRoles(data);
-    } catch (err:any) {
+      //setRoles(data);
+      setData(data);
+    } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);
@@ -147,9 +347,9 @@ const Component = () => {
   };
   //funcion para editar un Rol
   const saveRole = (savedRole: any) => {
-    setRoles((prevRoles:any) => {
+    setRoles((prevRoles: any) => {
       if (editingRole) {
-        return prevRoles.map((permiso: any) => 
+        return prevRoles.map((permiso: any) =>
           permiso.id_per === savedRole.id_per ? savedRole : permiso
         );
       } else {
@@ -158,79 +358,81 @@ const Component = () => {
     });
     setEditingRole(null);
     fetchRoles();
-    
   };
   //función para eliminar un Rol
   const deleteRoles = async (id: number) => {
     try {
       const response = await fetch(`${API_ROLES}/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (response.ok) {
-        setRoles((prevRoles) => prevRoles.filter((rol:any) => rol.id_rol !== id));
-        console.log('Permiso eliminado correctamente');
+        setRoles((prevRoles) =>
+          prevRoles.filter((rol: any) => rol.id_rol !== id)
+        );
+        console.log("Permiso eliminado correctamente");
       } else {
-        console.error('Error al eliminar el permiso');
+        console.error("Error al eliminar el permiso");
       }
     } catch (error) {
-      console.error('Error al conectar con la API:', error);
+      console.error("Error al conectar con la API:", error);
     }
   };
 
-
   if (loading) {
-    return (<>
-    <div className="p-6 space-y-6">
-      {/* Breadcrumb skeleton */}
-      <div className="flex items-center gap-2 text-sm">
-        <Skeleton className="h-4 w-12" />
-        <Skeleton className="h-4 w-4" />
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-4 w-4" />
-        <Skeleton className="h-4 w-16" />
-      </div>
+    return (
+      <>
+        <div className="p-6 space-y-6">
+          {/* Breadcrumb skeleton */}
+          <div className="flex items-center gap-2 text-sm">
+            <Skeleton className="h-4 w-12" />
+            <Skeleton className="h-4 w-4" />
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-4" />
+            <Skeleton className="h-4 w-16" />
+          </div>
 
-      {/* Title skeleton */}
-      <div className="space-y-4">
-        <Skeleton className="h-8 w-32" />
-        
-        {/* New button skeleton */}
-        <Button variant="outline" disabled className="gap-2">
-          <Skeleton className="h-4 w-12" />
-        </Button>
-      </div>
+          {/* Title skeleton */}
+          <div className="space-y-4">
+            <Skeleton className="h-8 w-32" />
 
-      {/* Table skeleton */}
-      <div className="rounded-lg border">
-        {/* Header */}
-        <div className="grid grid-cols-[100px_1fr_100px] bg-muted p-4 gap-4">
-          <Skeleton className="h-4 w-8" />
-          <Skeleton className="h-4 w-16" />
-          <Skeleton className="h-4 w-20" />
-        </div>
+            {/* New button skeleton */}
+            <Button variant="outline" disabled className="gap-2">
+              <Skeleton className="h-4 w-12" />
+            </Button>
+          </div>
 
-        {/* Table row */}
-        <div className="grid grid-cols-[100px_1fr_100px] p-4 gap-4 items-center">
-          <Skeleton className="h-4 w-6" />
-          <Skeleton className="h-4 w-32" />
-          <div className="flex gap-2">
+          {/* Table skeleton */}
+          <div className="rounded-lg border">
+            {/* Header */}
+            <div className="grid grid-cols-[100px_1fr_100px] bg-muted p-4 gap-4">
+              <Skeleton className="h-4 w-8" />
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+
+            {/* Table row */}
+            <div className="grid grid-cols-[100px_1fr_100px] p-4 gap-4 items-center">
+              <Skeleton className="h-4 w-6" />
+              <Skeleton className="h-4 w-32" />
+              <div className="flex gap-2">
+                <Skeleton className="h-8 w-8" />
+                <Skeleton className="h-8 w-8" />
+              </div>
+            </div>
+          </div>
+
+          {/* Pagination skeleton */}
+          <div className="flex justify-center gap-2 mt-4">
+            <Skeleton className="h-8 w-8" />
+            <Skeleton className="h-8 w-8" />
+            <Skeleton className="h-8 w-8" />
             <Skeleton className="h-8 w-8" />
             <Skeleton className="h-8 w-8" />
           </div>
         </div>
-      </div>
-
-      {/* Pagination skeleton */}
-      <div className="flex justify-center gap-2 mt-4">
-        <Skeleton className="h-8 w-8" />
-        <Skeleton className="h-8 w-8" />
-        <Skeleton className="h-8 w-8" />
-        <Skeleton className="h-8 w-8" />
-        <Skeleton className="h-8 w-8" />
-      </div>
-    </div>
-    </>);
+      </>
+    );
   }
 
   if (error) {
@@ -244,13 +446,28 @@ const Component = () => {
         <h1 className="text-2xl font-bold text-black dark:text-white">Roles</h1>
       </div>
       <div className="flex justify-between">
-        <Button variant="secondary" size="sm" onClick={() => { setEditingRole(null); toggleModal(); }}>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => {
+            setEditingRole(null);
+            toggleModal();
+          }}
+        >
           <CirclePlus className="h-4 w-4" />
           Nuevo
         </Button>
         <Input className="w-64" placeholder="Buscar..." />
       </div>
       <div className="bg-[#E3E6ED] rounded-lg">
+        <DynamicTable
+          configuration={configurationUser}
+          data={currentItems}
+          onSort={handleSort}
+        />
+        
+
+        {/*
         <Table className="w-[90%] mx-auto my-6 border-1">
           <TableHeader className="bg-gray-900 text-white">
             <TableRow>
@@ -283,18 +500,20 @@ const Component = () => {
             ))}
           </TableBody>
         </Table>
+        */}
       </div>
-      <div className="flex justify-between items-center">
-        <Button variant="outline" size="sm">
-          Anterior
-        </Button>
-        <span>1</span>
-        <Button variant="outline" size="sm">
-          Siguiente
-        </Button>
-      </div>
+      
+      <div className="flex justify-center space-x-2 mt-4">
+          {renderPaginationButtons()}
+        </div>
 
-      <EditModal isOpen={isModalOpen} closeModal={toggleModal} onSaveRole={saveRole} editingRole={editingRole} />
+      <EditModal
+        isOpen={isModalOpen}
+        closeModal={toggleModal}
+        onSaveRole={saveRole}
+        editingRole={editingRole}
+      />
+
     </div>
   );
 };
