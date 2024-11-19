@@ -2,15 +2,16 @@
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { X, Edit, Trash2, CirclePlus } from "lucide-react";
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useContext } from 'react';
 import { API_PERMISOS } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
 import BreadcrumbItems from "@/components/breadcrumb";
-
+import {AvisoContext} from '@/context/avisoContext'
 // Modal para agregar o editar un Permiso
 export const EditModal = ({ isOpen, closeModal, onSavePermission, editingPermission }: any) => {
   const [name, setName] = useState('');
   const [abbreviation, setAbbreviation] = useState('');
+  const {mostrarAviso} = useContext<any>(AvisoContext);
 
   useEffect(() => {
     if (editingPermission) {
@@ -37,14 +38,14 @@ export const EditModal = ({ isOpen, closeModal, onSavePermission, editingPermiss
 
       if (response.ok) {
         const savedPermission = await response.json();
-        console.log('Permiso guardado correctamente');
         onSavePermission(savedPermission);
+        mostrarAviso('succefull', 'Permiso guardado correctamente.');
         closeModal();
       } else {
-        console.error('Error al guardar el permiso');
+        mostrarAviso('warning', 'Error al guardar el permiso.');
       }
     } catch (error) {
-      console.error('Error al conectar con la API:', error);
+      mostrarAviso('warning', 'Error al conectar con la API:', error);
     }
   };
 
@@ -115,6 +116,7 @@ export default function Component() {
   const [editingPermission, setEditingPermission] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const {mostrarAviso} = useContext<any>(AvisoContext);
   /// función para obtener datos desde la API
   const fetchPermisos = async () => {
     try {
@@ -167,12 +169,13 @@ export default function Component() {
 
       if (response.ok) {
         setPermisos((prevPermisos) => prevPermisos.filter((permiso:any) => permiso.id_per !== id));
-        console.log('Permiso eliminado correctamente');
+        mostrarAviso('succefull', 'Permiso Eliminado correctamente.');
+        fetchPermisos();
       } else {
-        console.error('Error al eliminar el permiso');
+        mostrarAviso('warning', 'Error al Eliminar el Permiso.');
       }
     } catch (error) {
-      console.error('Error al conectar con la API:', error);
+      mostrarAviso('succefull', 'Error al conectar con la API:', error);
     }
   };
 

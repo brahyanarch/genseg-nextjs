@@ -2,10 +2,10 @@
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Edit,X, Trash2, MoreVertical, CirclePlus } from "lucide-react"
-import {useState, useEffect} from "react"
+import {useState, useEffect, useContext} from "react"
 import { API_USERS } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
-
+import {AvisoContext} from '@/context/avisoContext'
 const users = [
   { id: 1, nombre: "Jose Roberto Mamani Zaa", rol: "Sub administrador", abreviatura: "JRMZ", estado: "Activo" },
   { id: 2, nombre: "David Rodolfo Laruta", rol: "Coordinador", abreviatura: "DRL", estado: "Activo" },
@@ -16,6 +16,7 @@ const users = [
 export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnidad }: any) => {
   const [name, setName] = useState('');
   const [abbreviation, setAbbreviation] = useState('');
+  const {mostrarAviso} = useContext<any>(AvisoContext);
   useEffect(() => {
     if (editingSubUnidad) {
       setName(editingSubUnidad.n_per);
@@ -40,14 +41,15 @@ export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnida
 
       if (response.ok) {
         const savedPermission = await response.json();
-        console.log('Permiso guardado correctamente');
         onSaveSubUnidad(savedPermission);
+        mostrarAviso('succefull', 'Usuario guardado correctamente.');
         closeModal();
       } else {
-        console.error('Error al guardar el permiso');
+        mostrarAviso('warning', 'Error al guardar el Usuario.');
       }
     } catch (error) {
-      console.error('Error al conectar con la API:', error);
+      mostrarAviso('warning', 'Error al conectar con la API:', error
+      );
     }
   };
 

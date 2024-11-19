@@ -33,8 +33,8 @@ const AvisoProvider = ({ children }: { children: ReactNode }) => {
       {children}
       {isVisible && avisoData && (
         <div className={clsx("fixed top-4 left-1/2 transform -translate-x-1/2",{
-          "w-[80%]": avisoData.fixed == true,
-          "w-[20%]": avisoData.fixed === true,
+          "w-[80%]": avisoData.fixed === true,
+          "w-[20%]": avisoData.fixed === false,
 
         })}>
           <Aviso type={avisoData.type} content={avisoData.content} fixed={avisoData.fixed} />
