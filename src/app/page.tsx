@@ -1,6 +1,6 @@
 "use client";
 //importando
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Menu, X, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,6 +10,7 @@ import Footer from "@/components/comPageMain/Footer";
 import ObtenerCertificado from "@/components/comPageMain/getCertificate";
 import AvisoModal from "@/components/comPageMain/avisoModal";
 import Aviso from '@/components/aviso';
+import {AvisoContext} from '@/context/avisoContext'
 //funcion principal que controla el Modal de aviso
 
 const datos = [
@@ -67,7 +68,18 @@ const frameworks = [
 
 export default function Home() {
   const [mostrarAlerta, setMostrarAlerta] = useState(false);
+  const {mostrarAviso} = useContext<any>(AvisoContext);
+  
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const isValid = Math.random() > 0.5; // Simular validación
+    if (isValid) {
+      mostrarAviso('succefull', 'Formulario enviado correctamente.');
+    } else {
+      mostrarAviso('warning', 'Ocurrió un error al enviar el formulario.',true);
+    }
+  };
   useEffect(() => {
     setMostrarAlerta(true);
 
@@ -85,7 +97,11 @@ export default function Home() {
       <Carrusel data={datos}/>
       {/*<ObtenerCertificado key={frameworks} />*/}
       <ObtenerCertificado data={frameworks} />
-      <Aviso type={"succefull"} content={"Hola mundo"} />
+      <div>
+        <button onClick={handleSubmit}>
+          Mostrar Aviso
+        </button>
+      </div>
       <Footer />
     </div>
   );

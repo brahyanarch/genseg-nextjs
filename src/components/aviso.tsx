@@ -1,77 +1,52 @@
-import {CircleAlert, CircleCheck, MessageSquareWarning, TriangleAlert} from 'lucide-react'
+'use client'
+import {CircleAlert, CircleCheck, MessageSquareWarning, TriangleAlert} from 'lucide-react';
+import {useState} from 'react';
+import clsx from 'clsx';
+
 interface avisoProps {
   type?: String;
   content?: String;
+  fixed?:Boolean;
 }
 
-const aviso = ({type, content}: avisoProps) =>{
-  function getMessage() {
-      switch (type) {
-          case "warning":
-              return (
-                <>
-                 <div className="bg-red-100 py-2">
-                  <div className="w-1 h-full bg-red-800 absolute top-0 left-0"></div>
-                  <section className=" text-md pl-5 pr-10 ml-2"><TriangleAlert color="#dd222c"  className="inline"/>
-                  <section className="inline text-red-700 ml-2 text-md">{type}</section>
-                  </section>
-                  <p className="text-red-500  py-2 px-5  ml-2 rounded-lg">{content}</p>
-                  </div>
-                </>
-                
-              );
-              break;
-          case "important":
-              return (
-                  <>
-                  <div className="bg-yellow-100 py-2">
-                   <div className="w-1 h-full bg-yellow-600 absolute top-0 left-0"></div>
-                   <section className=" text-md pl-5 pr-10 ml-2"><MessageSquareWarning color="#f5b505" className="inline"/>
-                   <section className="inline text-yellow-700 ml-2 text-md">{type}</section>
-                   </section>
-                   <p className="text-yellow-500 py-2 px-10 rounded-lg">{content}</p>
-                   </div>
-                 </>
-              );
-              break;
-          case "succefull":
-              return (
-                  
-                  <>
-                  <div className="bg-green-100 py-2">
-                   <div className="w-1 h-full bg-green-800 absolute top-0 left-0"></div>
-                   <section className=" text-md pl-5 pr-10 ml-2"><CircleCheck color="#128a0a" className="inline"/>
-                   <section className="inline text-green-700 ml-2 text-md">{type}</section>
-                   </section>
-                   <p className="text-green-500  py-2 px-10 rounded-lg">{content}</p>
-                   </div>
-                 </>
-                  
-              );
-              break;
-      
-          default:
-              return (
-                  <>
-                  <div className="bg-blue-100 py-2">
-                   <div className="w-1 h-full bg-blue-800 absolute top-0 left-0"></div>
-                   <section className=" text-md pl-5 pr-10 ml-2"><CircleAlert color="blue" className="inline"/>
-                   <section className="inline text-blue-700 ml-2 text-md">{type}</section>
-                   </section>
-                   <p className="text-blue-500  py-2 px-10 rounded-lg">{content}</p>
-                   </div>
-                 </>
-              );
-              break;
+const Aviso = ({type, content,fixed}:avisoProps) =>{
+
+  return(
+  <div className={clsx("py-2",{
+    "bg-red-100": type === "warning",
+    "bg-yellow-100": type === "important",
+    "bg-green-100": type === "succefull",
+    "bg-blue-100": type != "warning" && type != "important" && type != "succefull" ,
+  })}>
+    <div className={clsx("w-1 h-full absolute top-0 left-0",{
+    "bg-red-800": type === "warning",
+    "bg-yellow-600": type === "important",
+    "bg-green-800": type === "succefull",
+    "bg-blue-800": type != "warning" && type != "important" && type != "succefull" ,
+  })}></div>
+    <section className="text-md pl-5 pr-10 ml-2">
+      {
+        type === "warning"?
+        (<TriangleAlert color="#dd222c"  className="inline"/>): type==="important"? 
+        (<MessageSquareWarning color="#f5b505" className="inline"/>):  type==="succefull"?
+        (<CircleCheck color="#128a0a" className="inline"/>):
+        (<CircleAlert color="blue" className="inline"/>)
       }
-  }
-
-return(
-  <>
-      <div className="relative w-[80%] mx-auto ">
-          {getMessage()}
-      </div>
-  </>
-);
+    <section className= {clsx("inline ml-2 text-md",{
+    " text-red-700": type === "warning",
+    "text-yellow-700": type === "important",
+    "text-green-700": type === "succefull",
+    "text-blue-700": type != "warning" && type != "important" && type != "succefull" ,
+  })}>{type}</section>
+    </section>
+    <p className={clsx("py-2 px-5 ml-2 rounded-lg",{
+    " text-red-500": type === "warning",
+    "text-yellow-500": type === "important",
+    "text-green-500": type === "succefull",
+    "text-blue-500": type != "warning" && type != "important" && type != "succefull" ,
+  })}>{content}</p>
+  </div>
+  );
 }
-export default aviso;
+
+export default Aviso;

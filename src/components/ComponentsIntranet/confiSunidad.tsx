@@ -3,10 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { X, Edit, Trash2, CirclePlus } from "lucide-react";
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useContext } from 'react';
 import { API_SUBUNIDADES } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
 import BreadcrumbItems from "@/components/breadcrumb";
+import {AvisoContext} from '@/context/avisoContext'
 import DynamicTable from "@/components/DynamicTable";
 import {Subunidad} from "@/tipos/typos"
 
@@ -14,6 +15,7 @@ import {Subunidad} from "@/tipos/typos"
 export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnidad }: any) => {
   const [name, setName] = useState('');
   const [abbreviation, setAbbreviation] = useState('');
+  const {mostrarAviso} = useContext<any>(AvisoContext);
   useEffect(() => {
     if (editingSubUnidad) {
       setName(editingSubUnidad.n_subuni);
@@ -38,14 +40,14 @@ export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnida
 
       if (response.ok) {
         const savedPermission = await response.json();
-        console.log('Permiso guardado correctamente');
         onSaveSubUnidad(savedPermission);
+        mostrarAviso('succefull', 'SubUnidad guardado correctamente.');
         closeModal();
       } else {
-        console.error('Error al guardar el permiso');
+        mostrarAviso('warning', 'Error al guardar la SubUnidad');
       }
     } catch (error) {
-      console.error('Error al conectar con la API:', error);
+      mostrarAviso('warning', 'Error al conectar con la API:', error);
     }
   };
 
@@ -118,6 +120,7 @@ export default function Component() {
   const [editingRole, setEditingRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const {mostrarAviso} = useContext<any>(AvisoContext);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
@@ -342,13 +345,18 @@ export default function Component() {
 
       if (response.ok) {
         // Actualiza la lista de permisos eliminando el permiso
+        setSubUnidad((prevSubUnidad) => prevSubUnidad.filter((subUnidad:any) => subUnidad.id_subuni !== id));
+        mostrarAviso('succefull', 'SubUnidad Eliminado correctamente.');
+        fetchSubUnidad();
+        
         setData((prevSubUnidad) => prevSubUnidad.filter((subUnidad:any) => subUnidad.id_subuni !== id));
         console.log('Permiso eliminado correctamente');
       } else {
         console.error('Error al eliminar el permiso');
+        mostrarAviso('warning', 'Error al eliminar la SubUnidad');
       }
     } catch (error) {
-      console.error('Error al conectar con la API:', error);
+      mostrarAviso('warning', 'Error al conectar con la API:', error);
     }
 
   fetchSubUnidad()

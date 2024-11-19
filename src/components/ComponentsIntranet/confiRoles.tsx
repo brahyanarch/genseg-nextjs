@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -16,6 +16,7 @@ import { API_ROLES } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
 import DynamicTable from "@/components/DynamicTable";
 import {Rol} from "@/tipos/typos"
+import {AvisoContext} from '@/context/avisoContext'
 
 // Modal para agregar un nuevo Rol
 
@@ -27,7 +28,7 @@ export const EditModal = ({
 }: any) => {
   const [name, setName] = useState("");
   const [abbreviation, setAbbreviation] = useState("");
-  
+  const {mostrarAviso} = useContext<any>(AvisoContext);
   useEffect(() => {
     if (editingRole) {
       setName(editingRole.n_rol);
@@ -56,14 +57,14 @@ export const EditModal = ({
       
       if (response.ok) {
         const savedRole = await response.json();
-        console.log("Rol guardado correctamente");
         onSaveRole(savedRole);
+        mostrarAviso('succefull', 'Rol guardado correctamente.');
         closeModal();
       } else {
-        console.error("Error al guardar el Rol");
+        mostrarAviso('warning', 'Error al guardar el Rol.');
       }
     } catch (error) {
-      console.error("Error al conectar con la API:", error);
+      mostrarAviso('warning', 'Error al conectar con la API.');
     }
   };
   
@@ -147,7 +148,10 @@ const Component = () => {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [itemsPerPage] = useState(3);
   const totalPages = Math.ceil(Data.length / itemsPerPage);
+  const {mostrarAviso} = useContext<any>(AvisoContext);
   
+  
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -369,12 +373,13 @@ const Component = () => {
         setData((prevRoles) =>
           prevRoles.filter((rol: any) => rol.id_rol !== id)
         );
-        console.log("Permiso eliminado correctamente");
+        mostrarAviso('succefull', 'Rol Eliminado correctamente.');
+        fetchRoles();
       } else {
-        console.error("Error al eliminar el permiso");
+        mostrarAviso('warning', 'Error al eliminar el Rol.');
       }
     } catch (error) {
-      console.error("Error al conectar con la API:", error);
+      mostrarAviso('warning', "Error al conectar con la API:", error);
     }
   };
 
