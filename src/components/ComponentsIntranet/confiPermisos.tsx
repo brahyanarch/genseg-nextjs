@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react';
 import { API_PERMISOS } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
 import BreadcrumbItems from "@/components/breadcrumb";
+import DynamicTable from "@/components/DynamicTable";
+import {Rol} from "@/tipos/typos"
 
 // Modal para agregar o editar un Permiso
 export const EditModal = ({ isOpen, closeModal, onSavePermission, editingPermission }: any) => {

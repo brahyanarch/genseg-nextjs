@@ -1,11 +1,14 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
 import { X, Edit, Trash2, CirclePlus } from "lucide-react";
 import { useState, useEffect } from 'react';
 import { API_SUBUNIDADES } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
 import BreadcrumbItems from "@/components/breadcrumb";
+import DynamicTable from "@/components/DynamicTable";
+import {Subunidad} from "@/tipos/typos"
 
 // Modal para agregar un nuevo Permiso
 export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnidad }: any) => {
@@ -108,12 +111,188 @@ export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnida
 };
 
 export default function Component() {
-  const [subUnidad, setSubUnidad] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSubUnidad, setEditingSubUnidad] = useState(null);
+
+  const [Data, setData] = useState<Subunidad[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingRole, setEditingRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [itemsPerPage] = useState(3);
+  const totalPages = Math.ceil(Data.length / itemsPerPage);
   // Funcion asíncrona para obtener los datos
+  // Función para acceder a propiedades anidadas
+  const getNestedProperty = (obj: any, key: string) => {
+    return key.split('.').reduce((value, part) => value && value[part], obj);
+  };
+
+  const getSortedData = () => {
+    if (!sortColumn) return Data;
+
+    return [...Data].sort((a, b) => {
+      const fieldA = getNestedProperty(a, sortColumn);
+      const fieldB = getNestedProperty(b, sortColumn);
+
+      if (fieldA === undefined || fieldB === undefined) return 0;
+
+      if (typeof fieldA === "string" && typeof fieldB === "string") {
+        return sortDirection === "asc"
+          ? fieldA.localeCompare(fieldB)
+          : fieldB.localeCompare(fieldA);
+      }
+      
+      if (typeof fieldA === "number" && typeof fieldB === "number") {
+        return sortDirection === "asc" ? fieldA - fieldB : fieldB - fieldA;
+      }
+
+      return 0;
+    });
+  };
+  const handleSort = (column: string) => {
+    setSortColumn(column);
+    setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+  };
+  const sortedData = getSortedData();
+  // Paginación
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = sortedData.slice(indexOfFirstItem, indexOfLastItem);
+  
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const configurationData = [
+    {
+      key: "index",
+      label: "ID",
+      render: (item: Subunidad) => <>{Data.indexOf(item) + 1}</>,
+      sortable: true
+    },
+    {
+      key: "n_usu",
+      label: "Nombre",
+      render: (item: Subunidad) => item.n_subuni,
+      sortable: true,
+    },
+    {
+      key: "rol.abrev",
+      label: "Abreviatura",
+      render: (item: Subunidad) => item.abreviatura,
+      sortable: true,
+    },
+    {
+      key: "opciones",
+      label: "Opciones",
+      render: (item: Subunidad) => (
+        <>
+          <Button variant="ghost" size="icon" onClick={() => openEditModal(item)}>
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => deleteSubUnidad(item.id_subuni)}
+            >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </>
+      ),
+    },
+  ];
+
+  const renderPaginationButtons = () => {
+    const pageButtons = [];
+
+    // Botón de "Anterior"
+    pageButtons.push(
+      <Button
+        key="prev"
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="text-black dark:text-white"
+      >
+        Anterior
+      </Button>
+    );
+
+    // Mostrar la primera página siempre
+    if (currentPage > 3) {
+      pageButtons.push(
+        <Button
+          key={1}
+          variant="outline"
+          size="sm"
+          onClick={() => handlePageChange(1)}
+          className=""
+        >
+          <p className="text-black dark:text-white">1</p>
+        </Button>
+      );
+      pageButtons.push(<span key="start-ellipsis" className="px-2">...</span>);
+    }
+
+    // Rango de páginas cercanas a la actual
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, currentPage + Math.floor(maxVisiblePages / 2));
+
+    if (endPage - startPage < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageButtons.push(
+        <Button
+          key={i}
+          variant="outline"
+          size="sm"
+          onClick={() => handlePageChange(i)}
+          className={currentPage === i ? "bg-blue-500 text-white" : "text-black dark:text-white"}
+        >
+          {i}
+        </Button>
+      );
+    }
+
+    // Mostrar la última página siempre
+    if (currentPage < totalPages - 2) {
+      pageButtons.push(<span key="end-ellipsis" className="px-2">...</span>);
+      pageButtons.push(
+        <Button
+          key={totalPages}
+          variant="outline"
+          size="sm"
+          onClick={() => handlePageChange(totalPages)}
+        >
+          <p className="text-black dark:text-white">{totalPages}</p>
+        </Button>
+      );
+    }
+
+    // Botón de "Siguiente"
+    pageButtons.push(
+      <Button
+        key="next"
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="text-black dark:text-white "
+      >
+        Siguiente
+      </Button>
+    );
+
+    return pageButtons;
+  };
+  
+  
   const fetchSubUnidad = async () => {
     try {
       const response = await fetch(API_SUBUNIDADES);
@@ -121,7 +300,7 @@ export default function Component() {
         throw new Error('Error al obtener los Permisos');
       }
       const data = await response.json();
-      setSubUnidad(data);
+      setData(data);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -141,7 +320,7 @@ export default function Component() {
     setIsModalOpen(true);
   };
   const saveSubUnidad = (savedSubUnidad: any) => {
-    setSubUnidad((prevSubUnidad:any) => {
+    setData((prevSubUnidad:any) => {
       if (editingSubUnidad) {
         return prevSubUnidad.map((subUnidad: any) => 
           subUnidad.id_subuni === savedSubUnidad.id_subuni ? savedSubUnidad : subUnidad
@@ -163,7 +342,7 @@ export default function Component() {
 
       if (response.ok) {
         // Actualiza la lista de permisos eliminando el permiso
-        setSubUnidad((prevSubUnidad) => prevSubUnidad.filter((subUnidad:any) => subUnidad.id_subuni !== id));
+        setData((prevSubUnidad) => prevSubUnidad.filter((subUnidad:any) => subUnidad.id_subuni !== id));
         console.log('Permiso eliminado correctamente');
       } else {
         console.error('Error al eliminar el permiso');
@@ -187,6 +366,8 @@ export default function Component() {
     return <p>Error: {error}</p>;
   }
 
+  
+
   return (
     <div className="w-[90%] m-4 p-4 space-y-4 text-white min-h-screen">
       <BreadcrumbItems items={["Inicio", "Configuración", "Sub Unidad"]} />
@@ -197,42 +378,17 @@ export default function Component() {
         <CirclePlus className="h-4 w-4" />
         Nuevo
       </Button>
+      <Input className="w-64" placeholder="Buscar..." />
       <div className="bg-[#E3E6ED] rounded-lg">
-        <Table className="w-[90%] mx-auto my-6">
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-16 border-l border-gray-900">ID</TableHead>
-              <TableHead>Nombre</TableHead>
-              <TableHead className="w-24 border-r border-gray-900">Opciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody className="text-gray-900">
-            {subUnidad.map((subUnidad: any, index) => (
-              <TableRow key={subUnidad.id_subuni}>
-                <TableCell className="px-4 border-l border-gray-900">{index+1}</TableCell>
-                <TableCell>{subUnidad.n_subuni}</TableCell>
-                <TableCell className="border-r border-gray-900">
-                  <div className="flex space-x-2">
-                    <Button variant="ghost" size="icon" onClick={() => openEditModal(subUnidad)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => deleteSubUnidad(subUnidad.id_subuni)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <DynamicTable
+          configuration={configurationData}
+          data={currentItems}
+          onSort={handleSort}
+        />
       </div>
-      <div className="flex justify-center items-center space-x-2">
-        <Button variant="outline" size="sm">Anterior</Button>
-        <Button variant="outline" size="sm">1</Button>
-        <Button variant="outline" size="sm">2</Button>
-        <Button variant="outline" size="sm">3</Button>
-        <Button variant="outline" size="sm">Siguiente</Button>
-      </div>
+      <div className="flex justify-center space-x-2 mt-4">
+          {renderPaginationButtons()}
+        </div>
       <EditModal isOpen={isModalOpen} closeModal={toggleModal} onSaveSubUnidad={saveSubUnidad} editingSubUnidad={editingSubUnidad} />
     </div>
   );
