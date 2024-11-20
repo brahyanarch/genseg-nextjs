@@ -124,7 +124,7 @@ export default function Component() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(1);
+  const [itemsPerPage] = useState(4);
   const totalPages = Math.ceil(Users.length / itemsPerPage);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
@@ -236,6 +236,7 @@ export default function Component() {
         size="sm"
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
+        className="text-black dark:text-white"
       >
         Anterior
       </Button>
@@ -249,8 +250,9 @@ export default function Component() {
           variant="outline"
           size="sm"
           onClick={() => handlePageChange(1)}
+          className=""
         >
-          1
+          <p className="text-black dark:text-white">1</p>
         </Button>
       );
       pageButtons.push(<span key="start-ellipsis" className="px-2">...</span>);
@@ -272,7 +274,7 @@ export default function Component() {
           variant="outline"
           size="sm"
           onClick={() => handlePageChange(i)}
-          className={currentPage === i ? "bg-blue-500 text-white" : ""}
+          className={currentPage === i ? "bg-blue-500 text-white" : "text-black dark:text-white"}
         >
           {i}
         </Button>
@@ -289,7 +291,7 @@ export default function Component() {
           size="sm"
           onClick={() => handlePageChange(totalPages)}
         >
-          {totalPages}
+          <p className="text-black dark:text-white">{totalPages}</p>
         </Button>
       );
     }
@@ -302,6 +304,7 @@ export default function Component() {
         size="sm"
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
+        className="text-black dark:text-white "
       >
         Siguiente
       </Button>
@@ -397,9 +400,9 @@ export default function Component() {
         data={currentItems}
         onSort={handleSort}
       />
+      </div>
       <div className="flex justify-center space-x-2 mt-4">
         {renderPaginationButtons()}
-      </div>
       </div>
       
     </div>

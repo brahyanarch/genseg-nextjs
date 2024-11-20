@@ -20,3 +20,10 @@ export type User = {
   rol: Rol;
   sub_uni: Subunidad;
 };
+
+export type Permisos = {
+  id: number;
+  n_per: string;
+  abreviatura: string;
+
+}

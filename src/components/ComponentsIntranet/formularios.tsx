@@ -1,6 +1,6 @@
-import { Search, PenSquare, Trash2, Circle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Search, PenSquare, Trash2, Circle, FilePenLine } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -8,14 +8,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
 interface FormEntry {
-  id: number
-  nombre: string
-  fechaCreacion: string
-  abreviatura: string
-  active: boolean
+  id: number;
+  nombre: string;
+  fechaCreacion: string;
+  abreviatura: string;
+  active: boolean;
 }
 
 export default function Component() {
@@ -41,21 +41,16 @@ export default function Component() {
       abreviatura: "F140224",
       active: false,
     },
-  ]
+  ];
 
   return (
     <div className="w-full max-w-6xl mx-auto p-4 space-y-4">
       <h1 className="text-2xl font-bold">Edicion de formulario</h1>
       <div className="flex justify-between items-center gap-4 flex-wrap">
-        <Button className="bg-blue-500 hover:bg-blue-600">
-          + nuevo
-        </Button>
+        <Button className="bg-blue-500 hover:bg-blue-600">+ nuevo</Button>
         <div className="relative">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar..."
-            className="pl-8 w-[300px]"
-          />
+          <Input placeholder="Buscar..." className="pl-8 w-[300px]" />
         </div>
       </div>
       <div className="border rounded-lg">
@@ -85,7 +80,14 @@ export default function Component() {
                       <Trash2 className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="icon">
-                      <Circle className={`h-4 w-4 ${form.active ? "fill-primary" : ""}`} />
+                      <Circle
+                        className={`h-4 w-4 ${
+                          form.active ? "fill-primary" : ""
+                        }`}
+                      />
+                    </Button>
+                    <Button variant="ghost" size="icon">
+                      <FilePenLine />
                     </Button>
                   </div>
                 </TableCell>
@@ -101,10 +103,8 @@ export default function Component() {
         <Button variant="outline" className="px-4">
           1
         </Button>
-        <Button variant="outline"> 
-          Siguiente
-        </Button>
+        <Button variant="outline">Siguiente</Button>
       </div>
     </div>
-  )
+  );
 }

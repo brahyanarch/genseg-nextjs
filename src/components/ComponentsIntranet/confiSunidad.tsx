@@ -345,7 +345,7 @@ export default function Component() {
 
       if (response.ok) {
         // Actualiza la lista de permisos eliminando el permiso
-        setSubUnidad((prevSubUnidad) => prevSubUnidad.filter((subUnidad:any) => subUnidad.id_subuni !== id));
+        setData((prevSubUnidad) => prevSubUnidad.filter((subUnidad:any) => subUnidad.id_subuni !== id));
         mostrarAviso('succefull', 'SubUnidad Eliminado correctamente.');
         fetchSubUnidad();
         
