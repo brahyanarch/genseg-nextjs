@@ -139,7 +139,6 @@ export const EditModal = ({
 
 const Component = () => {
   const [Data, setData] = useState<Rol[]>([]);
-  const [roles, setRoles] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRole, setEditingRole] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -147,7 +146,7 @@ const Component = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [itemsPerPage] = useState(1);
+  const [itemsPerPage] = useState(3);
   const totalPages = Math.ceil(Data.length / itemsPerPage);
   const {mostrarAviso} = useContext<any>(AvisoContext);
   
@@ -283,6 +282,7 @@ const Component = () => {
       key: "index",
       label: "ID",
       render: (item: Rol) => <>{Data.indexOf(item) + 1}</>,
+      sortable: true
     },
     {
       key: "n_usu",
@@ -291,8 +291,8 @@ const Component = () => {
       sortable: true,
     },
     {
-      key: "rol.n_rol",
-      label: "Rol",
+      key: "rol.abrev",
+      label: "Abreviatura",
       render: (item: Rol) => item.abrev,
       sortable: true,
     },
@@ -328,7 +328,6 @@ const Component = () => {
         throw new Error("Error al obtener los roles");
       }
       const data = await response.json();
-      //setRoles(data);
       setData(data);
     } catch (err: any) {
       setError(err.message);
@@ -351,7 +350,7 @@ const Component = () => {
   };
   //funcion para editar un Rol
   const saveRole = (savedRole: any) => {
-    setRoles((prevRoles: any) => {
+    setData((prevRoles: any) => {
       if (editingRole) {
         return prevRoles.map((permiso: any) =>
           permiso.id_per === savedRole.id_per ? savedRole : permiso
@@ -371,7 +370,7 @@ const Component = () => {
       });
 
       if (response.ok) {
-        setRoles((prevRoles) =>
+        setData((prevRoles) =>
           prevRoles.filter((rol: any) => rol.id_rol !== id)
         );
         mostrarAviso('succefull', 'Rol Eliminado correctamente.');
@@ -470,42 +469,6 @@ const Component = () => {
           data={currentItems}
           onSort={handleSort}
         />
-        
-
-        {/*
-        <Table className="w-[90%] mx-auto my-6 border-1">
-          <TableHeader className="bg-gray-900 text-white">
-            <TableRow>
-              <TableHead className="border-l border-gray-900">ID</TableHead>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Abreviatura</TableHead>
-              <TableHead className="w-24 border-r border-gray-900">Opciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody className="bg-[#FFFFFF] text-[#141824]">
-            {roles.map((role:any) => (
-              <TableRow key={role.id_rol}>
-                <TableCell className="px-6 border-l border-gray-900">{role.id_rol}</TableCell>
-                <TableCell>{role.n_rol}</TableCell>
-                <TableCell>{role.abrev}</TableCell>
-                <TableCell className="px-2 border-r border-gray-900">
-                  <div className="flex space-x-2">
-                    <Button variant="ghost" size="icon" onClick={() => openEditModal(role)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => deleteRoles(role.id_rol)} >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <List className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        */}
       </div>
       
       <div className="flex justify-center space-x-2 mt-4">
