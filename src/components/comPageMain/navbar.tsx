@@ -37,10 +37,10 @@ export default function Navbar() {
           {/* Menú para pantallas grandes */}
           <div className="hidden sm:flex sm:items-center">
             <Link
-              href="/PageMain/GA"
+              href="/GA"
               className={clsx(
                 'px-3 py-4 rounded-md text-sm font-medium w-52  text-gray-700 hover:bg-gray-400 hover:text-gray-700',{
-                  'bg-gray-600 text-white': '/PageMain/GA' === usePathname(),
+                  'bg-gray-600 text-white': '/GA' === usePathname(),
                 }
               )}
               
@@ -48,20 +48,20 @@ export default function Navbar() {
               Gestión Ambiental
             </Link>
             <Link
-              href="/PageMain/SDG"
+              href="/SDG"
               className={clsx(
                 'px-3 py-2 rounded-md text-sm font-medium w-52 h-30 text-gray-700 hover:bg-gray-400 hover:text-gray-700',{
-                  'bg-gray-600 text-white': '/PageMain/SDG' === usePathname(),
+                  'bg-gray-600 text-white': '/SDG' === usePathname(),
                 }
               )}
             >
               Seguimiento y Desarrollo del Graduado
             </Link>
             <Link
-              href="/PageMain/PSEC"
+              href="/PSEC"
               className={clsx(
                 'px-3 py-2 rounded-md text-sm font-medium w-52 text-gray-700 hover:bg-gray-400 hover:text-gray-700',{
-                  'bg-gray-600 text-white': '/PageMain/PSEC' === usePathname(),
+                  'bg-gray-600 text-white': '/PSEC' === usePathname(),
                 }
               )}
             >
@@ -95,7 +95,7 @@ export default function Navbar() {
               className={`block px-3 py-2 rounded-md text-base font-medium ${
                 selectedLink === '/PageMain/GA' ? 'bg-gray-500 text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
               }`}
-              onClick={() => handleLinkClick('/PageMain/GA')}
+              onClick={() => handleLinkClick('/GA')}
             >
               Gestión Ambiental
             </Link>
@@ -104,7 +104,7 @@ export default function Navbar() {
               className={`block px-3 py-2 rounded-md text-base font-medium ${
                 selectedLink === '/PageMain/SDG' ? 'bg-gray-500 text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
               }`}
-              onClick={() => handleLinkClick('/PageMain/SDG')}
+              onClick={() => handleLinkClick('/SDG')}
             >
               Seguimiento y Desarrollo del Graduado
             </Link>
@@ -113,7 +113,7 @@ export default function Navbar() {
               className={`block px-3 py-2 rounded-md text-base font-medium ${
                 selectedLink === '/PageMain/PSEC' ? 'bg-gray-500 text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
               }`}
-              onClick={() => handleLinkClick('/PageMain/PSEC')}
+              onClick={() => handleLinkClick('/PSEC')}
             >
               Proyección Social y Extensión Cultural
             </Link>
