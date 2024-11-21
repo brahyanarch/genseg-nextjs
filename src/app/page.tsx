@@ -11,6 +11,7 @@ import ObtenerCertificado from "@/components/comPageMain/getCertificate";
 import AvisoModal from "@/components/comPageMain/avisoModal";
 import Aviso from '@/components/aviso';
 import {AvisoContext} from '@/context/avisoContext'
+import ModalForm from '@/components/componentesFormulario/noteForm'
 //funcion principal que controla el Modal de aviso
 
 const datos = [
@@ -97,11 +98,12 @@ export default function Home() {
       <Carrusel data={datos}/>
       {/*<ObtenerCertificado key={frameworks} />*/}
       <ObtenerCertificado data={frameworks} />
-      <div>
+      <div className="w-[80%]">
         <button onClick={handleSubmit}>
           Mostrar Aviso
         </button>
       </div>
+      <ModalForm/>
       <Footer />
     </div>
   );
