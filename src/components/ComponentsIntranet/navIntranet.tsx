@@ -21,11 +21,14 @@ import {
   API_ROLES_WITH_DNI,
 } from "@/config/apiconfig";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { API_USERS } from "@/config/apiconfig";
+import { User as Us } from "@/tipos/typos";
 
 interface ComponentProps {
   idRol?: number;
   idSubUnidad?: number;
   dni?: string;
+  name?:string;
 }
 
 interface Rol {
@@ -122,26 +125,41 @@ export function Notificacion() {
   );
 }
 
-export function Perfil() {
+export function Perfil({name}: {name:string} ) {
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
+  const [Us, setUs] = useState<Us[]>([]);
 
   // Función para alternar la visibilidad de la ventana flotante
   const toggleProfileMenu = () => {
     setIsProfileOpen(!isProfileOpen);
   };
 
+  const fetchUs = async () => {
+    try {
+      const response = await fetch(`${API_USERS}/{}`);
+      if (!response.ok) {
+        throw new Error('Error al obtener los usuarios');
+      }
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setUs(data);
+      } else {
+        console.error('Respuesta de API no válida:', data);
+      }
+    } catch (err: any) {
+      console.error(err.message);
+    }
+  };
   // Cerrar el menú si el usuario hace clic fuera de él
   useEffect(() => {
+    //fetchUs();
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        profileMenuRef.current &&
-        !profileMenuRef.current.contains(event.target as Node)
-      ) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false);
       }
     };
-
+    
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -154,7 +172,7 @@ export function Perfil() {
         
         <Avatar onClick={toggleProfileMenu} className="cursor-pointer">
                 <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                <AvatarFallback>U</AvatarFallback>
+                <AvatarFallback>{name}</AvatarFallback>
               </Avatar>
       
       <div>
@@ -165,7 +183,7 @@ export function Perfil() {
                 M
               </div>
               <div>
-                <h2 className="font-semibold">Mariana artista muchacha</h2>
+                <h2 className="font-semibold">{name}</h2>
               </div>
             </div>
             <nav>
@@ -282,6 +300,7 @@ const Component: React.FC<ComponentProps> = ({
   idRol = 1,
   idSubUnidad = 1,
   dni = "",
+  name,
 }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
@@ -386,7 +405,7 @@ const Component: React.FC<ComponentProps> = ({
         <Notificacion />
 
         <Roles dni={dni} idRol={idRol} idSubUnidad={idSubUnidad} />
-        <Perfil />
+        <Perfil name={"ads"}/>
       </div>
     </nav>
   );

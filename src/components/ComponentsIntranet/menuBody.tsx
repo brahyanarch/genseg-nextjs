@@ -101,10 +101,12 @@ const Component = ({
   idrol,
   idsubuni,
   dni,
+  name,
 }: {
   idrol: number;
   idsubuni: number;
   dni: string;
+  name: string;
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
@@ -254,7 +256,7 @@ const Component = ({
               <Notificacion />
 
               <Roles idRol={idrol} idSubUnidad={idsubuni} dni={dni} />
-              <Perfil />
+              <Perfil name={name} />
             </div>
           </div>
         </div>

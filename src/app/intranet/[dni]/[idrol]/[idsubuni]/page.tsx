@@ -3,8 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from 'next/navigation';
 import NavIntranet from "@/components/ComponentsIntranet/navIntranet";
-import { API_ROLES, API_SUBUNIDADES } from "@/config/apiconfig";
+import { API_ROLES, API_SUBUNIDADES, API_USERS } from "@/config/apiconfig";
 import MenuBody from "@/components/ComponentsIntranet/menuBody";
+import { User } from "@/tipos/typos";
 interface Role {
   id_rol: number;
   n_rol: string;
@@ -22,6 +23,8 @@ const PrivilegiosPage = () => {
   const [roles, setRoles] = useState<Role[]>([]);
   const [subunidades, setSubunidades] = useState<Subunidad[]>([]);
   const [isClient, setIsClient] = useState(false);
+  const [User, setUser] = useState<User[]>([]);
+
   
   // Obtener los parámetros de la URL: idrol, idsubuni, dni
   const { idrol, idsubuni, dni } = useParams();
@@ -37,9 +40,26 @@ const PrivilegiosPage = () => {
     const subunidad = subunidades.find((s) => s.id_subuni === subunidad_id);
     return subunidad ? subunidad.n_subuni : `Subunidad ${subunidad_id}`;
   };
+  const fetchUs = async () => {
+    try {
+      const response = await fetch(`${API_USERS}/${dni}`);
+      if (!response.ok) {
+        throw new Error('Error al obtener los usuarios');
+      }
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setUser(data);
+      } else {
+        console.error('Respuesta de API no válida:', data);
+      }
+    } catch (err: any) {
+      console.error(err.message);
+    }
+  };
 
   // Fetch de roles y subunidades
   useEffect(() => {
+    fetchUs();
     const fetchData = async () => {
       try {
         // Fetch roles
@@ -62,6 +82,7 @@ const PrivilegiosPage = () => {
         console.error("Error fetching data:", error);
       }
     };
+console.log(User);
 
     //fetchData();
   }, []);
@@ -87,7 +108,7 @@ const PrivilegiosPage = () => {
       ) : (
         <>
           {/*<NavIntranet idRol={Number(idrol)} idSubUnidad={Number(idsubuni)} dni={dni.toString()} />*/}
-          <MenuBody idrol={Number(idrol)} idsubuni={Number(idsubuni)} dni={dni.toString()}/> 
+          <MenuBody idrol={Number(idrol)} idsubuni={Number(idsubuni)} dni={dni.toString()} name={User[0]?.n_usu || 'K'}/> 
 
         </>
       )}
