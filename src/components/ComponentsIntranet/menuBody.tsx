@@ -53,7 +53,7 @@ import ConfiUsers from "@/components/ComponentsIntranet/confiUsers";
 import ConfiSunidad from "@/components/ComponentsIntranet/confiSunidad";
 import Proyectos from "@/components/ComponentsIntranet/confiProyectos";
 import Formulario from "@/components/ComponentsIntranet/formularios";
-
+import NoteForm from '@/components/componentesFormulario/noteForm'
 interface Role {
   id_rol: number;
   n_rol: string;
@@ -78,6 +78,7 @@ type ContentType =
   | "Estadísticas"
   | "Sub configuracion"
   | "Formularios"
+  | "Editar Formulario"
   | "Logs";
 
 
@@ -94,7 +95,6 @@ const contentMap: Record<ContentType, JSX.Element> = {
   Estadísticas: <>Componente de Estadísticas</>,
   Logs: <>Componente de Logs</>,
   "Sub configuracion": <>sdf</>,
-  "Formularios": <Formulario />,
 };
 
 const Component = ({
@@ -111,6 +111,7 @@ const Component = ({
   const [isMonitorOpen, setIsMonitorOpen] = useState(false); // Para el segundo submenú
   const [isSubConfigOpen, setisSubConfigOpen] = useState(false); // Para el tercer submenú
   const [activeContent, setActiveContent] = useState<ContentType>("Principal");
+  const [selectedForm, setSelectedForm] = useState<number | null>(null);
   const [nomroles, setnomroles] = useState<Role[]>([]);
   const [subunidades, setSubunidades] = useState<Subunidad[]>([]);
   const [nombreRol, setNombreRol] = useState<String>();
@@ -145,7 +146,11 @@ const Component = ({
       onClick: toggleSubConfig,
     },
   ];
-
+  /// función para cambiar formulario
+  const handleEditForm = (formId: number) => {
+    setSelectedForm(formId);
+    setActiveContent("Editar Formulario");
+  };
   const getRoleName = (rol_id: number) => {
     const role = nomroles.find((r) => r.id_rol === rol_id);
     //return role ? role.n_rol : `Rol ${rol_id}`; // poner esqueleton
@@ -344,8 +349,27 @@ const Component = ({
             <p className="text-gray-600 dark:text-gray-300">
               {/*Este es el contenido de la sección {activeContent}. Aquí se
               mostraría la información relevante para esta área.*/}
+                  {activeContent === "Formularios" && (
+                    <Formulario
+                      onEdit={(formId) => {
+                        setSelectedForm(formId); // Almacena el formulario seleccionado
+                        setActiveContent("Editar Formulario"); // Cambia al contenido de edición
+                      }}
+                    />
+                  )}
 
-              {contentMap[activeContent] || <>Componentes de por defecto</>}
+                  {/* Renderizar el formulario de edición dinámico */}
+                  {activeContent === "Editar Formulario" && selectedForm && (
+                    <NoteForm
+                      formId={selectedForm} // Pasa el ID del formulario
+                      onBack={() => setActiveContent("Formularios")} // Regresa a la vista de formularios
+                    />
+                  )}
+
+                  {/* Renderizar los demás contenidos del mapa */}
+                  {activeContent !== "Formularios" && activeContent !== "Editar Formulario" && (
+                    contentMap[activeContent] || <>Componente por defecto</>
+                  )}
             </p>
           </div>
         </main>
