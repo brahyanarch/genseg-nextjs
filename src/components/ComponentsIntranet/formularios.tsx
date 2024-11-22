@@ -157,10 +157,10 @@ export const EditModal = ({
 export default function Component({onEdit}: {
   onEdit: (idForm:number) => void;
 }) {
-  const [form, setForm] = useState();
+  const [form, setForm] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingForm, setEditingForm] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const {mostrarAviso} = useContext<any>(AvisoContext);
 
@@ -311,12 +311,12 @@ if (error) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {forms.map((form) => (
+            {form.map((form:any) => (
               <TableRow key={form.idf}>
                 <TableCell>{form.idf}</TableCell>
-                <TableCell>{form.nombre}</TableCell>
-                <TableCell>{form.fechaCreacion}</TableCell>
-                <TableCell>{form.abreviatura}</TableCell>
+                <TableCell>{form.nmForm}</TableCell>
+                <TableCell>{form.Fcreate}</TableCell>
+                <TableCell>{form.abre}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button variant="ghost" size="icon" onClick={() => openEditModal(form)}>
