@@ -49,15 +49,15 @@ export const EditModal = ({
   const {mostrarAviso} = useContext<any>(AvisoContext);
   useEffect(() => {
     if (editingForm) {
-      setName(editingForm.n_rol);
-      setAbbreviation(editingForm.abrev);
+      setName(editingForm.nmForm);
+      setAbbreviation(editingForm.abre);
     }
   }, [editingForm]);
   
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     const updatedForm = {
-      n_rol: name,
+      name: name,
       abrev: abbreviation,
     };
     
@@ -160,7 +160,7 @@ export default function Component({onEdit}: {
   const [form, setForm] = useState();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingForm, setEditingForm] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const {mostrarAviso} = useContext<any>(AvisoContext);
 
