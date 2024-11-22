@@ -98,12 +98,6 @@ export default function Home() {
       <Carrusel data={datos}/>
       {/*<ObtenerCertificado key={frameworks} />*/}
       <ObtenerCertificado data={frameworks} />
-      <div className="w-[80%]">
-        <button onClick={handleSubmit}>
-          Mostrar Aviso
-        </button>
-      </div>
-      <ModalForm/>
       <Footer />
     </div>
   );
