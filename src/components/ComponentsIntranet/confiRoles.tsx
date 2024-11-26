@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import DynamicTable from "@/components/DynamicTable";
 import {Rol} from "@/tipos/typos"
 import {AvisoContext} from '@/context/avisoContext'
+import PermissionsManager from '@/components/ComponentsIntranet/permisosmanages'
 
 // Modal para agregar un nuevo Rol
 
@@ -149,6 +150,11 @@ const Component = () => {
   const [itemsPerPage] = useState(3);
   const totalPages = Math.ceil(Data.length / itemsPerPage);
   const {mostrarAviso} = useContext<any>(AvisoContext);
+  const [showPermissions, setShowPermissions] = useState(false) //para la interfaz de permisos asociados con los roles
+  
+  const handleTogglePermissions = () => {
+    setShowPermissions(!showPermissions)
+  }
   
   
 
@@ -311,6 +317,20 @@ const Component = () => {
           >
             <Trash2 className="h-4 w-4" />
           </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleTogglePermissions}
+          >
+            <List  className="h-4 w-4" />
+          </Button>
+          {showPermissions && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-background rounded-lg shadow-lg">
+            <PermissionsManager onClose={() => setShowPermissions(false)} />
+          </div>
+        </div>
+      )}
         </>
       ),
     },
