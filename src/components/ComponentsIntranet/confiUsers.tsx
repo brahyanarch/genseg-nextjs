@@ -199,7 +199,7 @@ export default function Component() {
     {
       key: "estado",
       label: "Estado",
-      render: (item: User) => (item.estado ? <Button className="bg-green-500" onClick={()=>toggleStateUser(item.dni,item.rol_id,item.subunidad_id_subuni)} >Activo</Button> : <Button className="bg-red-400" onClick={()=>toggleStateUser(item.dni)} >Desactivo</Button>),
+      render: (item: User) => (item.estado ? <Button className="bg-green-500" onClick={()=>toggleStateUser(item.dni,item.rol_id,item.subunidad_id_subuni)} >Activo</Button> : <Button className="bg-red-400"  onClick={()=>toggleStateUser(item.dni,item.rol_id,item.subunidad_id_subuni)}  >Desactivo</Button>),
     },
     {
       key: "opciones",
