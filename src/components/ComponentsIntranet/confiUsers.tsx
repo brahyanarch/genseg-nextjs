@@ -1,60 +1,56 @@
 'use client'
 import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Edit,X, Trash2, MoreVertical, CirclePlus } from "lucide-react"
+import { Edit,X, Trash2, CirclePlus } from "lucide-react"
 import {useState, useEffect, useContext} from "react"
 import { API_USERS } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
 import {AvisoContext} from '@/context/avisoContext'
 import DynamicTable from "@/components/DynamicTable";
 import {User} from "@/tipos/typos"
-
-const users = [
-  { id: 1, nombre: "Jose Roberto Mamani Zaa", rol: "Sub administrador", abreviatura: "JRMZ", estado: "Activo" },
-  { id: 2, nombre: "David Rodolfo Laruta", rol: "Coordinador", abreviatura: "DRL", estado: "Activo" },
-  { id: 3, nombre: "Ever Laurencio Sorocco", rol: "Personal de planta", abreviatura: "ELS", estado: "Activo" },
-]
-
 // Modal para agregar un nuevo Permiso
-export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnidad }: any) => {
+export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) => {
   const [name, setName] = useState('');
   const [abbreviation, setAbbreviation] = useState('');
   const {mostrarAviso} = useContext<any>(AvisoContext);
   useEffect(() => {
-    if (editingSubUnidad) {
-      setName(editingSubUnidad.n_per);
-      setAbbreviation(editingSubUnidad.abrev);
+    if (editingUser) {
+      setName(editingUser.n_usu);
+      setAbbreviation(editingUser.abrev);
     }
-  }, [editingSubUnidad]);
+  }, [editingUser]);
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    const updatedSubUnidad = {
-      nombre: name,
-      abreviatura: abbreviation
+    
+    const updatedUser = {
+      n_usu: name,  // nombre del usuario
+      abrev: abbreviation,  // abreviatura (si corresponde)
+      rol_id: editingUser?.rol_id,  // rol_id, lo debes pasar como está en el objeto de usuario
+      subunidad_id_subuni: editingUser?.subunidad_id_subuni,  // subunidad_id_subuni
     };
 
     try {
-      const response = await fetch(editingSubUnidad ? `${API_USERS}/${editingSubUnidad.id_per}` : API_USERS, {
-        method: editingSubUnidad ? 'PUT' : 'POST',
+      const response = await fetch(editingUser ? `${API_USERS}/${editingUser.dni}` : API_USERS, {
+        method: editingUser ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(updatedSubUnidad)
+        body: JSON.stringify(updatedUser)
       });
 
       if (response.ok) {
-        const savedPermission = await response.json();
-        onSaveSubUnidad(savedPermission);
+        const savedUser = await response.json();
+        onSaveUser(savedUser);
         mostrarAviso('succefull', 'Usuario guardado correctamente.');
         closeModal();
       } else {
         mostrarAviso('warning', 'Error al guardar el Usuario.');
       }
     } catch (error) {
-      mostrarAviso('warning', 'Error al conectar con la API:', error
-      );
+      mostrarAviso('warning', 'Error al conectar con la API:', error);
     }
-  };
+};
+
 
   if (!isOpen) return null;
 
@@ -203,20 +199,20 @@ export default function Component() {
     {
       key: "estado",
       label: "Estado",
-      render: (item: User) => (item.estado ? <Button className="bg-green-500">Activo</Button> : <Button className="bg-red-400">Desactivo</Button>),
+      render: (item: User) => (item.estado ? <Button className="bg-green-500" onClick={()=>toggleStateUser(item.dni,item.rol_id,item.subunidad_id_subuni)} >Activo</Button> : <Button className="bg-red-400" onClick={()=>toggleStateUser(item.dni)} >Desactivo</Button>),
     },
     {
       key: "opciones",
       label: "Opciones",
       render: (item: User) => (
         <>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" onClick={() => openEditModal(item)} >
             <Edit className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => console.log("Eliminar", item.dni)}
+            onClick={() => deleteUser(item.dni)}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -315,7 +311,7 @@ export default function Component() {
   let isFetching = false; // Variable global para rastrear si hay una solicitud en curso
 
   // Funcion asíncrona para obtener los datos
-  const fetchSubUnidad = async () => {
+  const fetchUser = async () => {
     if (isFetching) return; // Si ya está en curso, no ejecutar otra solicitud
     isFetching = true;
     try {
@@ -334,51 +330,97 @@ export default function Component() {
   };
   // useEffect para obtener los permisos desde la API al montar el componente
   useEffect(() => {
-    fetchSubUnidad();
-    
-    const interval = setInterval(fetchSubUnidad, 5000); // Cada 5 segundos
+    fetchUser();
+    const interval = setInterval(fetchUser, 5000); // Cada 5 segundos
     return () => clearInterval(interval); // Limpia el intervalo al desmontar
   }, []);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
-  const openEditModal = (subUnidad: any) => {
-    setEditingUser(subUnidad);
+  const openEditModal = (User: any) => {
+    setEditingUser(User);
     setIsModalOpen(true);
   };
-  const saveSubUnidad = (savedSubUnidad: any) => {
-    setEditingUser((prevSubUnidad:any) => {
-      if (editingUser) {
-        return prevSubUnidad.map((subUnidad: any) => 
-          subUnidad.id_per === savedSubUnidad.id_per ? savedSubUnidad : subUnidad
-        );
-      } else {
-        return [...prevSubUnidad, savedSubUnidad];
-      }
-    });
-    setEditingUser(null);
-    fetchSubUnidad();
-    
-  };
-
-  const deleteSubUnidad = async (id: number) => {
-    try {
-      const response = await fetch(`${API_USERS}/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        // Actualiza la lista de permisos eliminando el permiso
-        setUsers((prevSubUnidad) => prevSubUnidad.filter((subUnidad:any) => subUnidad.id_per !== id));
-        console.log('Permiso eliminado correctamente');
-      } else {
-        console.error('Error al eliminar el permiso');
-      }
-    } catch (error) {
-      console.error('Error al conectar con la API:', error);
+ const saveUser = (savedUser: any) => {
+  setUsers((prevUsers) => {
+    // Si estás editando un usuario, actualiza el usuario correspondiente
+    if (editingUser) {
+      return prevUsers.map((user: any) =>
+        user.dni === savedUser.dni &&
+        user.rol_id === savedUser.rol_id &&
+        user.subunidad_id_subuni === savedUser.subunidad_id_subuni
+          ? savedUser
+          : user
+      );
+    } else {
+      return [...prevUsers, savedUser];
     }
-  };
+  });
+  setEditingUser(null);
+  fetchUser();  // Recarga los usuarios actualizados
+};
+
+
+const deleteUser = async (id: string) => {
+  try {
+    const response = await fetch(`${API_USERS}/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      // Actualiza la lista de usuarios eliminando el usuario
+      setUsers((prevUsers) => prevUsers.filter((user: any) => user.dni !== id));
+      console.log('Usuario eliminado correctamente');
+    } else {
+      console.error('Error al eliminar el usuario');
+    }
+  } catch (error) {
+    console.error('Error al conectar con la API:', error);
+  }
+};
+const toggleStateUser = async (dni: string, rol_id: number, subunidad_id_subuni: number) => {
+  try {
+    // Encuentra el usuario por su DNI
+    const user = Users.find((user) => user.dni === dni);
+    if (!user) throw new Error("Usuario no encontrado");
+
+    // Invertir el estado actual del usuario
+    const updatedUser = { ...user, estado: !user.estado };
+
+    // Realiza la petición PUT para actualizar el estado del usuario
+    const response = await fetch(`${API_USERS}/toggle`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        dni: updatedUser.dni,
+        rol_id: rol_id, // Asume que rol_id y subunidad_id_subuni son parte de los datos del usuario
+        subunidad_id_subuni: subunidad_id_subuni,
+        estado: updatedUser.estado, // El estado que se invertirá
+      }),
+    });
+
+    if (response.ok) {
+      const updatedData = await response.json();
+      // Actualiza el estado local de los usuarios en el frontend
+      setUsers((prevUsers) =>
+        prevUsers.map((u) =>
+          u.dni === dni
+            ? { ...u, estado: updatedUser.estado } // Cambia el estado del usuario
+            : u
+        )
+      );
+      console.log("Estado actualizado:", updatedData);
+    } else {
+      const errorData = await response.json();
+      console.error("Error al actualizar el estado del usuario:", errorData.message);
+    }
+  } catch (error) {
+    console.error("Error al cambiar el estado del usuario:", error);
+  }
+};
 
   if (loading) {
     return (
@@ -411,7 +453,12 @@ export default function Component() {
       <div className="flex justify-center space-x-2 mt-4">
         {renderPaginationButtons()}
       </div>
-      
+      <EditModal
+        isOpen={isModalOpen}
+        closeModal={toggleModal}
+        onSaveUser={saveUser}
+        editingUser={editingUser}
+      />
     </div>
   )
 }

@@ -87,7 +87,7 @@ export default function NoteForm( { formId,
   };
   return (
     <>
-        <div className="w-full max-w-6xl mx-auto p-6 shadow-lg rounded-lg">
+        <div className="w-full max-w-6xl mx-auto p-6  rounded-lg">
           <div className='w-full flex justify-between items-center'>
           <h1 className="text-2xl font-bold mb-6">Editar Formulario {formId}</h1>
           <button type="button"  className="px-6 py-2 bg-green-500 text-white rounded-md" onClick={onBack}>
