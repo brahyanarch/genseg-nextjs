@@ -85,12 +85,9 @@ const PrivilegiosPage = () => {
 console.log(User);
 
     //fetchData();
-  }, []);
-
-  useEffect(() => {
-    // Asegurarse de que el componente está montado en el cliente
     setIsClient(true);
   }, []);
+
 
   // Validación de cliente para evitar el renderizado en el servidor
   if (!isClient) return null;

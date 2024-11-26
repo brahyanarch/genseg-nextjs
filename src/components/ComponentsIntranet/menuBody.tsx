@@ -94,7 +94,9 @@ const contentMap: Record<ContentType, JSX.Element> = {
   Monitoreo: <>Componente de Monitoreo</>,
   Estadísticas: <>Componente de Estadísticas</>,
   Logs: <>Componente de Logs</>,
-  "Sub configuracion": <>sdf</>,
+  "Sub configuracion": <>Sub configuracion</>,
+  Formularios: <>Formularios</>,
+  "Editar Formulario": <>Editar Formulario</>
 };
 
 const Component = ({

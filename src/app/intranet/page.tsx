@@ -1,10 +1,15 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { API_ROLES, API_SUBUNIDADES,API_LOGIN } from "@/config/apiconfig";
-import { devNull } from "os";
+import {
+  API_ROLES,
+  API_SUBUNIDADES,
+  API_LOGIN,
+  API_ADMIN,
+} from "@/config/apiconfig";
 
 interface User {
   dni: string;
@@ -34,14 +39,19 @@ interface Subunidad {
 interface RoleProps {
   title: string;
   subtitle: string;
-  onClick: () => void; // Añadir esta propiedad
+  onClick: () => void;
+}
+
+type Admin = {
+  id: number;
+  usuario: string;
 }
 
 function RoleCard({ title, subtitle, onClick }: RoleProps) {
   return (
     <Card
       className="w-48 h-48 bg-gray-900 text-white flex flex-col items-center justify-center cursor-pointer hover:bg-slate-700"
-      onClick={onClick} // Maneja el evento onClick
+      onClick={onClick}
     >
       <CardContent className="text-center p-4">
         <div className="text-4xl font-bold text-green-500 mb-4">M</div>
@@ -57,41 +67,36 @@ const RoleSelectionPage: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [userRoles, setUserRoles] = useState<User[]>([]);
+  const [admin, setAdmin] = useState<Admin | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
   const [subunidades, setSubunidades] = useState<Subunidad[]>([]);
   const router = useRouter();
 
-  // Fetch roles y subunidades cuando se carga la página
+  // Fetch roles y subunidades al cargar la página
   useEffect(() => {
-    const fetchRoles = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(API_ROLES);
-        const data: Role[] = await response.json();
-        setRoles(data);
+        const [rolesRes, subunidadesRes] = await Promise.all([
+          fetch(API_ROLES),
+          fetch(API_SUBUNIDADES),
+        ]);
+
+        setRoles(await rolesRes.json());
+        setSubunidades(await subunidadesRes.json());
       } catch (error) {
-        console.error("Error fetching roles:", error);
+        console.error("Error fetching data:", error);
       }
     };
 
-    const fetchSubunidades = async () => {
-      try {
-        const response = await fetch(API_SUBUNIDADES);
-        const data: Subunidad[] = await response.json();
-        setSubunidades(data);
-      } catch (error) {
-        console.error("Error fetching subunidades:", error);
-      }
-    };
-
-    fetchRoles();
-    fetchSubunidades();
+    fetchData();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null); // Limpiar errores previos
+    setError(null);
 
     try {
+      // Buscar en la API de usuarios normales
       const response = await fetch(API_LOGIN, {
         method: "POST",
         headers: {
@@ -103,106 +108,127 @@ const RoleSelectionPage: React.FC = () => {
         }),
       });
 
-      const data: LoginResponse = await response.json();
-      console.log(data.token);
-
       if (response.ok) {
-        // Guarda el token en localStorage
-        localStorage.setItem("token", data.token);
-        console.log("Inicio de sesión exitoso");
+        const data: LoginResponse = await response.json();
+        console.log("Usuario encontrado en usuarios normales:", data.token);
 
-        // Actualiza la lista de roles y subunidades del usuario
-        setUserRoles(data.users);
+        localStorage.setItem("token", data.token);
+        if(data.message === "admin" )
+        {
+          const dataAdmin: Admin = await response.json();
+          setAdmin(dataAdmin);
+        }
+        else {
+          setUserRoles(data.users); // Actualiza roles de usuario normal
+        }
+        
+        return;
       } else {
-        setError(data.error || "Error al iniciar sesión");
+        console.warn("Usuario no encontrado en API de usuarios normales.");
       }
     } catch (error) {
-      console.log("Error al conectarse con el servidor");
-      setError("Error de conexión con el servidor");
+      console.error("Error al buscar en la API de usuarios normales:", error);
     }
+
+    // Si no hay roles normales, buscar en la API de administradores
+    try {
+      const responseAdmin = await fetch(API_ADMIN, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          usuario: usuario,
+          password: password,
+        }),
+      });
+
+      if (responseAdmin.ok) {
+        const dataAdmin: Admin = await responseAdmin.json();
+        console.log("Usuario encontrado en administradores:", dataAdmin);
+
+        setAdmin(dataAdmin); // Guardar datos del administrador
+        localStorage.setItem("adminId", String(dataAdmin.id));
+        return;
+      } else {
+        console.warn("Usuario no encontrado en API de administradores.");
+      }
+    } catch (error) {
+      console.error("Error al buscar en la API de administradores:", error);
+    }
+
+    // Si no se encuentran datos en ambas APIs
+    setError("Usuario no encontrado en ambas APIs.");
   };
 
-  const handleRoleSelection = (dni: String, rol_id: number, subunidad_id_subuni: number) => {
-    // Redirigir a la página seleccionada con el rol y subunidad elegidos
-    console.log(rol_id, subunidad_id_subuni)
-    router.push(`/intranet/${dni}/${rol_id}/${subunidad_id_subuni}`);
+  const handleRoleSelection = (user: User) => {
+    router.push(`/intranet/${user.dni}/${user.rol_id}/${user.subunidad_id_subuni}`);
   };
 
-  // Obtener el nombre del rol por su ID
-  const getRoleName = (rol_id: number) => {
-    const role = roles.find((r) => r.id_rol === rol_id);
-    return role ? role.n_rol : devNull;
-  };
+  const getRoleName = (rol_id: number) =>
+    roles.find((role) => role.id_rol === rol_id)?.n_rol || "Rol desconocido";
 
-  // Obtener el nombre de la subunidad por su ID
-  const getSubunidadName = (subunidad_id: number) => {
-    const subunidad = subunidades.find((s) => s.id_subuni === subunidad_id);
-    return subunidad ? subunidad.n_subuni : `Subunidad ${subunidad_id}`;
-  };
+  const getSubunidadName = (subunidad_id: number) =>
+    subunidades.find((sub) => sub.id_subuni === subunidad_id)?.n_subuni || `Subunidad ${subunidad_id}`;
+
+  // Redirigir directamente si es administrador
+  useEffect(() => {
+    if (admin) {
+      //router.push(`/admin/dashboard/${admin.id}`);
+      router.push(`/intranet/privilegios`);
+    }
+  }, [admin, router]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-gray-300">
-      {userRoles.length === 0 ? (
-        // Si no hay roles todavía, mostrar el formulario de inicio de sesión
-        <div className="w-full max-w-md space-y-8">
-          <div className="flex flex-col items-center ">
-            <div className="bg-white rounded-full">
-              <img
-                alt="Logo"
-                className="h-24 w-24"
-                src="/resources/images/DPSEClogo.png"
-              />
-            </div>
-            <h2 className="mt-6 text-3xl font-bold">INICIAR SESIÓN</h2>
-          </div>
-          <hr />
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-4 rounded-md shadow-sm">
-              <div>
-                <label htmlFor="cuenta" className="sr-only">Cuenta</label>
-                <div className="relative">
-                  <input
-                    id="cuenta"
-                    type="text"
-                    required
-                    onChange={(e) => setUsuario(e.target.value)}
-                    className="appearance-none rounded-md w-full px-3 py-2 pl-10 border border-gray-700 placeholder-gray-500 text-white bg-gray-800"
-                    placeholder="Nombre de usuario"
-                  />
-                </div>
-              </div>
-              <div>
-                <label htmlFor="password" className="sr-only">Contraseña</label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    type="password"
-                    required
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="appearance-none rounded-md w-full px-3 py-2 pl-10 border border-gray-700 placeholder-gray-500 text-white bg-gray-800"
-                    placeholder="••••••••"
-                  />
-                </div>
-              </div>
-            </div>
-            <Button type="submit" className="w-full py-2 bg-blue-600">Iniciar Sesión</Button>
-          </form>
-          {error && <p style={{ color: "red" }}>{error}</p>}
-        </div>
-      ) : (
-        // Si ya hay roles disponibles, mostrar las opciones en RoleCard
+      {userRoles.length > 0 ? (
+        // Mostrar tarjetas de roles normales
         <div className="w-full max-w-md space-y-8">
           <h2 className="text-2xl font-bold">Selecciona un Rol y Subunidad</h2>
-          <div className="grid grid-cols-3 gap-4 m-[-80px]">
-            {userRoles.map((user, index) => (
+          <div className="grid grid-cols-3 gap-4">
+            {userRoles.map((user) => (
               <RoleCard
-                key={index}
+                key={`${user.dni}-${user.rol_id}-${user.subunidad_id_subuni}`}
                 title={getRoleName(user.rol_id)}
                 subtitle={getSubunidadName(user.subunidad_id_subuni)}
-                onClick={() => handleRoleSelection(user.dni, user.rol_id, user.subunidad_id_subuni)}
+                onClick={() => handleRoleSelection(user)}
               />
             ))}
           </div>
+        </div>
+      ) : (
+        // Formulario de inicio de sesión
+        <div className="w-full max-w-md space-y-8">
+          <div className="flex flex-col items-center">
+            <img
+              alt="Logo"
+              className="h-24 w-24 rounded-full bg-white"
+              src="/resources/images/DPSEClogo.png"
+            />
+            <h2 className="mt-6 text-3xl font-bold">INICIAR SESIÓN</h2>
+          </div>
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <input
+                type="text"
+                required
+                onChange={(e) => setUsuario(e.target.value)}
+                className="w-full px-3 py-2 rounded-md bg-gray-800 text-white border border-gray-700"
+                placeholder="Nombre de usuario"
+              />
+              <input
+                type="password"
+                required
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-3 py-2 rounded-md bg-gray-800 text-white border border-gray-700"
+                placeholder="••••••••"
+              />
+            </div>
+            <Button type="submit" className="w-full py-2 bg-blue-600">
+              Iniciar Sesión
+            </Button>
+          </form>
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
       )}
     </div>
@@ -210,3 +236,4 @@ const RoleSelectionPage: React.FC = () => {
 };
 
 export default RoleSelectionPage;
+

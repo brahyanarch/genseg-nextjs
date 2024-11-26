@@ -312,9 +312,12 @@ export default function Component() {
 
     return pageButtons;
   };
+  let isFetching = false; // Variable global para rastrear si hay una solicitud en curso
 
   // Funcion asíncrona para obtener los datos
   const fetchSubUnidad = async () => {
+    if (isFetching) return; // Si ya está en curso, no ejecutar otra solicitud
+    isFetching = true;
     try {
       const response = await fetch(API_USERS);
       if (!response.ok) {
@@ -325,12 +328,16 @@ export default function Component() {
     } catch (err: any) {
       setError(err.message);
     } finally {
+      isFetching = false;
       setLoading(false);
     }
   };
   // useEffect para obtener los permisos desde la API al montar el componente
   useEffect(() => {
     fetchSubUnidad();
+    
+    const interval = setInterval(fetchSubUnidad, 5000); // Cada 5 segundos
+    return () => clearInterval(interval); // Limpia el intervalo al desmontar
   }, []);
 
   const toggleModal = () => {

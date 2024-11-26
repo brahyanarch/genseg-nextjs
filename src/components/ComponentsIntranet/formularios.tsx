@@ -332,7 +332,7 @@ if (error) {
                         }`}
                       />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={()=>onEdit(1)}>
+                    <Button variant="ghost" size="icon" onClick={()=>onEdit(1)} >
                       <FilePenLine />
                     </Button>
                   </div>
