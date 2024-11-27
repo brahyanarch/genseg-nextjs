@@ -350,7 +350,7 @@ const Component = ({
             <h1 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-white">
               {/*activeContent*/}
             </h1>
-            <p className="text-gray-600 dark:text-gray-300">
+            <div className="text-gray-600 dark:text-gray-300">
               {/*Este es el contenido de la sección {activeContent}. Aquí se
               mostraría la información relevante para esta área.*/}
                   {activeContent === "Formularios" && (
@@ -374,7 +374,7 @@ const Component = ({
                   {activeContent !== "Formularios" && activeContent !== "Editar Formulario" && (
                     contentMap[activeContent] || <>Componente por defecto</>
                   )}
-            </p>
+            </div>
           </div>
         </main>
       </div>

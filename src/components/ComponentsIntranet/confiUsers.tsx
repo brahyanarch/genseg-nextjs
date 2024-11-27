@@ -64,7 +64,9 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
         >
           <X size={24} />
         </button>
-        <h2 className="text-2xl font-bold mb-4 text-white">Agregar Permiso</h2>
+        <h2 className="text-2xl font-bold mb-4 text-white">
+          {editingUser ? "Editar Usuario" : "Agregar Usuario"}
+        </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
@@ -382,7 +384,7 @@ const deleteUser = async (id: string) => {
 const toggleStateUser = async (dni: string, rol_id: number, subunidad_id_subuni: number) => {
   try {
     // Encuentra el usuario por su DNI
-    const user = Users.find((user) => user.dni === dni);
+    const user = Users.find((user) => user.dni === dni && user.rol_id === rol_id && user.subunidad_id_subuni===subunidad_id_subuni);
     if (!user) throw new Error("Usuario no encontrado");
 
     // Invertir el estado actual del usuario
@@ -407,7 +409,7 @@ const toggleStateUser = async (dni: string, rol_id: number, subunidad_id_subuni:
       // Actualiza el estado local de los usuarios en el frontend
       setUsers((prevUsers) =>
         prevUsers.map((u) =>
-          u.dni === dni
+          u.dni === dni && u.rol_id === rol_id && u.subunidad_id_subuni===subunidad_id_subuni
             ? { ...u, estado: updatedUser.estado } // Cambia el estado del usuario
             : u
         )
@@ -435,11 +437,14 @@ const toggleStateUser = async (dni: string, rol_id: number, subunidad_id_subuni:
   }
 
   return (
-    <div className=" w-[90%] m-4 p-4 space-y-4 text-white min-h-screen">
+    <div className=" w-[90%] m-4 p-4 space-y-4 text-gray-800  dark:text-white min-h-screen">
       <div >
         <h1 className="text-2xl font-bold">Usuarios</h1>
       </div>
-      <Button variant="secondary" size="sm" >
+      <Button variant="secondary" size="sm" onClick={() => {
+            setEditingUser(null);
+            toggleModal();
+          }} >
       <CirclePlus className="h-4 w-4" />
           nuevo
       </Button>
