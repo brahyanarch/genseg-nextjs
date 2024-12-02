@@ -349,7 +349,7 @@ const Component = () => {
       }
       const data = await response.json();
       setData(data);
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
@@ -364,16 +364,16 @@ const Component = () => {
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
-  const openEditModal = (role: any) => {
+  const openEditModal = (role:boolean) => {
     setEditingRole(role);
     setIsModalOpen(true);
   };
   //funcion para editar un Rol
-  const saveRole = (savedRole: any) => {
-    setData((prevRoles: any) => {
+  const saveRole = (savedRole) => {
+    setData((prevRoles) => {
       if (editingRole) {
-        return prevRoles.map((permiso: any) =>
-          permiso.id_per === savedRole.id_per ? savedRole : permiso
+        return prevRoles.map((rol) =>
+          rol.id_rol === savedRole.id_per ? savedRole : rol
         );
       } else {
         return [...prevRoles, savedRole];
@@ -391,7 +391,7 @@ const Component = () => {
 
       if (response.ok) {
         setData((prevRoles) =>
-          prevRoles.filter((rol: any) => rol.id_rol !== id)
+          prevRoles.filter((rol) => rol.id_rol !== id)
         );
         mostrarAviso('succefull', 'Rol Eliminado correctamente.');
         fetchRoles();

@@ -1,6 +1,7 @@
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { X} from 'lucide-react'
 import {GeneralData, TaskList} from '@/components/componentesProyecto/porjectInfo'
 import Image from 'next/image'
 ///
