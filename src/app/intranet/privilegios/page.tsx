@@ -321,7 +321,7 @@ const Component = ({
                     )}
                   </Button>
                   {!isCollapsed && subItems && ((label === "Configuracion" && isConfigOpen) || (label === "Monitoreo" && isMonitorOpen) || (label === "Sub configuracion" && isSubConfigOpen)) && (
-                    <ul className="pl-6 space-y-1">
+                    <ul className="pl-6 space-y-1 flex flex-col justify-between items-start">
                       {subItems.map((subItem) => (
                         <li key={subItem}>
                           <Button
