@@ -18,6 +18,7 @@ export const apipermisos_id = (path: string, id: number): string => {
 export const API_ROLES_WITH_DNI = `${API_URL}/api/roles/:dni`;  // Corrige el nombre para evitar errores
 export const API_PERMISOS_ID = `${API_URL}/api/permisos/:id`;  // Corrige el nombre para evitar errores
 export const API_ROLES = `${API_URL}/api/roles`;
+export const API_DETALLE_PERMISOS = `${API_URL}/api/de_permisos`;
 export const API_SUBUNIDADES = `${API_URL}/api/subunidad`;
 export const API_LOGIN = `${API_URL}/api/auth/login`;
 export const API_PERMISOS = `${API_URL}/api/permisos`;
