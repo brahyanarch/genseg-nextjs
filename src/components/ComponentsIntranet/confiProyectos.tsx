@@ -6,7 +6,7 @@ import {Table,TableBody,TableCell,TableHead,TableHeader,TableRow,} from "@/compo
 import { API_PROJECTS } from "@/config/apiconfig";
 import {AvisoContext} from '@/context/avisoContext'
 import { Edit,X, Trash2, MoreVertical, CirclePlus } from "lucide-react"
-import ProjectDetails from '@/components/componentesProyecto/mainContent'
+
 interface Project {
     id: number;
     nombre: string;
@@ -73,8 +73,6 @@ export const EditModal = ({
       mostrarAviso('warning', 'Error al conectar con la API.');
     }
   };
-
-
   
   if (!isOpen) return null;
   
@@ -144,6 +142,8 @@ export const EditModal = ({
     </div>
   );
 }; 
+
+
 export default function Component() {
   const [projects, setProjects] = useState();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -151,7 +151,6 @@ export default function Component() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const {mostrarAviso} = useContext<any>(AvisoContext);
-  const [visibleModal, setVisibleModal] = useState(false);
 
  //función para obtener datos desde la API
  const fetchProjects = async () => {
@@ -191,11 +190,11 @@ const saveProject = (savedProject: any) => {
     } else {
       return [...prevProjects, savedProject];
     }
-  });
+  }); 
   setEditingProject(null);
   fetchProjects();
 };
-//función para eliminar un Rol
+//función para eliminar un Rolgit
 const deleteProject = async (id: number) => {
   try {
     const response = await fetch(`${API_PROJECTS}/${id}`, {
@@ -215,9 +214,6 @@ const deleteProject = async (id: number) => {
     mostrarAviso('warning', "Error al conectar con la API:", error);
   }
 };
-const isOpenModalProject = ()=>{
-  setVisibleModal(!visibleModal);
-}
 
 if (loading) {
   return (
@@ -325,7 +321,7 @@ if (error) {
               </TableCell>
               <TableCell className="border-r border-gray-900">
                 <div className="flex space-x-2">
-                  <Button variant="ghost" size="icon" onClick={isOpenModalProject} >
+                  <Button variant="ghost" size="icon" onClick={() => openEditModal(proyect)} >
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button variant="ghost" size="icon" onClick={()=>deleteProject(proyect.id)}>
@@ -351,10 +347,6 @@ if (error) {
         </Button>
       </div>
       <EditModal isOpen={isModalOpen} closeModal={toggleModal} onSaveProject={saveProject} editingProject={editingProject} />
-
-     { visibleModal && 
-      <ProjectDetails isOpenModalProject={isOpenModalProject} />}
-      
     </div>
   )
 }
