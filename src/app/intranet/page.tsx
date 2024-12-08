@@ -10,7 +10,7 @@ import {
   API_LOGIN,
   API_ADMIN,
 } from "@/config/apiconfig";
-
+import Image from 'next/image'
 interface User {
   dni: string;
   rol_id: number;
@@ -50,7 +50,7 @@ type Admin = {
 function RoleCard({ title, subtitle, onClick }: RoleProps) {
   return (
     <Card
-      className="w-48 h-48 bg-gray-900 text-white flex flex-col items-center justify-center cursor-pointer hover:bg-slate-700"
+      className="w-48 h-48 bg-gray-900 text-white flex flex-col items-center justify-between cursor-pointer hover:bg-slate-700"
       onClick={onClick}
     >
       <CardContent className="text-center p-4">
@@ -200,10 +200,10 @@ const RoleSelectionPage: React.FC = () => {
         // Formulario de inicio de sesión
         <div className="w-full max-w-md space-y-8">
           <div className="flex flex-col items-center">
-            <img
+            <Image
               alt="Logo"
               className="h-24 w-24 rounded-full bg-white"
-              src="/resources/images/DPSEClogo.png"
+              src={"/resources/images/DPSEClogo.png"}
             />
             <h2 className="mt-6 text-3xl font-bold">INICIAR SESIÓN</h2>
           </div>

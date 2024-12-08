@@ -17,7 +17,7 @@ export default function ProjectDetails({isOpenModalProject}:any) {
       <CardHeader>
         <CardTitle className="text-xl font-semibold">
           Limpieza del bosque (LP451)
-          <button className="bg-red-600 py-2 px-5 rounded-md"  onClick={isOpenModalProject} >Cerrar</button>
+          <button className="bg-red-600 py-2 px-5 rounded-md"  onClick={isOpenModalProject} ><X /></button>
         </CardTitle>
         <Progress value={64} className="h-2 mt-2" />
         <span className="text-sm text-muted-foreground mt-1">64%</span>

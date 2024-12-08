@@ -1,51 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
+import Image from 'next/image'
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Bell,
-  Settings,
-  Users,
-  FileText,
-  LayoutDashboard,
-  ChevronDown,
-  Search,
-  Moon,
-  Sun,
-  FolderKanban,
-} from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  API_ROLES,
-  API_SUBUNIDADES,
-  apiRolesWithDni,
-  API_ROLES_WITH_DNI,
-} from "@/config/apiconfig";
-import { MenuRoles } from "@/components/iconsPlus";
-import {
-  Roles,
-  Perfil,
-  Notificacion,
-} from "@/components/ComponentsIntranet/navIntranet";
-import {
-  Breadcrumb,
-  BreadcrumbEllipsis,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import {ChevronLeft, ChevronRight, Bell, Settings, Users, FileText, LayoutDashboard, ChevronDown, Moon,Sun} from "lucide-react";
+import { API_ROLES, API_SUBUNIDADES} from "@/config/apiconfig";
+import { Roles, Perfil, Notificacion } from "@/components/ComponentsIntranet/navIntranet";
 import Principal from "@/components/ComponentsIntranet/principal";
 import ConfiRoles from "@/components/ComponentsIntranet/confiRoles";
 import ConfiPermisos from "@/components/ComponentsIntranet/confiPermisos";
@@ -118,13 +79,12 @@ const Component = ({
   const [selectedForm, setSelectedForm] = useState<number | null>(null);
   const [nomroles, setnomroles] = useState<Role[]>([]);
   const [subunidades, setSubunidades] = useState<Subunidad[]>([]);
-  const [nombreRol, setNombreRol] = useState<String>();
   const [darkMode, setDarkMode] = useState(false);
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
   const toggleConfig = () => setIsConfigOpen(!isConfigOpen);
   const toggleMonitor = () => setIsMonitorOpen(!isMonitorOpen);
-  const toggleSubConfig = () => setisSubConfigOpen(!isSubConfigOpen);
+  //const toggleSubConfig = () => setisSubConfigOpen(!isSubConfigOpen);
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Principal" },
@@ -145,10 +105,11 @@ const Component = ({
     
   ];
   /// función para cambiar formulario
+  /*
   const handleEditForm = (formId: number) => {
     setSelectedForm(formId);
     setActiveContent("Editar Formulario");
-  };
+  };*/
   const getRoleName = (rol_id: number) => {
     const role = nomroles.find((r) => r.id_rol === rol_id);
     //return role ? role.n_rol : `Rol ${rol_id}`; // poner esqueleton
@@ -214,8 +175,8 @@ const Component = ({
         <div className=" mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-              <img
-                src="/resources/images/DPSEClogo.png"
+              <Image
+                src={"/resources/images/DPSEClogo.png"}
                 alt="Logo"
                 className="h-9 w-9 rounded-full bg-white"
               />
