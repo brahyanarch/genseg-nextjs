@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   ChevronLeft,
   ChevronRight,
@@ -13,7 +12,6 @@ import {
   FileText,
   LayoutDashboard,
   ChevronDown,
-  Search,
   Moon,
   Sun,
   FolderKanban,
@@ -22,30 +20,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   API_ROLES,
   API_SUBUNIDADES,
-  apiRolesWithDni,
-  API_ROLES_WITH_DNI,
 } from "@/config/apiconfig";
-import { MenuRoles } from "@/components/iconsPlus";
 import {
   Roles,
   Perfil,
   Notificacion,
 } from "@/components/ComponentsIntranet/navIntranet";
-import {
-  Breadcrumb,
-  BreadcrumbEllipsis,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import Principal from "@/components/ComponentsIntranet/principal";
 import ConfiRoles from "@/components/ComponentsIntranet/confiRoles";
 import ConfiPermisos from "@/components/ComponentsIntranet/confiPermisos";
@@ -118,7 +98,6 @@ const Component = ({
   const [selectedForm, setSelectedForm] = useState<number | null>(null);
   const [nomroles, setnomroles] = useState<Role[]>([]);
   const [subunidades, setSubunidades] = useState<Subunidad[]>([]);
-  const [nombreRol, setNombreRol] = useState<String>();
   const [darkMode, setDarkMode] = useState(false);
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);

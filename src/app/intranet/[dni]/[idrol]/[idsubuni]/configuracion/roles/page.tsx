@@ -2,14 +2,6 @@
 import { Button } from "@/components/ui/button";
 import React, { useState, useEffect, useContext } from "react";
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { X, Edit, Trash2, List, CirclePlus } from "lucide-react";
 import BreadcrumbItems from "@/components/breadcrumb";
 import { API_ROLES } from "@/config/apiconfig";
@@ -138,7 +130,7 @@ export const EditModal = ({
   );
 };
 
-const Component = () => {
+const ConfiRoles=()=>{
   const [Data, setData] = useState<Rol[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRole, setEditingRole] = useState(null);
@@ -506,4 +498,5 @@ const Component = () => {
   );
 };
 
-export default Component;
+
+export default ConfiRoles;

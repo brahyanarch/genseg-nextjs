@@ -183,7 +183,7 @@ const RoleSelectionPage: React.FC = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-gray-300">
       {userRoles.length > 0 ? (
         // Mostrar tarjetas de roles normales
-        <div className="w-full max-w-md space-y-8">
+        <div className="w-[50%] space-y-8">
           <h2 className="text-2xl font-bold">Selecciona un Rol y Subunidad</h2>
           <div className="grid grid-cols-3 gap-4">
             {userRoles.map((user) => (
@@ -204,6 +204,8 @@ const RoleSelectionPage: React.FC = () => {
               alt="Logo"
               className="h-24 w-24 rounded-full bg-white"
               src={"/resources/images/DPSEClogo.png"}
+              width={80}
+              height={80}
             />
             <h2 className="mt-6 text-3xl font-bold">INICIAR SESIÓN</h2>
           </div>

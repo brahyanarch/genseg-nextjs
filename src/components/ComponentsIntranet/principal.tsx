@@ -1,13 +1,15 @@
-import {  Breadcrumb,  BreadcrumbEllipsis,  BreadcrumbItem,  BreadcrumbLink,  BreadcrumbList,  BreadcrumbPage,  BreadcrumbSeparator,} from "@/components/ui/breadcrumb";
 import BreadcrumbItems from "@/components/breadcrumb";
-import { EnCurso, Archivado, Pendiente, Completado } from "@/components/ComponentsIntranet/estadosProyecto";
-import Graficos from "@/components/ComponentsIntranet/graficos";
-import Dona from "@/components/ComponentsIntranet/graficoDona"
+import { EnCurso, Archivado, Pendiente, Completado } from "@/components/componentesGraficos/estadosProyecto";
+import Graficos from "@/components/componentesGraficos/graficos";
+import Dona from "@/components/componentesGraficos/graficoDona"
 export default function Principal (){
     return(
         <>
-        <BreadcrumbItems items={["Inicio", "Principal"]} />
-        <div className="flex items-center space-x-4">
+        <div className="self-start px-4 " >
+        <BreadcrumbItems items={["Inicio", "Principal"]}  />
+        </div>
+        
+        <div className="flex items-center justify-around space-x-2 mx-auto p-4">
 
         <Completado />
         <p className="pr-7">5 proyectos compleados</p>

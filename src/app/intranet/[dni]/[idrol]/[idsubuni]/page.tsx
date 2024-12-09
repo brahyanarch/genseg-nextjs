@@ -1,34 +1,8 @@
 "use client";
+import Principal from "@/components/ComponentsIntranet/principal";
+const Dashboard = () => {
 
-import React, { useEffect, useState } from "react";
-import { useParams, useRouter } from 'next/navigation';
-import NavIntranet from "@/components/ComponentsIntranet/navIntranet";
-import { API_ROLES, API_SUBUNIDADES, API_USERS } from "@/config/apiconfig";
-import MenuBody from "@/components/ComponentsIntranet/menuBody";
-import { User } from "@/tipos/typos";
-interface Role {
-  id_rol: number;
-  n_rol: string;
-  abrev: string;
-}
-
-interface Subunidad {
-  id_subuni: number;
-  n_subuni: string;
-  abreviatura: string;
-}
-
-const PrivilegiosPage = () => {
-  const [error, setError] = useState<string | null>(null);
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [subunidades, setSubunidades] = useState<Subunidad[]>([]);
-  const [isClient, setIsClient] = useState(false);
-  const [User, setUser] = useState<User[]>([]);
-
-  
-  // Obtener los parámetros de la URL: idrol, idsubuni, dni
-  const { idrol, idsubuni, dni } = useParams();
-
+/*
   // Obtener el nombre del rol por su ID
   const getRoleName = (rol_id: number) => {
     const role = roles.find((r) => r.id_rol === rol_id);
@@ -86,31 +60,16 @@ console.log(User);
 
     //fetchData();
     setIsClient(true);
-  }, []);
+  }, []);*/
 
-
-  // Validación de cliente para evitar el renderizado en el servidor
-  if (!isClient) return null;
-
-  // Validar que DNI esté disponible antes de usarlo
-  if (!dni) {
-    setError("El DNI no está disponible.");
-    return <p>{error}</p>;
-  }
+  
 
   return (
-    <div className="w-full">
-      {error ? (
-        <p>{error}</p>
-      ) : (
-        <>
-          {/*<NavIntranet idRol={Number(idrol)} idSubUnidad={Number(idsubuni)} dni={dni.toString()} />*/}
-          <MenuBody idrol={Number(idrol)} idsubuni={Number(idsubuni)} dni={dni.toString()} name={User[0]?.n_usu || 'K'}/> 
-
-        </>
-      )}
+    <div className="w-full flex flex-col justify-between gap-2 items-center overflow-auto mx-auto  bg-gray-600" >
+     <h1>Este es la página Principal</h1> 
+      <Principal/>
     </div>
   );
 };
 
-export default PrivilegiosPage;
+export default Dashboard;
