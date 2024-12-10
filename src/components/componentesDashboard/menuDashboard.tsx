@@ -82,7 +82,7 @@ const Menu = () => {
                 className={
                     clsx( "w-full flex justify-between items-center",
                         {
-                            "bg-gray-900 opacity-45": pathname === url,
+                            "bg-gray-400 text-black": pathname === url,
                         }
                     )
                 }
@@ -105,7 +105,13 @@ const Menu = () => {
                   {subItems.map(({label,url}) => (
                     <li key={label}>
                     <Link  href={url} >
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" className={
+                    clsx( "w-full flex justify-between items-center",
+                        {
+                            "bg-gray-400 text-black": pathname === url,
+                        }
+                    )
+                }>
                         {label}
                       </Button>
                     </Link>
