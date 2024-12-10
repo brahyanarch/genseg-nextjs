@@ -291,7 +291,7 @@ if (error) {
       <div >
         <h1 className="text-2xl font-bold text-black dark:text-white">Proyectos</h1>
       </div>
-      <Button variant="secondary" size="sm" >
+      <Button variant="default" size="sm" className='bg-blue-600'>
       <CirclePlus className="h-4 w-4" onClick={toggleModal} />
           nuevo
       </Button>

@@ -100,7 +100,7 @@ const RoleSelectionPage: React.FC = () => {
       const response = await fetch(API_LOGIN, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           usuario: usuario,
