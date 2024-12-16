@@ -328,7 +328,7 @@ if (error) {
                     <Button variant="ghost" size="icon">
                       <Circle
                         className={`h-4 w-4 ${
-                          form.active ? "fill-primary" : ""
+                          form.active ? "fill-primary" : " fill-none"
                         }`}
                       />
                     </Button>

@@ -3,7 +3,7 @@ import React, { useState, } from 'react';
 import 'tailwindcss/tailwind.css';
 type Question = {
   id: number;
-  type: 'text' | 'multipleChoice' | 'singleChoice' | 'dropdown' | 'date';
+  type: 'text' | 'multipleChoice' | 'singleChoice' | 'dropdown' | 'date' | 'archive';
   questionText: string;
   options?: string[]; // Para opción múltiple, una sola opción, dropdown
   answer?: string | string[]; // Almacenar respuesta, string para texto/una opción, array para varias opciones
@@ -17,7 +17,7 @@ export default function NoteForm( { formId,
 }) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [questionText, setQuestionText] = useState<string>('');
-  const [questionType, setQuestionType] = useState<'text' | 'multipleChoice' | 'singleChoice' | 'dropdown' | 'date'>('text');
+  const [questionType, setQuestionType] = useState<'text' | 'multipleChoice' | 'singleChoice' | 'dropdown' | 'date' | 'archive' >('text');
   const [options, setOptions] = useState<string[]>(['']); // Para opción múltiple, una sola opción, dropdown
   const [nextId, setNextId] = useState<number>(1);
   const [editingId, setEditingId] = useState<number | null>(null); // Para editar preguntas
@@ -66,6 +66,8 @@ export default function NoteForm( { formId,
 
     setQuestionText('');
     setOptions(['']);
+    console.log(questions);
+    //console.log(options);
   };
 
   const removeQuestion = (id: number) => {
@@ -85,6 +87,8 @@ export default function NoteForm( { formId,
       }
     }
   };
+
+  
   return (
     <>
         <div className="w-full max-w-6xl mx-auto p-6  rounded-lg">
@@ -121,6 +125,7 @@ export default function NoteForm( { formId,
               <option value="singleChoice">Una opción (radio buttons)</option>
               <option value="dropdown">Una opción (combobox)</option>
               <option value="date">Fecha</option>
+              <option value="archive">Archivo</option>
             </select>
           </div>
   
@@ -169,6 +174,7 @@ export default function NoteForm( { formId,
                     {question.type === 'multipleChoice' && <p>Tipo: Opción múltiple</p>}
                     {question.type === 'singleChoice' && <p>Tipo: Una opción</p>}
                     {question.type === 'dropdown' && <p>Tipo: Combobox</p>}
+                    {question.type === 'archive' && <p>Tipo: Archivo</p>}
                   </div>
                   <div>
                     <button className="text-blue-500 mr-4" onClick={() => editQuestion(question.id)}>

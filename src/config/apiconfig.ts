@@ -28,18 +28,6 @@ export const API_PROJECTS = `${API_URL}/api/projects`;
 //rutas admin general
 export const API_ADMIN = `${API_URL}/auth/login`;
 //rutas edicion de formulario
-export const API_PREGUNTAS = `${API_URL}/api/Pregunta`;
-export const API_RESPUESTAS = `${API_URL}/api/Respuesta`;
-//rutas tipos pregunta
-export const API_OPC_DES = `${API_URL}/api/OpcionDes`;
-export const API_OPC_MUL = `${API_URL}/api/OpcionMul`;
-export const API_OPC_UNI = `${API_URL}/api/OpcionUni`;
-//rutas tipos respuesta
-export const API_RES_OPC_DES = `${API_URL}/api/ResOpcDes`;
-export const API_RES_OPC_MUL = `${API_URL}/api/ResOpcMul`;
-export const API_RES_OPC_UNI = `${API_URL}/api/ResOpcUni`;
-export const API_RES_FECHA = `${API_URL}/api/ResDate`;
-export const API_RES_ARCHIVO = `${API_URL}/api/ResFile`;
-export const API_RES_TEXTO = `${API_URL}/api/ResOpcText`;
+export const API_PREGUNTAS = `${API_URL}/api/form/preguntas`;
 //https://2nlfx0w1-3000.brs.devtunnels.mshttps//2nlfx0w1-3000.brs.devtunnels.ms/api/roles/75548237
 //https://2nlfx0w1-3000.brs.devtunnels.ms/api/roles/75548237
