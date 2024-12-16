@@ -17,8 +17,8 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ configuration, data, onSort
   return (
     <div className="bg-[#E3E6ED] rounded-lg overflow-hidden">
       <Table className="w-[90%] mx-auto my-6">
-        <TableHeader>
-          <TableRow>
+        <TableHeader >
+          <TableRow >
             {configuration.map((col) => (
               <TableHead key={col.key}>
                 {col.label}
@@ -36,11 +36,11 @@ const DynamicTable: React.FC<DynamicTableProps> = ({ configuration, data, onSort
             ))}
           </TableRow>
         </TableHeader>
-        <TableBody className="text-gray-900">
+        <TableBody className="text-gray-900 ">
           {data.map((item, index) => (
-            <TableRow key={index}>
+            <TableRow key={index} >
               {configuration.map((col) => (
-                <TableCell key={col.key}>{col.render(item)}</TableCell>
+                <TableCell key={col.key}  >{col.render(item)}</TableCell>
               ))}
             </TableRow>
           ))}

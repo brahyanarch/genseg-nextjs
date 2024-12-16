@@ -193,14 +193,14 @@ export default function Component() {
       render: (item: Subunidad) => (
         <>
           <Button variant="ghost" size="icon" onClick={() => openEditModal(item)}>
-            <Edit className="h-4 w-4" />
+            <Edit className="h-5 w-5"  strokeWidth={2.5}  />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => deleteSubUnidad(item.id_subuni)}
             >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-5 w-5"  strokeWidth={2.5}  />
           </Button>
         </>
       ),

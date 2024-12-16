@@ -1,23 +1,32 @@
+'use client'
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { X} from 'lucide-react'
-import {GeneralData, TaskList} from '@/components/componentesProyecto/porjectInfo'
+import { TaskList} from '@/components/componentesProyecto/porjectInfo'
 import Image from 'next/image'
+import {useState} from "react"
+import {usePathname, useRouter } from "next/navigation"
 ///
 
-export default function ProjectDetails({isOpenModalProject}:any) {
+export default function ProjectDetails() {
+  const route = useRouter();
+  const pathname = usePathname();
+  /// Fucion para cambiar a interfaz de detalles de una actividad
+  const toggleOpenDetailsActivities = (activityId:number)=>{
+    route.push(`${pathname}/viewActivity/${activityId}`);
+  } 
   return (
     <>
-    <div className="absolute inset-0 bg-black opacity-50"></div>
-    <Card className=" w-[60%] h-[80%] mx-auto shadow-lg absolute overflow-y-auto top-20 z-50  ">
+    <Card className=" w-full bg-white dark:bg-gray-900 mx-auto overflow-y-auto p-2 relative">
       <CardContent className="">
-        <Image src={"/resources/images/6.jpg"} alt="imagen header" width={300} height={200} ></Image>
+        <Image src={"/resources/images/imgActividad.jpg"} alt="imagen header" className="w-[100%] h-44" width={500} height={300} ></Image>
       </CardContent>
+      <div className=" w-[90%] mx-auto" >
       <CardHeader>
         <CardTitle className="text-xl font-semibold">
           Limpieza del bosque (LP451)
-          <button className="bg-red-600 py-2 px-5 rounded-md"  onClick={isOpenModalProject} ><X /></button>
+          <button className="bg-red-600 absolute top-2 right-2 py-2 px-3 rounded-md" ><X className="w-5 h-5" /></button>
         </CardTitle>
         <Progress value={64} className="h-2 mt-2" />
         <span className="text-sm text-muted-foreground mt-1">64%</span>
@@ -40,9 +49,8 @@ export default function ProjectDetails({isOpenModalProject}:any) {
 
         <div>
           <h3 className="font-medium mb-2">Asignados</h3>
-          <div className="flex items-center gap-2">
-           
-            <span className="text-sm">L</span>
+          <div className="w-10 h-10 flex items-center justify-center bg-gray-400 rounded-full">
+            <span className=" text-black font-bold text-lg ">L</span>
           </div>
         </div>
 
@@ -62,16 +70,9 @@ export default function ProjectDetails({isOpenModalProject}:any) {
           </p>
           <button className="text-sm text-primary mt-2">leer más...</button>
         </div>
+        <TaskList toggleOpenDetsAct={(id:number)=>toggleOpenDetailsActivities(id)} />
       </CardContent>
-      <GeneralData projectNumber={"451"}
-        studentName={"Luis Mamani Coari"}
-        policyTitle={"Eje de Política 5: Educación formativa ambiental"}
-        location={"Local"}
-        groupNumber={"45"}
-        responsible={"Luis Mamani Coari"}
-        projectId={"SGLGA-01"}
-        checklistDescription={"Concientizar a la población universitaria sobre los activismos del periodo que son nuestro bosque."} />
-        <TaskList/>
+      </div>
     </Card>
     </>
     

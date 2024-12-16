@@ -27,3 +27,8 @@ export type Permisos = {
   abreviatura: string;
 
 }
+export type Activities = {
+  id: number;
+  n_act: string;
+  
+}

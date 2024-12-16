@@ -1,12 +1,12 @@
-'use client'
-import {useState, useEffect,useContext} from 'react'
-import { Button } from "@/components/ui/button"
+'use client';
+import {useState, useEffect,useContext} from 'react';
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {Table,TableBody,TableCell,TableHead,TableHeader,TableRow,} from "@/components/ui/table";
 import { API_PROJECTS } from "@/config/apiconfig";
-import {AvisoContext} from '@/context/avisoContext'
-import { Edit,X, Trash2, MoreVertical, CirclePlus } from "lucide-react"
-
+import {AvisoContext} from '@/context/avisoContext';
+import { Edit,X, Trash2, MoreVertical,Eye, CirclePlus } from "lucide-react";
+import {usePathname, useRouter } from "next/navigation";
 interface Project {
     id: number;
     nombre: string;
@@ -19,12 +19,12 @@ interface Project {
     { id: 1, nombre: "Proyecto campos verdes", escuelaProfesional: "EPIS", fecha: "11/02/24 - 26/11/24", estado: "PENDIENTE" },
     { id: 2, nombre: "Limpieza en el bosque", escuelaProfesional: "EPIME", fecha: "11/02/24 - 26/11/24", estado: "ARCHIVADO" },
     { id: 3, nombre: "Nombre del proyecto", escuelaProfesional: "EPEE", fecha: "11/02/24 - 26/11/24", estado: "COMPLETADO" },
-    { id: 1, nombre: "Nombre del proyecto", escuelaProfesional: "EPE", fecha: "11/02/24 - 26/11/24", estado: "EN CURSO" },
-    { id: 2, nombre: "Nombre del proyecto", escuelaProfesional: "EPN", fecha: "11/02/24 - 26/11/24", estado: "PENDIENTE" },
-    { id: 3, nombre: "Nombre del proyecto", escuelaProfesional: "EPMH", fecha: "11/02/24 - 26/11/24", estado: "PENDIENTE" },
+    { id: 4, nombre: "Nombre del proyecto", escuelaProfesional: "EPE", fecha: "11/02/24 - 26/11/24", estado: "EN CURSO" },
+    { id: 5, nombre: "Nombre del proyecto", escuelaProfesional: "EPN", fecha: "11/02/24 - 26/11/24", estado: "PENDIENTE" },
+    { id: 6, nombre: "Nombre del proyecto", escuelaProfesional: "EPMH", fecha: "11/02/24 - 26/11/24", estado: "PENDIENTE" },
   ]
 
- 
+ /*
 // modal para editar o añadir  un formulario
 export const EditModal = ({
   isOpen,
@@ -143,15 +143,25 @@ export const EditModal = ({
   );
 }; 
 
-
+*/
 export default function Component() {
   const [projects, setProjects] = useState();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editingProject, setEditingProject] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState(null);
   const {mostrarAviso} = useContext<any>(AvisoContext);
+  const pathname = usePathname();
+  const router = useRouter();
 
+ // función para ver detalles del proyecto
+ const viewProject = (projectId:number) =>{
+      router.push(`${pathname}/viewProject/${projectId}`);
+ }
+ //función para insertar un nuevo proyecto
+ const insertProject = () =>{
+    router.push(`${pathname}/insertProject`);
+ }
  //función para obtener datos desde la API
  const fetchProjects = async () => {
   try {
@@ -285,14 +295,14 @@ if (loading) {
   }
 if (error) {
   return <p>Error: {error}</p>;
-}
+} 
   return (
     <div className=" w-[90%] m-4 p-4 space-y-4 text-white min-h-screen">
       <div >
         <h1 className="text-2xl font-bold text-black dark:text-white">Proyectos</h1>
       </div>
-      <Button variant="secondary" size="sm" >
-      <CirclePlus className="h-4 w-4" onClick={toggleModal} />
+      <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600" size="sm" onClick={insertProject} >
+      <CirclePlus className="h-4 w-4"  />
           nuevo
       </Button>
       <div className="bg-[#E3E6ED] rounded-lg ">
@@ -327,8 +337,8 @@ if (error) {
                   <Button variant="ghost" size="icon" onClick={()=>deleteProject(proyect.id)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon">
-                    <MoreVertical className="h-4 w-4" />
+                  <Button variant="ghost" size="icon" onClick={()=>viewProject(proyect.id)} >
+                  <Eye className="h-5 w-5"  strokeWidth={2.5}  />
                   </Button>
                 </div>
               </TableCell>
@@ -346,7 +356,7 @@ if (error) {
           Siguiente
         </Button>
       </div>
-      <EditModal isOpen={isModalOpen} closeModal={toggleModal} onSaveProject={saveProject} editingProject={editingProject} />
+     {/** <EditModal isOpen={isModalOpen} closeModal={toggleModal} onSaveProject={saveProject} editingProject={editingProject} />*/} 
     </div>
   )
 }

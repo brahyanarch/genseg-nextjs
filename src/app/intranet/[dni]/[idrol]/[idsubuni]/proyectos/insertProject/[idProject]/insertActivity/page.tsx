@@ -1,0 +1,255 @@
+'use client'
+
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {AvisoContext} from "@/context/avisoContext"
+import { useState, useContext, useEffect } from "react"
+import { useParams, usePathname, useRouter } from "next/navigation"
+import {API_FORM, API_ACTIVITIES } from "@/config/apiconfig"
+
+export default function ActivityForm() {
+   const [questions, setQuestions] = useState([]);
+   const {mostrarAviso} = useContext<any>(AvisoContext);
+   ///entradas obligatorios
+   const [nombreActividad, setNombreActividad] = useState();
+   const [fechaInicio,setFechaInicio] = useState();
+   const [fechaFinal, setFechaFinal] = useState();
+   const [answers, setAnswers] = useState({}); // Estado para almacenar respuestas
+   const {idProject} = useParams();
+   // Manejar cambios en las respuestas
+   const handleChange = (id, value) => {
+     setAnswers((prev) => ({ ...prev, [id]: value }));
+   };
+   /// casos de single choice
+   const handleSingleChange = (id, value) => {
+    setAnswers((prev) => ({ ...prev, [id]: value }));
+  };
+
+   // Manejar cambios para opciones múltiples
+   const handleMultipleChoiceChange = (id, option) => {
+     setAnswers((prev) => {
+       const currentValues = prev[id] || [];
+       const updatedValues = currentValues.includes(option)
+         ? currentValues.filter((val) => val !== option)
+         : [...currentValues, option];
+       return { ...prev, [id]: updatedValues };
+     });
+   };
+   //
+     const handleSubmitAnswers = async (event: any) => {
+         event.preventDefault();
+         const finalResponses = {
+          "name":nombreActividad,
+          "fInit":fechaInicio,
+          "fFin":fechaFinal,
+          "responses":{
+          ...answers
+        },
+          "idproj": Number(idProject),
+        };
+        console.log(finalResponses);
+         try {
+           const response = await fetch(API_ACTIVITIES, {
+             method:'POST',
+             headers: {
+               'Content-Type': 'application/json'
+             },
+             body: JSON.stringify(finalResponses)
+           });
+     
+           if (response.ok) {
+             const resIdProject = await response.json();
+             mostrarAviso('succefull', 'Respuestas guardado correctamente.');
+             //setIdProject(resIdProject);
+           } else {
+             mostrarAviso('warning', 'Error al guardar las respuestas.');
+           }
+         } catch (error) {
+           mostrarAviso('warning', `Error al conectar con la API:${error}`);
+         }
+       };
+     /// obtener las preguntas del formulario
+     const fetchQuestions = async () => {
+      try {
+        const response = await fetch(API_FORM);
+        if (!response.ok) {
+          throw new Error('Error al obtener las preguntas');
+        }
+        const data = await response.json();
+        setQuestions(data);
+      } catch (err: any) {
+        mostrarAviso('warning',err.message);
+      } finally {
+        console.log("Todo completo");
+      }
+    };
+      ///obtener las preguntas existentes en la base de datos desde la API
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
+  return (
+    <div className="min-h-screen bg-background p-6">
+      <div className="text-sm breadcrumbs mb-6 text-muted-foreground">
+        <span>Inicio</span> {' > '} 
+        <span>Proyectos</span> {' > '} 
+        <span>Insertar</span> {' > '} 
+        <span>actividad</span>
+      </div>
+      
+      <div className="max-w-2xl mx-auto space-y-6">
+        <h1 className="text-2xl font-semibold mb-8">Insertar Actividad</h1>
+        
+        <form className="space-y-4" onSubmit={handleSubmitAnswers} >
+          <div className="space-y-2">
+            <Label htmlFor="activity-name">Nombre de la actividad</Label>
+            <Input 
+              id="activity-name"
+              placeholder="Nombre de la actividad"
+              className="bg-background"
+              value={nombreActividad}
+              onChange={(e) => setNombreActividad(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="start-date">Fecha inicial</Label>
+            <Input 
+              id="start-date"
+              type="date"
+              placeholder="Fecha inicial"
+              value={fechaInicio}
+              onChange={(e) => setFechaInicio(e.target.value)}
+              className="bg-background"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="end-date">Fecha final</Label>
+            <Input 
+              id="end-date"
+              type="date"
+              placeholder="Fecha final"
+              className="bg-background"
+              value={fechaFinal}
+              onChange={(e) => setFechaFinal(e.target.value)}
+            />
+          </div>
+          {questions.map((question) => {
+          switch (question.type) {
+            case "text":
+              return (
+                <div key={question.id}>
+                  <label className="block font-medium">{question.questionText}</label>
+                  <input
+                    type="text"
+                    className="border rounded p-2 w-full bg-background"
+                    placeholder="Escribe tu respuesta"
+                    value={answers[question.id] || ""}
+                    onChange={(e) => handleChange(question.id, e.target.value)}
+                  />
+                </div>
+              );
+
+            case "date":
+              return (
+                <div key={question.id}>
+                  <label className="block font-medium bg-background">{question.questionText}</label>
+                  <input
+                    type="date"
+                    className="border rounded p-2 w-full bg-background"
+                    value={answers[question.id] || ""}
+                    onChange={(e) => handleChange(question.id, e.target.value)}
+                  />
+                </div>
+              );
+
+            case "multipleChoice":
+              return (
+                <div key={question.id}>
+                  <label className="block font-medium">{question.questionText}</label>
+                  {question.options?.map((option, index) => (
+                    <div key={index}>
+                      <label className="flex items-center gap-2">
+                        <input type="checkbox" className="border rounded"
+                        id={`${question.id}-${option}`}
+                        value={option}
+                        checked={answers[question.id]?.includes(option) || false}
+                        onChange={(e) => handleMultipleChoiceChange(question.id, option.indexOf(e.target.value))} />
+                        {option}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              );
+
+            case "singleChoice":
+              return (
+                <div key={question.id}>
+                  <label className="block font-medium">{question.questionText}</label>
+                  {question.options?.map((option, index) => (
+                    <div key={index}>
+                      <label className="flex items-center gap-2">
+                        <input type="radio" name={`singleChoice-${question.id}`} value={option}
+                        checked={answers[question.id] === option} 
+                        onChange={(e) => handleChange(question.id, option.indexOf(e.target.value))} />
+                        {option}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              );
+
+            case "archive":
+              return (
+                <div key={question.id}>
+                  <label className="block font-medium bg-background">{question.questionText}</label>
+                  <input
+                    type="file"
+                    className="border rounded p-2 w-full"
+                    onChange={(e) => handleChange(question.id, e.target.value)}
+                  />
+                </div>
+              );
+
+            case "dropdown":
+              return (
+                <div key={question.id}>
+                  <label className="block font-medium bg-background">{question.questionText}</label>
+                  <select className="border rounded p-2 w-full bg-background"
+                   value={answers[question.id] || ""}
+                  onChange={(e) => handleChange(question.id, option.indexOf(e.target.value))}>
+                    <option value="">Seleccione una opción</option>
+                    {question.options?.map((option, index) => (
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              );
+
+            default:
+              return null;
+        }
+      })}
+          <div className="flex justify-end space-x-4 pt-4">
+            <Button 
+              variant="destructive" 
+              className="bg-[#F08080] hover:bg-[#E07070] text-white"
+            >
+              Cancelar
+            </Button>
+            <Button 
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-600"
+            >
+              Insertar Actividad
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
