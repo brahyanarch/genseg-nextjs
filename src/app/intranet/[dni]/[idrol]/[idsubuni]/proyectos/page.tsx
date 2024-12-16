@@ -2,157 +2,33 @@
 import {useState, useEffect,useContext} from 'react';
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import {Table,TableBody,TableCell,TableHead,TableHeader,TableRow,} from "@/components/ui/table";
 import { API_PROJECTS } from "@/config/apiconfig";
 import {AvisoContext} from '@/context/avisoContext';
 import { Edit,X, Trash2, MoreVertical,Eye, CirclePlus } from "lucide-react";
-import {usePathname, useRouter } from "next/navigation";
+import DynamicTable from "@/components/DynamicTable";
+import {usePathname, useRouter, useParams } from "next/navigation";
 interface Project {
     id: number;
-    nombre: string;
+    estado: string;
     escuelaProfesional: string;
-    fecha: string;
-    estado: 'PENDIENTE' | 'ARCHIVADO' | 'COMPLETADO' | 'EN CURSO';
+    fechaIn: string;
+    fechaFin: string;
+    nombre: string;
   }
-  
-  const proyectos: Project[] = [
-    { id: 1, nombre: "Proyecto campos verdes", escuelaProfesional: "EPIS", fecha: "11/02/24 - 26/11/24", estado: "PENDIENTE" },
-    { id: 2, nombre: "Limpieza en el bosque", escuelaProfesional: "EPIME", fecha: "11/02/24 - 26/11/24", estado: "ARCHIVADO" },
-    { id: 3, nombre: "Nombre del proyecto", escuelaProfesional: "EPEE", fecha: "11/02/24 - 26/11/24", estado: "COMPLETADO" },
-    { id: 4, nombre: "Nombre del proyecto", escuelaProfesional: "EPE", fecha: "11/02/24 - 26/11/24", estado: "EN CURSO" },
-    { id: 5, nombre: "Nombre del proyecto", escuelaProfesional: "EPN", fecha: "11/02/24 - 26/11/24", estado: "PENDIENTE" },
-    { id: 6, nombre: "Nombre del proyecto", escuelaProfesional: "EPMH", fecha: "11/02/24 - 26/11/24", estado: "PENDIENTE" },
-  ]
-
- /*
-// modal para editar o añadir  un formulario
-export const EditModal = ({
-  isOpen,
-  closeModal,
-  onSaveProject,
-  editingProject,
-}: any) => {
-  const [name, setName] = useState("");
-  const [abbreviation, setAbbreviation] = useState("");
-  const {mostrarAviso} = useContext<any>(AvisoContext);
-  useEffect(() => {
-    if (editingProject) {
-      setName(editingProject.n_rol);
-      setAbbreviation(editingProject.abrev);
-    }
-  }, [editingProject]);
-  
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    const updatedForm = {
-      n_rol: name,
-      abrev: abbreviation,
-    };
-    
-    try {
-      const response = await fetch(
-        editingProject ? `${API_PROJECTS}/${editingProject.idf}` : API_PROJECTS,
-        {
-          method: editingProject ? "PUT" : "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedForm),
-        }
-      );
-      
-      if (response.ok) {
-        const savedRole = await response.json();
-        onSaveProject(savedRole);
-        mostrarAviso('succefull', 'Proyecto guardado correctamente.');
-        closeModal();
-      } else {
-        mostrarAviso('warning', 'Error al guardar el Proyecto.');
-      }
-    } catch (error) {
-      mostrarAviso('warning', 'Error al conectar con la API.');
-    }
-  };
-  
-  if (!isOpen) return null;
-  
-  return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="absolute inset-0 bg-black opacity-50"></div>
-      <div className="relative bg-gray-800 p-6 rounded-lg shadow-xl w-[50%] h-[60%]">
-        <button
-          onClick={closeModal}
-          className="absolute top-2 right-2 text-gray-400 hover:text-white"
-          >
-          <X size={24} />
-        </button>
-        <h2 className="text-2xl font-bold mb-4 text-white">
-          {editingProject ? "Editar Proyecto" : "Agregar Proyecto"}
-        </h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-300 mb-1"
-              >
-              Nombre
-            </label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Poyecto 1"
-              className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
-              />
-          </div>
-          <div className="mb-8">
-            <label
-              htmlFor="abbreviation"
-              className="block text-sm font-medium text-gray-300 mb-1"
-              >
-              Abreviatura
-            </label>
-            <input
-              type="text"
-              id="abbreviation"
-              value={abbreviation}
-              onChange={(e) => setAbbreviation(e.target.value)}
-              placeholder="SubAdm"
-              className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
-              />
-          </div>
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={closeModal}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-              >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-              >
-              {editingProject ? "Actualizar" : "Guardar"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}; 
-
-*/
 export default function Component() {
-  const [projects, setProjects] = useState();
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [editingProject, setEditingProject] = useState(null);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState(null);
   const {mostrarAviso} = useContext<any>(AvisoContext);
   const pathname = usePathname();
   const router = useRouter();
+  const {dni, idsubuni} = useParams();
+  ///variables necesarios para la tabla dinámica
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
+  const totalPages = Math.ceil(projects.length / itemsPerPage);
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
  // función para ver detalles del proyecto
  const viewProject = (projectId:number) =>{
@@ -165,7 +41,7 @@ export default function Component() {
  //función para obtener datos desde la API
  const fetchProjects = async () => {
   try {
-    const response = await fetch(API_PROJECTS);
+    const response = await fetch(`${API_PROJECTS}/${dni}/${idsubuni}`);
     if (!response.ok) {
       throw new Error("Error al obtener los Proyectos");
     }
@@ -179,31 +55,10 @@ export default function Component() {
 };
 
 // useEffect para obtener los roles desde la API al montar el componente
-{/**   useEffect(() => {
+ useEffect(() => {
     fetchProjects();
-  }, []);*/}
+  }, []);
 
-const toggleModal = () => {
-  setIsModalOpen(!isModalOpen);
-};
-const openEditModal = (Project: any) => {
-  setEditingProject(Project);
-  setIsModalOpen(true);
-};
-//funcion para editar un Rol
-const saveProject = (savedProject: any) => {
-  setProjects((prevProjects: any) => {
-    if (editingProject) {
-      return prevProjects.map((form: any) =>
-        form.id_per === savedProject.idf ? savedProject : form
-      );
-    } else {
-      return [...prevProjects, savedProject];
-    }
-  }); 
-  setEditingProject(null);
-  fetchProjects();
-};
 //función para eliminar un Rolgit
 const deleteProject = async (id: number) => {
   try {
@@ -296,6 +151,196 @@ if (loading) {
 if (error) {
   return <p>Error: {error}</p>;
 } 
+ //Configuracion de la tabla dinámica
+ 
+   // Función para acceder a propiedades anidadas
+   const getNestedProperty = (obj: any, key: string) => {
+     return key.split('.').reduce((value, part) => value && value[part], obj);
+   };
+ 
+   // Función para ordenar los datos
+   const getSortedData = () => {
+     if (!sortColumn) return projects;
+ 
+     return [...projects].sort((a, b) => {
+       const fieldA = getNestedProperty(a, sortColumn);
+       const fieldB = getNestedProperty(b, sortColumn);
+ 
+       if (fieldA === undefined || fieldB === undefined) return 0;
+ 
+       if (typeof fieldA === "string" && typeof fieldB === "string") {
+         return sortDirection === "asc"
+           ? fieldA.localeCompare(fieldB)
+           : fieldB.localeCompare(fieldA);
+       }
+       
+       if (typeof fieldA === "number" && typeof fieldB === "number") {
+         return sortDirection === "asc" ? fieldA - fieldB : fieldB - fieldA;
+       }
+ 
+       return 0;
+     });
+   };
+ 
+   const handleSort = (column: string) => {
+     setSortColumn(column);
+     setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+   };
+ 
+   const sortedProjects = getSortedData();
+ 
+   // Paginación
+   const indexOfLastItem = currentPage * itemsPerPage;
+   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+   const currentItems = sortedProjects.slice(indexOfFirstItem, indexOfLastItem);
+ 
+   const handlePageChange = (page: number) => {
+     setCurrentPage(page);
+   };
+ 
+   // Configuración de la tabla
+   const configurationUser = [
+     {
+       key: "index",
+       label: "ID",
+       render: (item: Project) => <>{projects.indexOf(item) + 1}</>,
+       sortable:true,
+     },
+     {
+       key: "n_usu",
+       label: "Nombre",
+       render: (item: Project) => item.name,
+       sortable: true,
+     },
+     {
+       key: "fechaIncio",
+       label: "Fecha Inicio",
+       render: (item: Project) => item.fInit,
+       sortable: true,
+     },
+     {
+      key: "fechaFinal",
+      label: "Fecha Final",
+      render: (item: Project) => item.fFin,
+      sortable: true,
+    },
+    {
+      key: "Estado",
+      label: "Estado",
+      render: (item: Project) => item.estado,
+      sortable: true,
+    },
+     {
+       key: "opciones",
+       label: "Opciones",
+       render: (item: Project) => (
+         <>
+           <Button variant="ghost" size="icon">
+             <Edit className="h-5 w-5"  strokeWidth={2.5} />
+           </Button>
+           <Button
+             variant="ghost"
+             size="icon"
+             onClick={() => console.log("Eliminar", item.id)}
+           >
+             <Trash2 className="h-5 w-5"  strokeWidth={2.5}  />
+           </Button>
+           <Button variant="ghost" size="icon" onClick={()=>viewProject(item.id)} >
+             <Eye className="h-5 w-5"  strokeWidth={2.5} />
+           </Button>
+         </>
+       ),
+     },
+   ];
+ 
+   const renderPaginationButtons = () => {
+     const pageButtons = [];
+ 
+     // Botón de "Anterior"
+     pageButtons.push(
+       <Button
+         key="prev"
+         variant="outline"
+         size="sm"
+         onClick={() => handlePageChange(currentPage - 1)}
+         disabled={currentPage === 1}
+         className="text-black dark:text-white"
+       >
+         Anterior
+       </Button>
+     );
+ 
+     // Mostrar la primera página siempre
+     if (currentPage > 3) {
+       pageButtons.push(
+         <Button
+           key={1}
+           variant="outline"
+           size="sm"
+           onClick={() => handlePageChange(1)}
+           className=""
+         >
+           <p className="text-black dark:text-white">1</p>
+         </Button>
+       );
+       pageButtons.push(<span key="start-ellipsis" className="px-2">...</span>);
+     }
+ 
+     // Rango de páginas cercanas a la actual
+     const maxVisiblePages = 5;
+     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+     let endPage = Math.min(totalPages, currentPage + Math.floor(maxVisiblePages / 2));
+ 
+     if (endPage - startPage < maxVisiblePages) {
+       startPage = Math.max(1, endPage - maxVisiblePages + 1);
+     }
+ 
+     for (let i = startPage; i <= endPage; i++) {
+       pageButtons.push(
+         <Button
+           key={i}
+           variant="outline"
+           size="sm"
+           onClick={() => handlePageChange(i)}
+           className={currentPage === i ? "bg-blue-500 text-white" : "text-black dark:text-white"}
+         >
+           {i}
+         </Button>
+       );
+     }
+ 
+     // Mostrar la última página siempre
+     if (currentPage < totalPages - 2) {
+       pageButtons.push(<span key="end-ellipsis" className="px-2">...</span>);
+       pageButtons.push(
+         <Button
+           key={totalPages}
+           variant="outline"
+           size="sm"
+           onClick={() => handlePageChange(totalPages)}
+         >
+           <p className="text-black dark:text-white">{totalPages}</p>
+         </Button>
+       );
+     }
+ 
+     // Botón de "Siguiente"
+     pageButtons.push(
+       <Button
+         key="next"
+         variant="outline"
+         size="sm"
+         onClick={() => handlePageChange(currentPage + 1)}
+         disabled={currentPage === totalPages}
+         className="text-black dark:text-white "
+       >
+         Siguiente
+       </Button>
+     );
+ 
+     return pageButtons;
+   };
+
   return (
     <div className=" w-[90%] m-4 p-4 space-y-4 text-white min-h-screen">
       <div >
@@ -306,46 +351,14 @@ if (error) {
           nuevo
       </Button>
       <div className="bg-[#E3E6ED] rounded-lg ">
-      <Table className="w-[90%] mx-auto my-6">
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-16 border-l border-gray-900">ID</TableHead>
-            <TableHead>Nombre</TableHead>
-            <TableHead>Escuela Profesional</TableHead>
-            <TableHead>Fecha</TableHead>
-            <TableHead>Estado</TableHead>
-            <TableHead className="w-24 border-r border-gray-900">Opciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody className="text-gray-900">
-          {proyectos.map((proyect) => (
-            <TableRow key={proyect.id}>
-              <TableCell className="px-4 border-l border-gray-900">{proyect.id}</TableCell>
-              <TableCell>{proyect.nombre}</TableCell>
-              <TableCell>{proyect.escuelaProfesional}</TableCell>
-              <TableCell>{proyect.fecha}</TableCell>
-              <TableCell>
-                <span className={`px-2 py-1 rounded-md text-xs font-medium ${getStatusClass(proyect.estado)}`}>
-                    {proyect.estado}
-                </span>
-              </TableCell>
-              <TableCell className="border-r border-gray-900">
-                <div className="flex space-x-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal(proyect)} >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={()=>deleteProject(proyect.id)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={()=>viewProject(proyect.id)} >
-                  <Eye className="h-5 w-5"  strokeWidth={2.5}  />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <DynamicTable
+        configuration={configurationUser}
+        data={currentItems}
+        onSort={handleSort}
+      />
+      <div className="flex justify-center space-x-2 mt-4">
+        {renderPaginationButtons()}
+      </div>
       </div>
       <div className="flex justify-between items-center">
         <Button variant="outline" size="sm">

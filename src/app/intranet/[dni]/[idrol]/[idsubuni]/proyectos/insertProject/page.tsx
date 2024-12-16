@@ -44,7 +44,7 @@ export default function ProjectForm() {
   const pathname = usePathname();
   //// funciones importantes
   const handleFileChange = (event) => {
-    setPlanProyecto(event.target.files[0]);
+    setPlanProyecto(event.target.value);
   };
   const insertActivity = ()=>{
     router.push(`${pathname}/${idProject}/insertActivity`);

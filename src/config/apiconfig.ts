@@ -24,9 +24,8 @@ export const API_LOGIN = `${API_URL}/api/auth/login`;
 export const API_PERMISOS = `${API_URL}/api/permisos`;
 export const API_USERS = `${API_URL}/api/auth/user`;
 export const API_FORM = `${API_URL}/api/project/form`;
-export const API_PROJECTS = `${API_URL}/api/project`;
-export const API_ACTIVITIES= `${API_URL}/api/actividad`;
-
+export const API_ACTIVITIES = `${API_URL}/api/actividad`;
+export const API_PROJECTS = `${API_URL}/api/project/user`;
 //rutas admin general
 export const API_ADMIN = `${API_URL}/auth/login`;
 //rutas edicion de formulario

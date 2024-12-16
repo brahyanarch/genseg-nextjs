@@ -1,6 +1,5 @@
 'use client';
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { X, Edit, Trash2, CirclePlus } from "lucide-react";
 import { useState, useEffect,useContext } from 'react';
 import { API_PERMISOS } from "@/config/apiconfig";

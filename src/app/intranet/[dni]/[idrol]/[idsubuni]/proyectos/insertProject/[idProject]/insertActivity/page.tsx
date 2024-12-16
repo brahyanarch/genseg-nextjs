@@ -23,19 +23,25 @@ export default function ActivityForm() {
    };
    /// casos de single choice
    const handleSingleChange = (id, value) => {
-    setAnswers((prev) => ({ ...prev, [id]: value }));
+    setAnswers((prev) => ({
+      ...prev,
+      [id]: [value], // Guarda el ID seleccionado como un array
+    }));
   };
+  
 
    // Manejar cambios para opciones múltiples
-   const handleMultipleChoiceChange = (id, option) => {
-     setAnswers((prev) => {
-       const currentValues = prev[id] || [];
-       const updatedValues = currentValues.includes(option)
-         ? currentValues.filter((val) => val !== option)
-         : [...currentValues, option];
-       return { ...prev, [id]: updatedValues };
-     });
-   };
+   const handleMultipleChoiceChange = (id, optionId) => {
+    setAnswers((prev) => {
+      const currentValues = prev[id] || [];
+      const updatedValues = currentValues.includes(optionId)
+        ? currentValues.filter((val) => val !== optionId) // Elimina si ya está seleccionado
+        : [...currentValues, optionId]; // Agrega si no está seleccionado
+  
+      return { ...prev, [id]: updatedValues };
+    });
+  };
+  
    //
      const handleSubmitAnswers = async (event: any) => {
          event.preventDefault();
@@ -168,38 +174,46 @@ export default function ActivityForm() {
               return (
                 <div key={question.id}>
                   <label className="block font-medium">{question.questionText}</label>
-                  {question.options?.map((option, index) => (
-                    <div key={index}>
+                  {question.options?.map((option) => (
+                    <div key={option.idop}>
                       <label className="flex items-center gap-2">
-                        <input type="checkbox" className="border rounded"
-                        id={`${question.id}-${option}`}
-                        value={option}
-                        checked={answers[question.id]?.includes(option) || false}
-                        onChange={(e) => handleMultipleChoiceChange(question.id, option.indexOf(e.target.value))} />
-                        {option}
+                        <input
+                          type="checkbox"
+                          className="border rounded"
+                          id={`${question.id}-${option.idop}`} // Vincula correctamente con el ID
+                          value={option.idop}
+                          checked={answers[question.id]?.includes(option.idop) || false} // Comprueba contra option.id
+                          onChange={() => handleMultipleChoiceChange(question.id, option.idop)} // Envía option.id correctamente
+                        />
+                        {option.optionTxt} {/* Usa la propiedad correcta para el texto */}
                       </label>
                     </div>
                   ))}
+
                 </div>
               );
-
-            case "singleChoice":
-              return (
-                <div key={question.id}>
-                  <label className="block font-medium">{question.questionText}</label>
-                  {question.options?.map((option, index) => (
-                    <div key={index}>
-                      <label className="flex items-center gap-2">
-                        <input type="radio" name={`singleChoice-${question.id}`} value={option}
-                        checked={answers[question.id] === option} 
-                        onChange={(e) => handleChange(question.id, option.indexOf(e.target.value))} />
-                        {option}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              );
-
+              case "singleChoice":
+                return (
+                  <div key={question.id}>
+                    <label className="block font-medium">{question.questionText}</label>
+                    {question.options?.map((option) => (
+                      <div key={option.idop}>
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            name={`singleChoice-${question.id}`}
+                            value={option.idop}
+                            checked={answers[question.id]?.includes(option.idop)} // Verifica si está incluido en el array
+                            onChange={(e) => handleSingleChange(question.id, option.idop)} // Llama a la función con el ID
+                          />
+                          {option.optionTxt}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                );
+              
+                         
             case "archive":
               return (
                 <div key={question.id}>
@@ -212,23 +226,25 @@ export default function ActivityForm() {
                 </div>
               );
 
-            case "dropdown":
-              return (
-                <div key={question.id}>
-                  <label className="block font-medium bg-background">{question.questionText}</label>
-                  <select className="border rounded p-2 w-full bg-background"
-                   value={answers[question.id] || ""}
-                  onChange={(e) => handleChange(question.id, option.indexOf(e.target.value))}>
-                    <option value="">Seleccione una opción</option>
-                    {question.options?.map((option, index) => (
-                      <option key={index} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              );
-
+              case "dropdown":
+                return (
+                  <div key={question.id}>
+                    <label className="block font-medium bg-background">{question.questionText}</label>
+                    <select
+                      className="border rounded p-2 w-full bg-background"
+                      value={answers[question.id]?.[0] || ""} // Accede al primer valor del array
+                      onChange={(e) => handleSingleChange(question.id, e.target.value)} // Llama a la función con el valor seleccionado
+                    >
+                      <option value="">Seleccione una opción</option>
+                      {question.options?.map((option) => (
+                        <option key={option.idop} value={option.idop}>
+                          {option.optionTxt}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                );
+              
             default:
               return null;
         }
