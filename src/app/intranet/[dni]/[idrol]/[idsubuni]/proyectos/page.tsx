@@ -7,8 +7,8 @@ import {AvisoContext} from '@/context/avisoContext';
 import { Edit,X, Trash2, MoreVertical,Eye, CirclePlus } from "lucide-react";
 import DynamicTable from "@/components/DynamicTable";
 import {usePathname, useRouter, useParams } from "next/navigation";
-type Project = {
-    id: number;
+interface Project {
+    idproj: number;
     estado: string;
     escuelaProfesional: string;
     fInit: string;
@@ -209,7 +209,7 @@ if (error) {
      {
        key: "n_usu",
        label: "Nombre",
-       render: (item: Project) => item.name,
+       render: (item: Project) => item.idString,
        sortable: true,
      },
      {
@@ -245,7 +245,7 @@ if (error) {
            >
              <Trash2 className="h-5 w-5"  strokeWidth={2.5}  />
            </Button>
-           <Button variant="ghost" size="icon" onClick={()=>viewProject(item.id)} >
+           <Button variant="ghost" size="icon" onClick={()=>viewProject(item.idproj)} >
              <Eye className="h-5 w-5"  strokeWidth={2.5} />
            </Button>
          </>
@@ -356,18 +356,9 @@ if (error) {
         data={currentItems}
         onSort={handleSort}
       />
+      </div>
       <div className="flex justify-center space-x-2 mt-4">
         {renderPaginationButtons()}
-      </div>
-      </div>
-      <div className="flex justify-between items-center">
-        <Button variant="outline" size="sm">
-          Anterior
-        </Button>
-        <span>1</span>
-        <Button variant="outline" size="sm">
-          Siguiente
-        </Button>
       </div>
      {/** <EditModal isOpen={isModalOpen} closeModal={toggleModal} onSaveProject={saveProject} editingProject={editingProject} />*/} 
     </div>
