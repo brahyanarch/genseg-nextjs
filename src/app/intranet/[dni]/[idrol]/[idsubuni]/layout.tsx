@@ -51,7 +51,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   if (!isClient) return null;
 
   return (
-    <div className="flex flex-col h-screen w-full bg-gray-100 dark:bg-gray-900">
+    <div className="flex flex-col h-screen w-full bg-gray-200 dark:bg-gray-900">
       <Navbar
         idrol={Number(idrol)} // Reemplaza con datos reales
         idsubuni={Number(idsubuni)} // Reemplaza con datos reales
@@ -62,7 +62,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       />
       <div className="flex flex-1 overflow-hidden">
         <Menu />
-        <main className="flex-1 overflow-auto bg-gray-900">{children}</main>
+        <main className="flex-1 overflow-auto bg-gray-200 dark:bg-gray-900">{children}</main>
       </div>
     </div>
   );

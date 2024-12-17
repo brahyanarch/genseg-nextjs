@@ -2,7 +2,7 @@
 import {useState, useEffect,useContext} from 'react';
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { API_PROJECTS } from "@/config/apiconfig";
+import { API_GET_PROJECTS } from "@/config/apiconfig";
 import {AvisoContext} from '@/context/avisoContext';
 import { Edit,X, Trash2, MoreVertical,Eye, CirclePlus } from "lucide-react";
 import DynamicTable from "@/components/DynamicTable";
@@ -41,7 +41,7 @@ export default function Component() {
  //función para obtener datos desde la API
  const fetchProjects = async () => {
   try {
-    const response = await fetch(`${API_PROJECTS}/${dni}/${idsubuni}`);
+    const response = await fetch(`${API_GET_PROJECTS}/${dni}/${idsubuni}`);
     if (!response.ok) {
       throw new Error("Error al obtener los Proyectos");
     }

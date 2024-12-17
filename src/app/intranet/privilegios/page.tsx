@@ -8,11 +8,11 @@ import {ChevronLeft, ChevronRight, Bell, Settings, Users, FileText, LayoutDashbo
 import { API_ROLES, API_SUBUNIDADES} from "@/config/apiconfig";
 import { Roles, Perfil, Notificacion } from "@/components/ComponentsIntranet/navIntranet";
 import Principal from "@/components/ComponentsIntranet/principal";
-import ConfiRoles from "@/components/ComponentsIntranet/confiRoles";
-import ConfiPermisos from "@/components/ComponentsIntranet/confiPermisos";
-import ConfiUsers from "@/components/ComponentsIntranet/confiUsers";
-import ConfiSunidad from "@/components/ComponentsIntranet/confiSunidad";
-import Proyectos from "@/components/ComponentsIntranet/confiProyectos";
+//import ConfiRoles from "@/components/ComponentsIntranet/confiRoles";
+//import ConfiPermisos from "@/components/ComponentsIntranet/confiPermisos";
+//import ConfiUsers from "@/components/ComponentsIntranet/confiUsers";
+//import ConfiSunidad from "@/components/ComponentsIntranet/confiSunidad";
+//import Proyectos from "@/components/ComponentsIntranet/confiProyectos";
 import Formulario from "@/components/ComponentsIntranet/formularios";
 import NoteForm from '@/components/componentesFormulario/noteForm'
 interface Role {
@@ -45,13 +45,13 @@ type ContentType =
 
 // Define el tipo del mapeo de contenido
 const contentMap: Record<ContentType, JSX.Element> = {
-  Principal: <Principal />,
-  Configuracion: <Principal />,
-  Roles: <ConfiRoles />,
-  Permisos: <ConfiPermisos />,
-  Usuarios: <ConfiUsers />,
-  "Sub unidad": <ConfiSunidad />,
-  Proyectos: <Proyectos />,
+  Principal: <>Componente de Monitoreo</>,
+  Configuracion: <>Componente de Monitoreo</>,
+  Roles: <>Componente de Monitoreo</>,
+  Permisos: <>Componente de Monitoreo</>,
+  Usuarios: <>Componente de Monitoreo</>,
+  "Sub unidad": <>Componente de Monitoreo</>,
+  Proyectos: <>Componente de Monitoreo</>,
   Monitoreo: <>Componente de Monitoreo</>,
   Estadísticas: <>Componente de Estadísticas</>,
   Logs: <>Componente de Logs</>,
@@ -179,6 +179,8 @@ const Component = ({
                 src={"/resources/images/DPSEClogo.png"}
                 alt="Logo"
                 className="h-9 w-9 rounded-full bg-white"
+                width={50}
+                height={50}
               />
               <div className="flex flex-col pl-3">
                 <span className="text-sm font-semibold text-gray-800 dark:text-white ">
