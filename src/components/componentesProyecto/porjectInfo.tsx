@@ -3,69 +3,55 @@ import { Card } from "@/components/ui/card"
 import { Edit, Trash2, Eye,Search, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {useState} from "react"
+import {useState, useEffect} from "react"
+import { API_PROJECT_ACTIVITIES } from "@/config/apiconfig";
+import {usePathname, useRouter, useParams } from "next/navigation"
 import DynamicTable from "@/components/DynamicTable";
 //
-interface Task {
-  id: number
-  name: string
-  escuelaPro: string
-  date: string
-  status: "COMPLETADO" | "EN CURSO" | "PENDIENTE"
+interface Activities {
+  idActivi: number;
+  name: string;
+  fInit: string;
+  fFin: string;
+  estado: string;
+  idString: string;
+  idproj: number;
+  idres: number;
 }
 
-const tasks: Task[] = [
-  {
-    id: 1,
-    name: "Convacatorio",
-    escuelaPro: "EPIS",
-    date: "12 Nov, 2024",
-    status: "COMPLETADO",
-  },
-  {
-    id: 2,
-    name: "Convacatorio",
-    escuelaPro: "EPIS",
-    date: "12 Nov, 2024",
-    status: "COMPLETADO",
-  },
-  {
-    id: 3,
-    name: "Convacatorio",
-    escuelaPro: "EPIS",
-    date: "12 Nov, 2024",
-    status: "COMPLETADO",
-  },
-  {
-    id: 4,
-    name: "Convacatorio",
-    escuelaPro: "EPIS",
-    date: "12 Nov, 2024",
-    status: "COMPLETADO",
-  },
-  {
-    id: 5,
-    name: "Convacatorio",
-    escuelaPro: "EPIS",
-    date: "12 Nov, 2024",
-    status: "COMPLETADO",
-  },
-  {
-    id: 6,
-    name: "Convacatorio",
-    escuelaPro: "EPIS",
-    date: "12 Nov, 2024",
-    status: "COMPLETADO",
-  },
-]
-
 export function TaskList({toggleOpenDetsAct}) {
- 
+
+  //variable importantes
+  const [activitiesProject, setActivitiesProjects ] = useState<Activities[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
-  const totalPages = Math.ceil(tasks.length / itemsPerPage);
+  const totalPages = Math.ceil(activitiesProject.length / itemsPerPage);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const {projectId} = useParams();
+  /// Fucion para cambiar a interfaz de detalles de una actividad 
+  //función para obtener datos desde la API
+ const fetchActivitiesProject = async () => {
+  try {
+    const response = await fetch(`${API_PROJECT_ACTIVITIES}/${projectId}`);
+    if (!response.ok) {
+      throw new Error("Error al obtener los Proyectos");
+    }
+    const data = await response.json();
+    setActivitiesProjects(data.actividades);
+  } catch (err: any) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+// useEffect para obtener los roles desde la API al montar el componente
+useEffect(() => {
+  fetchActivitiesProject();
+}, []);
+
 
   // Función para acceder a propiedades anidadas
   const getNestedProperty = (obj: any, key: string) => {
@@ -74,9 +60,9 @@ export function TaskList({toggleOpenDetsAct}) {
 
   // Función para ordenar los datos
   const getSortedData = () => {
-    if (!sortColumn) return tasks;
+    if (!sortColumn) return activitiesProject;
 
-    return [...tasks].sort((a, b) => {
+    return [...activitiesProject].sort((a, b) => {
       const fieldA = getNestedProperty(a, sortColumn);
       const fieldB = getNestedProperty(b, sortColumn);
 
@@ -117,37 +103,43 @@ export function TaskList({toggleOpenDetsAct}) {
     {
       key: "index",
       label: "ID",
-      render: (item: Task) => <>{tasks.indexOf(item) + 1}</>,
+      render: (item: Activities) => <>{activitiesProject.indexOf(item) + 1}</>,
       sortable:true,
     },
     {
       key: "n_usu",
       label: "Nombre",
-      render: (item: Task) => item.name,
+      render: (item: Activities) => item.name,
       sortable: true,
     },
     {
       key: "abrev.abrev",
       label: "Escuela Profesional",
-      render: (item: Task) => item.escuelaPro,
+      render: (item: Activities) => item.idString,
       sortable: true,
     },
     {
       key: "dateNow",
-      label: "Fecha",
-      render: (item: Task) => item.date,
+      label: "Fecha Inicio",
+      render: (item: Activities) => item.fInit,
+      sortable: true,
+    },
+    {
+      key: "dateNow",
+      label: "Fecha Final",
+      render: (item: Activities) => item.fFin,
       sortable: true,
     },
     {
       key: "status",
       label: "Estado",
-      render: (item: Task) => item.status,
+      render: (item: Activities) => item.estado,
       sortable: true,
     },
     {
       key: "opciones",
       label: "Opciones",
-      render: (item: Task) => (
+      render: (item: Activities) => (
         <div className=" flex justify-center items-center">
           <Button variant="ghost" size="icon">
             <Edit className="h-5 w-5"  strokeWidth={2.5} />
@@ -159,7 +151,7 @@ export function TaskList({toggleOpenDetsAct}) {
           >
             <Trash2 className="h-5 w-5"  strokeWidth={2.5} />
           </Button>
-          <Button variant="ghost" size="icon" onClick={()=>toggleOpenDetsAct(item.id)} >
+          <Button variant="ghost" size="icon" onClick={()=>toggleOpenDetsAct(item.idActivi)} >
             <Eye className="h-5 w-5"  strokeWidth={2.5}  />
           </Button>
         </div>
