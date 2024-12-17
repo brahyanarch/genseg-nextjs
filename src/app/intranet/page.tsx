@@ -113,7 +113,7 @@ const RoleSelectionPage: React.FC = () => {
         console.log("Usuario encontrado en usuarios normales:", data.token);
 
         localStorage.setItem("token", data.token);
-        if(data.message === "admin" )
+        if(data.tipo === "admin" )
         {
           const dataAdmin: Admin = await response.json();
           setAdmin(dataAdmin);
