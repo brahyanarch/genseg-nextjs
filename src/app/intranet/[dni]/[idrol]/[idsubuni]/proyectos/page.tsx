@@ -7,13 +7,13 @@ import {AvisoContext} from '@/context/avisoContext';
 import { Edit,X, Trash2, MoreVertical,Eye, CirclePlus } from "lucide-react";
 import DynamicTable from "@/components/DynamicTable";
 import {usePathname, useRouter, useParams } from "next/navigation";
-interface Project {
+type Project = {
     id: number;
     estado: string;
     escuelaProfesional: string;
-    fechaIn: string;
-    fechaFin: string;
-    nombre: string;
+    fInit: string;
+    fFin: string;
+    name: string;
   }
 export default function Component() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -26,7 +26,7 @@ export default function Component() {
   ///variables necesarios para la tabla dinámica
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
-  const totalPages = Math.ceil(projects.length / itemsPerPage);
+  const totalPages = Math.ceil(projects.length/itemsPerPage);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -46,7 +46,7 @@ export default function Component() {
       throw new Error("Error al obtener los Proyectos");
     }
     const data = await response.json();
-    setProjects(data);
+    setProjects(data.projectSubUnidad);
   } catch (err: any) {
     setError(err.message);
   } finally {
@@ -67,8 +67,8 @@ const deleteProject = async (id: number) => {
     });
 
     if (response.ok) {
-      setProjects((prevProjects:any) =>
-        prevProjects.filter((form: any) => form.idf !== id)
+      setProjects((prevProjects:Project[]) =>
+        prevProjects.filter((form: Project) => form.id !== id)
       );
       mostrarAviso('succefull', 'Proyecto Eliminado correctamente.');
       fetchProjects();

@@ -18,11 +18,11 @@ export default function ActivityForm() {
    const [answers, setAnswers] = useState({}); // Estado para almacenar respuestas
    const {idProject} = useParams();
    // Manejar cambios en las respuestas
-   const handleChange = (id, value) => {
+   const handleChange = (id:number, value:string) => {
      setAnswers((prev) => ({ ...prev, [id]: value }));
    };
    /// casos de single choice
-   const handleSingleChange = (id, value) => {
+   const handleSingleChange = (id:number, value:string) => {
     setAnswers((prev) => ({
       ...prev,
       [id]: [value], // Guarda el ID seleccionado como un array
@@ -31,7 +31,7 @@ export default function ActivityForm() {
   
 
    // Manejar cambios para opciones múltiples
-   const handleMultipleChoiceChange = (id, optionId) => {
+   const handleMultipleChoiceChange = (id:number, optionId) => {
     setAnswers((prev) => {
       const currentValues = prev[id] || [];
       const updatedValues = currentValues.includes(optionId)
