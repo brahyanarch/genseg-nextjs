@@ -152,6 +152,7 @@ export default function ActivityForm() {
                     className="border rounded p-2 w-full bg-background"
                     placeholder="Escribe tu respuesta"
                     value={answers[question.id] || ""}
+                    required
                     onChange={(e) => handleChange(question.id, e.target.value)}
                   />
                 </div>
@@ -165,6 +166,7 @@ export default function ActivityForm() {
                     type="date"
                     className="border rounded p-2 w-full bg-background"
                     value={answers[question.id] || ""}
+                    required
                     onChange={(e) => handleChange(question.id, e.target.value)}
                   />
                 </div>
@@ -184,6 +186,7 @@ export default function ActivityForm() {
                           value={option.idop}
                           checked={answers[question.id]?.includes(option.idop) || false} // Comprueba contra option.id
                           onChange={() => handleMultipleChoiceChange(question.id, option.idop)} // Envía option.id correctamente
+                          required
                         />
                         {option.optionTxt} {/* Usa la propiedad correcta para el texto */}
                       </label>
@@ -205,6 +208,7 @@ export default function ActivityForm() {
                             value={option.idop}
                             checked={answers[question.id]?.includes(option.idop)} // Verifica si está incluido en el array
                             onChange={(e) => handleSingleChange(question.id, option.idop)} // Llama a la función con el ID
+                            required
                           />
                           {option.optionTxt}
                         </label>
@@ -222,6 +226,7 @@ export default function ActivityForm() {
                     type="file"
                     className="border rounded p-2 w-full"
                     onChange={(e) => handleChange(question.id, e.target.value)}
+                    required
                   />
                 </div>
               );
@@ -234,6 +239,7 @@ export default function ActivityForm() {
                       className="border rounded p-2 w-full bg-background"
                       value={answers[question.id]?.[0] || ""} // Accede al primer valor del array
                       onChange={(e) => handleSingleChange(question.id, e.target.value)} // Llama a la función con el valor seleccionado
+                      required
                     >
                       <option value="">Seleccione una opción</option>
                       {question.options?.map((option) => (
