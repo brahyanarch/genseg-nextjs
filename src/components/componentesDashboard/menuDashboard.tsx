@@ -61,17 +61,17 @@ const Menu = () => {
 
   return (
     <aside
-      className={`bg-white text-black dark:bg-gray-800 dark:text-white ${
+      className={`bg-white text-black dark:bg-gray-800 dark:text-white border-r-2 border-gray-400 ${
         isCollapsed ? "w-16" : "w-64"
       }`}
     >
-      <div className="flex items-center justify-between p-4">
+      <div className="flex items-center justify-between p-4 ">
         {!isCollapsed && <h2 className="text-xl font-semibold">Menu</h2>}
         <Button variant="ghost" size="icon" onClick={toggleSidebar}>
           {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
         </Button>
       </div>
-      <ScrollArea>
+      <ScrollArea >
         <ul className="space-y-1 p-4">
           {menuItems.map(({ icon: Icon, label, url, subItems, onClick }) => (
             <li key={label}>

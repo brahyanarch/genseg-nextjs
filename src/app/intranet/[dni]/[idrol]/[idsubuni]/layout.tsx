@@ -62,7 +62,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       />
       <div className="flex flex-1 overflow-hidden">
         <Menu />
-        <main className="flex-1 overflow-auto bg-gray-200 dark:bg-gray-900">{children}</main>
+        <main className="flex-1 overflow-auto bg-white dark:bg-gray-900">{children}</main>
       </div>
     </div>
   );

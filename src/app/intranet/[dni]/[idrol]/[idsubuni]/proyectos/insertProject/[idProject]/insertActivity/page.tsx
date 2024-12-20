@@ -17,6 +17,7 @@ export default function ActivityForm() {
    const [fechaFinal, setFechaFinal] = useState();
    const [answers, setAnswers] = useState({}); // Estado para almacenar respuestas
    const {idProject} = useParams();
+   const router = useRouter();
    // Manejar cambios en las respuestas
    const handleChange = (id:number, value:string) => {
      setAnswers((prev) => ({ ...prev, [id]: value }));
@@ -67,6 +68,7 @@ export default function ActivityForm() {
            if (response.ok) {
              const resIdProject = await response.json();
              mostrarAviso('succefull', 'Respuestas guardado correctamente.');
+             router.back();
              //setIdProject(resIdProject);
            } else {
              mostrarAviso('warning', 'Error al guardar las respuestas.');

@@ -342,7 +342,7 @@ if (error) {
    };
 
   return (
-    <div className=" w-[90%] m-4 p-4 space-y-4 text-white min-h-screen">
+    <div className=" w-[90%] m-4 py-4 pl-10 space-y-4 text-black dark:text-white min-h-screen">
       <div >
         <h1 className="text-2xl font-bold text-black dark:text-white">Proyectos</h1>
       </div>

@@ -2,44 +2,43 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, Edit2, Trash2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import {AvisoContext} from "@/context/avisoContext"
-import { useState, useContext } from "react"
+import { Edit,Search, Trash2, MoreVertical,Eye, CirclePlus } from "lucide-react";
+import DynamicTable from "@/components/DynamicTable";
+import { useState, useContext, useEffect } from "react"
 import { useParams, usePathname, useRouter } from "next/navigation"
-import {API_PROJECTS } from "@/config/apiconfig"
-export default function ProjectForm() {
-  const activities = [
-    { id: 1, nombre: "Actividad 1", escuela: "EPIS", fecha: "11/02/24 - 26/11/24", estado: "PENDIENTE" },
-    { id: 2, nombre: "Actividad 2", escuela: "EPIME", fecha: "11/02/24 - 26/11/24", estado: "ARCHIVADO" },
-    { id: 3, nombre: "Actividad 3", escuela: "EPEE", fecha: "11/02/24 - 26/11/24", estado: "COMPLETADO" },
-    { id: 1, nombre: "Actividad 4", escuela: "EPE", fecha: "11/02/24 - 26/11/24", estado: "EN CURSO" },
-    { id: 2, nombre: "Actividad 5", escuela: "EPN", fecha: "11/02/24 - 26/11/24", estado: "PENDIENTE" },
-    { id: 3, nombre: "Actividad 6", escuela: "EPMH", fecha: "11/02/24 - 26/11/24", estado: "PENDIENTE" },
-  ]
+import {API_PROJECTS, API_PROJECT_ACTIVITIES } from "@/config/apiconfig"
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'pendiente':
-        return 'bg-orange-500/10 text-orange-500'
-      case 'archivado':
-        return 'bg-red-500/10 text-red-500'
-      case 'completado':
-        return 'bg-green-500/10 text-green-500'
-      case 'en curso':
-        return 'bg-blue-500/10 text-blue-500'
-      default:
-        return 'bg-gray-500/10 text-gray-500'
-    }
-  }
+interface Activities {
+  idActivi: number;
+  name: string;
+  fInit: string;
+  fFin: string;
+  estado: string;
+  idString: string;
+  idproj: number;
+  idres: number;
+}
+
+
+
+export default function ProjectForm() {
   /// variables importantes
   const [idProject, setIdProject] = useState<number>();
+  const [activitiesProject, setActivitiesProjects ] = useState<Activities[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const {mostrarAviso} = useContext<any>(AvisoContext);
   const [escuelaProfesional, setEscuelaProfesional] = useState<string>();
   const [planProyecto, setPlanProyecto] = useState(null);
   const {idrol,idsubuni, dni} = useParams();
+   ///variables necesarios para la tabla dinámica
+   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
+  const totalPages = Math.ceil(activitiesProject.length / itemsPerPage);
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const router = useRouter();
   const pathname = usePathname();
   //// funciones importantes
@@ -72,6 +71,7 @@ export default function ProjectForm() {
           const resIdProject = await response.json();
           mostrarAviso('succefull', 'Proyecto guardado correctamente.');
           setIdProject(resIdProject.idproj);
+          
          
         } else {
           mostrarAviso('warning', 'Error al guardar el proyecto.');
@@ -87,22 +87,240 @@ export default function ProjectForm() {
         </div>
       );
     }
+  //Tabla dinámica 
+  /// Fucion para cambiar a interfaz de detalles de una actividad 
+  //función para obtener datos desde la API
+ const fetchActivitiesProject = async () => {
+  try {
+    const response = await fetch(`${API_PROJECT_ACTIVITIES}/${idProject}`);
+    if (!response.ok) {
+      throw new Error("Error al obtener los Proyectos");
+    }
+    const data = await response.json();
+    setActivitiesProjects(data.actividades);
+    
+  } catch (err: any) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+// useEffect para obtener los roles desde la API al montar el componente
+useEffect(() => {
+  fetchActivitiesProject();
+}, []);
+
+
+  // Función para acceder a propiedades anidadas
+  const getNestedProperty = (obj: any, key: string) => {
+    return key.split('.').reduce((value, part) => value && value[part], obj);
+  };
+
+  // Función para ordenar los datos
+  const getSortedData = () => {
+    if (!sortColumn) return activitiesProject;
+
+    return [...activitiesProject].sort((a, b) => {
+      const fieldA = getNestedProperty(a, sortColumn);
+      const fieldB = getNestedProperty(b, sortColumn);
+
+      if (fieldA === undefined || fieldB === undefined) return 0;
+
+      if (typeof fieldA === "string" && typeof fieldB === "string") {
+        return sortDirection === "asc"
+          ? fieldA.localeCompare(fieldB)
+          : fieldB.localeCompare(fieldA);
+      }
+      
+      if (typeof fieldA === "number" && typeof fieldB === "number") {
+        return sortDirection === "asc" ? fieldA - fieldB : fieldB - fieldA;
+      }
+
+      return 0;
+    });
+  };
+
+  const handleSort = (column: string) => {
+    setSortColumn(column);
+    setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+  };
+
+  const sortedUsers = getSortedData();
+
+  // Paginación
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = sortedUsers.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // Configuración de la tabla
+  const configurationUser = [
+    {
+      key: "index",
+      label: "ID",
+      render: (item: Activities) => <>{activitiesProject.indexOf(item) + 1}</>,
+      sortable:true,
+    },
+    {
+      key: "n_usu",
+      label: "Nombre",
+      render: (item: Activities) => item.name,
+      sortable: true,
+    },
+    {
+      key: "abrev.abrev",
+      label: "Escuela Profesional",
+      render: (item: Activities) => item.idString,
+      sortable: true,
+    },
+    {
+      key: "dateNow",
+      label: "Fecha Inicio",
+      render: (item: Activities) => item.fInit,
+      sortable: true,
+    },
+    {
+      key: "dateNow",
+      label: "Fecha Final",
+      render: (item: Activities) => item.fFin,
+      sortable: true,
+    },
+    {
+      key: "status",
+      label: "Estado",
+      render: (item: Activities) => item.estado,
+      sortable: true,
+    },
+    {
+      key: "opciones",
+      label: "Opciones",
+      render: (item: Activities) => (
+        <div className=" flex justify-center items-center">
+          <Button variant="ghost" size="icon">
+            <Edit className="h-5 w-5"  strokeWidth={2.5} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => console.log("Eliminar", item.id)}
+          >
+            <Trash2 className="h-5 w-5"  strokeWidth={2.5} />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={()=>toggleOpenDetsAct(item.idActivi)} >
+            <Eye className="h-5 w-5"  strokeWidth={2.5}  />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  const renderPaginationButtons = () => {
+    const pageButtons = [];
+
+    // Botón de "Anterior"
+    pageButtons.push(
+      <Button
+        key="prev"
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="text-black dark:text-white"
+      >
+        Anterior
+      </Button>
+    );
+
+    // Mostrar la primera página siempre
+    if (currentPage > 3) {
+      pageButtons.push(
+        <Button
+          key={1}
+          variant="outline"
+          size="sm"
+          onClick={() => handlePageChange(1)}
+          className=""
+        >
+          <p className="text-black dark:text-white">1</p>
+        </Button>
+      );
+      pageButtons.push(<span key="start-ellipsis" className="px-2">...</span>);
+    }
+
+    // Rango de páginas cercanas a la actual
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, currentPage + Math.floor(maxVisiblePages / 2));
+
+    if (endPage - startPage < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageButtons.push(
+        <Button
+          key={i}
+          variant="outline"
+          size="sm"
+          onClick={() => handlePageChange(i)}
+          className={currentPage === i ? "bg-blue-500 text-white" : "text-black dark:text-white"}
+        >
+          {i}
+        </Button>
+      );
+    }
+
+    // Mostrar la última página siempre
+    if (currentPage < totalPages - 2) {
+      pageButtons.push(<span key="end-ellipsis" className="px-2">...</span>);
+      pageButtons.push(
+        <Button
+          key={totalPages}
+          variant="outline"
+          size="sm"
+          onClick={() => handlePageChange(totalPages)}
+        >
+          <p className="text-black dark:text-white">{totalPages}</p>
+        </Button>
+      );
+    }
+
+    // Botón de "Siguiente"
+    pageButtons.push(
+      <Button
+        key="next"
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="text-black dark:text-white "
+      >
+        Siguiente
+      </Button>
+    );
+
+    return pageButtons;
+  };
+  
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="text-sm breadcrumbs mb-6 text-muted-foreground">
+    <div className="flex-1 bg-background py-4 pl-4  text-black dark:text-white">
+      <div className=" flex gap-4 items-center text-sm breadcrumbs mb-6 text-muted-foreground">
         <span>Inicio</span> {' > '} 
         <span>Proyectos</span> {' > '} 
         <span>Insertar</span>
       </div>
       <h2>{idProject}</h2>
-      <div className="max-w-6xl mx-auto space-y-6">
-        <h1 className="text-2xl font-semibold mb-8">Insertar Proyecto</h1>
-        
-        <div className="grid gap-6">
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block">
+      <div className="w-full space-y-6">
+        <div className="flex-1 w-[80%]  flex flex-col justify-between ">
+          <div className=" pl-10 w-[100%] flex flex-1 justify-around items-center">
+            <div className="flex w-[80%] h-[40%] flex-col justify-between items-start">
+            <h1 className="text-2xl font-semibold mb-3">Insertar Proyecto</h1>
+            <div className="w-full">
+              <label className="text-lg font-medium mb-3 block">
                 Escuela Profesional
               </label>
               <Input 
@@ -111,23 +329,25 @@ export default function ProjectForm() {
                 value={escuelaProfesional}
                 onChange={(e) => setEscuelaProfesional(e.target.value)}
                 placeholder="Nombre del Proyecto"
-                className="bg-background w-[50%]"
+                className="bg-background w-96 h-10 mb-3"
               />
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-2 block">
+              <label className="text-lg font-medium mb-3 block">
                 Insertar el plan
               </label>
               <Input 
                 type="file"
                 onChange={handleFileChange}
-                className="bg-background w-[50%]"
+                className="bg-background w-96  h-10"
               />
             </div>
-            <Button className="bg-blue-500 hover:bg-blue-600" onClick={handleNewProyect} >
+            </div>
+            <Button className="bg-blue-500 hover:bg-blue-600 self-end flex-1 w-32 h-14 " onClick={handleNewProyect} >
               Crear Proyecto
             </Button>
+          </div>
           </div>
           { idProject !== undefined && (
             <>
@@ -139,76 +359,23 @@ export default function ProjectForm() {
                 className="pl-8 w-[250px] bg-background"
               />
             </div>
-            <Button className="bg-blue-500 hover:bg-blue-600" onClick={insertActivity} >
+            <Button className="bg-blue-500 hover:bg-blue-600 w-32 h-14" onClick={insertActivity} >
               Nueva Actividad
             </Button>
-          </div>
-
-          <div className="border rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-16">ID</TableHead>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead>Escuela Profesional</TableHead>
-                  <TableHead>Fecha</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead className="w-24">Opciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {activities.map((activity) => (
-                  <TableRow key={`${activity.id}-${activity.nombre}`}>
-                    <TableCell>{activity.id}</TableCell>
-                    <TableCell>{activity.nombre}</TableCell>
-                    <TableCell>{activity.escuela}</TableCell>
-                    <TableCell>{activity.fecha}</TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(activity.estado)}>
-                        {activity.estado}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon">
-                          <Edit2 className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <Button variant="outline" size="sm">Anterior</Button>
-              <Button variant="outline" size="sm">1</Button>
-              <Button variant="outline" size="sm">2</Button>
-              <Button variant="outline" size="sm">3</Button>
-              <Button variant="outline" size="sm">Siguiente</Button>
-            </div>
-            
-            <div className="flex gap-4">
-              <Button 
-                variant="destructive" 
-                className="bg-[#F08080] hover:bg-[#E07070]"
-              >
-                Cancelar
-              </Button>
-              <Button className="bg-blue-500 hover:bg-blue-600">
-                Guardar Cambios
-              </Button>
-            </div>
+            <div className="bg-[#E3E6ED] rounded-lg ">
+              <DynamicTable
+                configuration={configurationUser}
+                data={currentItems}
+                onSort={handleSort}
+              />
+              </div>
+              <div className="flex justify-center space-x-2 mt-4">
+                {renderPaginationButtons()}
+              </div>
           </div>
           </>
           )
           }
-        </div>
       </div>
     </div>
   )
