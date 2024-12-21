@@ -22,6 +22,7 @@ interface LoginResponse {
   users: User[];
   message: string;
   error?: string;
+  admin: boolean;
 }
 
 interface Role {
@@ -110,55 +111,27 @@ const RoleSelectionPage: React.FC = () => {
 
       if (response.ok) {
         const data: LoginResponse = await response.json();
-        console.log("Usuario encontrado en usuarios normales:", data.token);
-
-        localStorage.setItem("token", data.token);
-        if(data.tipo === "admin" )
-        {
-          const dataAdmin: Admin = await response.json();
-          setAdmin(dataAdmin);
-        }
-        else {
+        
+        if(data.admin)
+          {
+            const dataAdmin: Admin = await response.json();
+            localStorage.setItem("token", data.token);
+            setAdmin(dataAdmin);
+            router.push(`/intranet/privilegios`);
+          }
+          else {
           setUserRoles(data.users); // Actualiza roles de usuario normal
         }
-        
         return;
       } else {
-        console.warn("Usuario no encontrado en API de usuarios normales.");
+        setError("Usuario no encontrado.");
+        console.warn("Usuario no encontrado.");
       }
-    } catch (error) {
-      console.error("Error al buscar en la API de usuarios normales:", error);
+    } catch (error: any) {
+      setError("Error al logearse");
+      console.error("Error al logearse", error);
     }
 
-    // Si no hay roles normales, buscar en la API de administradores
-    try {
-      const responseAdmin = await fetch(API_ADMIN, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          usuario: usuario,
-          password: password,
-        }),
-      });
-
-      if (responseAdmin.ok) {
-        const dataAdmin: Admin = await responseAdmin.json();
-        console.log("Usuario encontrado en administradores:", dataAdmin);
-
-        setAdmin(dataAdmin); // Guardar datos del administrador
-        localStorage.setItem("adminId", String(dataAdmin.id));
-        return;
-      } else {
-        console.warn("Usuario no encontrado en API de administradores.");
-      }
-    } catch (error) {
-      console.error("Error al buscar en la API de administradores:", error);
-    }
-
-    // Si no se encuentran datos en ambas APIs
-    setError("Usuario no encontrado en ambas APIs.");
   };
 
   const handleRoleSelection = (user: User) => {
@@ -172,6 +145,7 @@ const RoleSelectionPage: React.FC = () => {
     subunidades.find((sub) => sub.id_subuni === subunidad_id)?.n_subuni || `Subunidad ${subunidad_id}`;
 
   // Redirigir directamente si es administrador
+  console.log(admin);
   useEffect(() => {
     if (admin) {
       //router.push(`/admin/dashboard/${admin.id}`);
