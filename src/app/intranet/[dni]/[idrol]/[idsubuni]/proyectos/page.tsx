@@ -25,7 +25,7 @@ export default function Component() {
   const {dni, idsubuni} = useParams();
   ///variables necesarios para la tabla dinámica
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5);
+  const [itemsPerPage] = useState(4);
   const totalPages = Math.ceil(projects.length/itemsPerPage);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
@@ -261,10 +261,9 @@ if (error) {
        <Button
          key="prev"
          variant="outline"
-         size="sm"
          onClick={() => handlePageChange(currentPage - 1)}
          disabled={currentPage === 1}
-         className="text-black dark:text-white"
+         className="text-black dark:text-white h-10 w-24 "
        >
          Anterior
        </Button>
@@ -276,9 +275,8 @@ if (error) {
          <Button
            key={1}
            variant="outline"
-           size="sm"
            onClick={() => handlePageChange(1)}
-           className=""
+           className="h-10 w-14 "
          >
            <p className="text-black dark:text-white">1</p>
          </Button>
@@ -287,7 +285,7 @@ if (error) {
      }
  
      // Rango de páginas cercanas a la actual
-     const maxVisiblePages = 5;
+     const maxVisiblePages = 3;
      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
      let endPage = Math.min(totalPages, currentPage + Math.floor(maxVisiblePages / 2));
  
@@ -300,9 +298,8 @@ if (error) {
          <Button
            key={i}
            variant="outline"
-           size="sm"
            onClick={() => handlePageChange(i)}
-           className={currentPage === i ? "bg-blue-500 text-white" : "text-black dark:text-white"}
+           className={currentPage === i ? "bg-blue-500 text-white h-10 w-14 " : "text-black dark:text-white h-10 w-14 "}
          >
            {i}
          </Button>
@@ -316,8 +313,8 @@ if (error) {
          <Button
            key={totalPages}
            variant="outline"
-           size="sm"
            onClick={() => handlePageChange(totalPages)}
+           className='h-10 w-14 '
          >
            <p className="text-black dark:text-white">{totalPages}</p>
          </Button>
@@ -332,7 +329,7 @@ if (error) {
          size="sm"
          onClick={() => handlePageChange(currentPage + 1)}
          disabled={currentPage === totalPages}
-         className="text-black dark:text-white "
+         className="text-black dark:text-white h-10 w-24  "
        >
          Siguiente
        </Button>
@@ -342,13 +339,14 @@ if (error) {
    };
 
   return (
-    <div className=" w-[90%] m-4 py-4 pl-10 space-y-4 text-black dark:text-white min-h-screen">
+    <div className=" w-[90%] mx-auto  py-4  space-y-4 text-black dark:text-white min-h-screen">
       <div >
         <h1 className="text-2xl font-bold text-black dark:text-white">Proyectos</h1>
       </div>
-      <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600" size="sm" onClick={insertProject} >
-      <CirclePlus className="h-4 w-4"  />
-          nuevo
+      <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 "  onClick={insertProject} >
+      <CirclePlus className="h-8 w-8 " />
+      <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
+          <p  className="font-bold" >Nuevo</p>
       </Button>
       <div className="bg-[#E3E6ED] rounded-lg ">
       <DynamicTable

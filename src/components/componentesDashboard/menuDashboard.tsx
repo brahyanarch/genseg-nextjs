@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronLeft, ChevronRight, ChevronDown, LayoutDashboard, Settings, FolderKanban, Bell } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, LayoutDashboard, Settings, Settings2, FolderKanban, Bell } from "lucide-react";
 import { useParams,usePathname } from "next/navigation";
 import Link from 'next/link'
 import clsx from 'clsx'
@@ -10,11 +10,11 @@ import clsx from 'clsx'
 const Menu = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
-  const [isMonitorOpen, setIsMonitorOpen] = useState(false);
+  const [isSubConfigOpen, setIsSubConfigOpen] = useState(false);
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
   const toggleConfig = () => setIsConfigOpen(!isConfigOpen);
-  const toggleMonitor = () => setIsMonitorOpen(!isMonitorOpen);
+  const toggleSubConfig = () => setIsSubConfigOpen(!isSubConfigOpen);
   
   const pathname = usePathname();
   const { idrol, idsubuni, dni } = useParams();
@@ -46,17 +46,27 @@ const Menu = () => {
         url: `/intranet/${dni}/${idrol}/${idsubuni}/configuracion/subUnidades`
         }],
       onClick: toggleConfig,
-    },/*
-    {
-      icon: FileText,
-      label: "Monitoreo",
-      url: `/intranet/${dni}/${idrol}/${idsubunidad}/monitoreo`,
-      subItems: ["Estadísticas", "Logs"],
-      onClick: toggleMonitor,
-    },*/
+      isOpen: isConfigOpen
+    },
     { icon: FolderKanban, 
       label: "Proyectos",
       url: `/intranet/${dni}/${idrol}/${idsubuni}/proyectos` },
+    {
+      icon: Settings2,
+      label: "Sub Configuraciones",
+      url: `#`,
+      subItems: [
+        { 
+          label:"Formularios",
+          url: `/intranet/${dni}/${idrol}/${idsubuni}/subConfiguraciones/Formularios`
+          },{
+          label: "Usuarios",
+          url: `/intranet/${dni}/${idrol}/${idsubuni}/configuracion/usuarios`
+          },
+      ],
+      onClick: toggleSubConfig,
+      isOpen: isSubConfigOpen,
+    },
   ];
 
   return (
@@ -73,7 +83,7 @@ const Menu = () => {
       </div>
       <ScrollArea >
         <ul className="space-y-1 p-4">
-          {menuItems.map(({ icon: Icon, label, url, subItems, onClick }) => (
+          {menuItems.map(({ icon: Icon, label, url, subItems, onClick, isOpen }) => (
             <li key={label}>
             <Link href={url} >
             <Button
@@ -95,12 +105,12 @@ const Menu = () => {
                   {!isCollapsed && label}
                 </div>
                 {!isCollapsed && subItems && (
-                  <ChevronDown className={`h-4 w-4 ${isConfigOpen ? "rotate-180" : ""}`} />
+                  <ChevronDown className={`h-4 w-4 ${isOpen ? "rotate-180" : ""}`} />
                 )}
               </Button>
             </Link>
 
-              {!isCollapsed && subItems && isConfigOpen && (
+              {!isCollapsed && subItems && isOpen && (
                 <ul className="pl-6">
                   {subItems.map(({label,url}) => (
                     <li key={label}>

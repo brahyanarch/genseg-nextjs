@@ -15,8 +15,8 @@ interface DynamicTableProps {
 
 const DynamicTable: React.FC<DynamicTableProps> = ({ configuration, data, onSort }) => {
   return (
-    <div className="bg-[#E3E6ED] rounded-lg overflow-hidden">
-      <Table className="w-[90%] mx-auto my-6">
+    <div className="bg-[#E3E6ED] rounded-lg overflow-hidden h-80">
+      <Table className="w-[90%] mx-auto my-7">
         <TableHeader >
           <TableRow >
             {configuration.map((col) => (

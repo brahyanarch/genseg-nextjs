@@ -65,8 +65,7 @@ console.log(User);
   
 
   return (
-    <div className="w-full flex flex-col justify-between gap-2 items-center overflow-auto mx-auto  bg-gray-900" >
-     <h1>Este es la página Principal</h1> 
+    <div className="w-full flex flex-col justify-between gap-2 text-black items-center overflow-auto mx-auto  bg-white dark:bg-gray-900 dark:text-white" > 
       <Principal/>
     </div>
   );

@@ -17,6 +17,7 @@ export default function ActivityForm() {
    const [fechaFinal, setFechaFinal] = useState();
    const [answers, setAnswers] = useState({}); // Estado para almacenar respuestas
    const {idProject} = useParams();
+   const pathname = usePathname(); 
    const router = useRouter();
    // Manejar cambios en las respuestas
    const handleChange = (id:number, value:string) => {
@@ -42,6 +43,17 @@ export default function ActivityForm() {
       return { ...prev, [id]: updatedValues };
     });
   };
+  //
+  const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
+    const partes = ruta.split('/'); // Divide la ruta en partes
+    const indice = partes.indexOf(segmento); // Encuentra el índice del segmento clave
+    if (indice === -1) return ruta; // Si no encuentra el segmento, retorna la ruta completa
+    return partes.slice(0, indice + 2).join('/'); // Toma hasta el segmento + un nivel
+  };
+  const handleCancelActivity = ()=>{
+    const recortada = recortarRutaHastaSegmento(pathname, 'insertProject');
+    router.push(recortada);
+  } 
   
    //
      const handleSubmitAnswers = async (event: any) => {
@@ -87,7 +99,7 @@ export default function ActivityForm() {
         const data = await response.json();
         setQuestions(data);
       } catch (err: any) {
-        mostrarAviso('warning',err.message);
+        mostrarAviso('warning',err.message );
       } finally {
         console.log("Todo completo");
       }
@@ -96,6 +108,7 @@ export default function ActivityForm() {
   useEffect(() => {
     fetchQuestions();
   }, []);
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="text-sm breadcrumbs mb-6 text-muted-foreground">
@@ -108,7 +121,7 @@ export default function ActivityForm() {
       <div className="max-w-2xl mx-auto space-y-6">
         <h1 className="text-2xl font-semibold mb-8">Insertar Actividad</h1>
         
-        <form className="space-y-4" onSubmit={handleSubmitAnswers} >
+        <form className="space-y-4" >
           <div className="space-y-2">
             <Label htmlFor="activity-name">Nombre de la actividad</Label>
             <Input 
@@ -257,21 +270,22 @@ export default function ActivityForm() {
               return null;
         }
       })}
-          <div className="flex justify-end space-x-4 pt-4">
+        </form>
+        <div className="w-[90%] mx-auto flex justify-end space-x-4 pt-4">
             <Button 
               variant="destructive" 
               className="bg-[#F08080] hover:bg-[#E07070] text-white"
+              onClick={handleCancelActivity}
             >
               Cancelar
             </Button>
             <Button 
-              type="submit"
               className="bg-blue-500 hover:bg-blue-600"
+              onClick={handleSubmitAnswers}
             >
               Insertar Actividad
             </Button>
           </div>
-        </form>
       </div>
     </div>
   )
