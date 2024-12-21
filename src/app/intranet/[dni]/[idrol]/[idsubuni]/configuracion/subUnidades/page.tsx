@@ -124,7 +124,7 @@ export default function Component() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [itemsPerPage] = useState(3);
+  const [itemsPerPage] = useState(4);
   const totalPages = Math.ceil(Data.length / itemsPerPage);
   // Funcion asíncrona para obtener los datos
   // Función para acceder a propiedades anidadas
@@ -215,10 +215,9 @@ export default function Component() {
       <Button
         key="prev"
         variant="outline"
-        size="sm"
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="text-black dark:text-white"
+        className="text-black dark:text-white h-10 w-24 "
       >
         Anterior
       </Button>
@@ -230,9 +229,8 @@ export default function Component() {
         <Button
           key={1}
           variant="outline"
-          size="sm"
           onClick={() => handlePageChange(1)}
-          className=""
+          className="h-10 w-14 "
         >
           <p className="text-black dark:text-white">1</p>
         </Button>
@@ -254,9 +252,8 @@ export default function Component() {
         <Button
           key={i}
           variant="outline"
-          size="sm"
           onClick={() => handlePageChange(i)}
-          className={currentPage === i ? "bg-blue-500 text-white" : "text-black dark:text-white"}
+          className={currentPage === i ? "bg-blue-500 text-white h-10 w-14 " : "text-black dark:text-white h-10 w-14 "}
         >
           {i}
         </Button>
@@ -270,8 +267,8 @@ export default function Component() {
         <Button
           key={totalPages}
           variant="outline"
-          size="sm"
           onClick={() => handlePageChange(totalPages)}
+          className='h-10 w-14 '
         >
           <p className="text-black dark:text-white">{totalPages}</p>
         </Button>
@@ -286,7 +283,7 @@ export default function Component() {
         size="sm"
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="text-black dark:text-white "
+        className="text-black dark:text-white h-10 w-24  "
       >
         Siguiente
       </Button>
@@ -294,7 +291,6 @@ export default function Component() {
 
     return pageButtons;
   };
-  
   
   const fetchSubUnidad = async () => {
     try {
@@ -377,16 +373,16 @@ export default function Component() {
   
 
   return (
-    <div className="w-[90%] m-4 p-4 space-y-4 text-white min-h-screen">
+    <div className="w-[90%] mx-auto  py-4  space-y-4 text-white min-h-screen">
       <BreadcrumbItems items={["Inicio", "Configuración", "Sub Unidad"]} />
       <div>
         <h1 className="text-2xl font-bold text-black dark:text-white">Sub Unidad</h1>
       </div>
-      <Button variant="secondary" size="sm" onClick={toggleModal}>
-        <CirclePlus className="h-4 w-4" />
-        Nuevo
-      </Button>
-      <Input className="w-64" placeholder="Buscar..." />
+        <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 " onClick={toggleModal} >
+      <CirclePlus className="h-8 w-8 " />
+      <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
+          <p  className="font-bold" >Nuevo</p>
+        </Button>
       <div className="bg-[#E3E6ED] rounded-lg">
         <DynamicTable
           configuration={configurationData}

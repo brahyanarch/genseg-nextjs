@@ -139,7 +139,7 @@ const ConfiRoles=()=>{
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [itemsPerPage] = useState(3);
+  const [itemsPerPage] = useState(4);
   const totalPages = Math.ceil(Data.length / itemsPerPage);
   const {mostrarAviso} = useContext<any>(AvisoContext);
   const [showPermissions, setShowPermissions] = useState(false) //para la interfaz de permisos asociados con los roles
@@ -195,10 +195,9 @@ const ConfiRoles=()=>{
       <Button
         key="prev"
         variant="outline"
-        size="sm"
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="text-black dark:text-white"
+        className="text-black dark:text-white h-10 w-24 "
       >
         Anterior
       </Button>
@@ -210,9 +209,8 @@ const ConfiRoles=()=>{
         <Button
           key={1}
           variant="outline"
-          size="sm"
           onClick={() => handlePageChange(1)}
-          className=""
+          className="h-10 w-14 "
         >
           <p className="text-black dark:text-white">1</p>
         </Button>
@@ -234,9 +232,8 @@ const ConfiRoles=()=>{
         <Button
           key={i}
           variant="outline"
-          size="sm"
           onClick={() => handlePageChange(i)}
-          className={currentPage === i ? "bg-blue-500 text-white" : "text-black dark:text-white"}
+          className={currentPage === i ? "bg-blue-500 text-white h-10 w-14 " : "text-black dark:text-white h-10 w-14 "}
         >
           {i}
         </Button>
@@ -250,8 +247,8 @@ const ConfiRoles=()=>{
         <Button
           key={totalPages}
           variant="outline"
-          size="sm"
           onClick={() => handlePageChange(totalPages)}
+          className='h-10 w-14 '
         >
           <p className="text-black dark:text-white">{totalPages}</p>
         </Button>
@@ -266,7 +263,7 @@ const ConfiRoles=()=>{
         size="sm"
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="text-black dark:text-white "
+        className="text-black dark:text-white h-10 w-24  "
       >
         Siguiente
       </Button>
@@ -456,23 +453,20 @@ const ConfiRoles=()=>{
   }
 
   return (
-    <div className="p-4 m-4 space-y-4 w-[90%] mt-4 text-white min-h-screen">
+    <div className="mx-auto  py-4  space-y-4 w-[90%]  text-white min-h-screen">
       <BreadcrumbItems items={["Inicio", "Administracion", "Roles"]} />
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-black dark:text-white">Roles</h1>
       </div>
       <div className="flex justify-between">
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => {
+        <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 "            onClick={() => {
             setEditingRole(null);
             toggleModal();
-          }}
-        >
-          <CirclePlus className="h-4 w-4" />
-          Nuevo
-        </Button>
+          }} >
+      <CirclePlus className="h-8 w-8 " />
+      <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
+          <p  className="font-bold" >Nuevo</p>
+      </Button>
         <Input className="w-64" placeholder="Buscar..." />
       </div>
       <div className="bg-[#E3E6ED] rounded-lg">

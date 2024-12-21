@@ -1,13 +1,14 @@
 'use client'
-import { Card } from "@/components/ui/card"
-import { Edit, Trash2, Eye,Search, ChevronDown } from "lucide-react";
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {useState, useEffect} from "react"
-import { API_PROJECT_ACTIVITIES } from "@/config/apiconfig";
-import {usePathname, useRouter, useParams } from "next/navigation"
+import {AvisoContext} from "@/context/avisoContext"
+import { Edit,Search, Trash2, MoreVertical,Eye, CirclePlus } from "lucide-react";
 import DynamicTable from "@/components/DynamicTable";
-//
+import { useState, useContext, useEffect } from "react"
+import { useParams, usePathname, useRouter } from "next/navigation"
+import { API_PROJECT_ACTIVITIES } from "@/config/apiconfig"
+
 interface Activities {
   idActivi: number;
   name: string;
@@ -19,28 +20,55 @@ interface Activities {
   idres: number;
 }
 
-export function TaskList({toggleOpenDetsAct}) {
 
-  //variable importantes
+
+export default function ProjectForm() {
+  /// variables importantes
   const [activitiesProject, setActivitiesProjects ] = useState<Activities[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const {mostrarAviso} = useContext<any>(AvisoContext);
+  const [escuelaProfesional, setEscuelaProfesional] = useState<string>();
+  const [planProyecto, setPlanProyecto] = useState(null);
+  const {idProject} = useParams();
+   ///variables necesarios para la tabla dinámica
+   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(4);
   const totalPages = Math.ceil(activitiesProject.length / itemsPerPage);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const {projectId} = useParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  //// funciones importantes
+  const handleFileChange = (event) => {
+    setPlanProyecto(event.target.value);
+  };
+  const insertActivity = ()=>{
+    router.push(`${pathname}/insertActivity`);
+  }
+  const handleSaveChange = () => {
+    const recortada = recortarRutaHastaSegmento(pathname, 'proyectos');
+    router.push(recortada);
+  }
+  //Tabla dinámica 
+    ///recortar rutas
+ const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
+    const partes = ruta.split('/'); // Divide la ruta en partes
+    const indice = partes.indexOf(segmento); // Encuentra el índice del segmento clave
+    if (indice === -1) return ruta; // Si no encuentra el segmento, retorna la ruta completa
+    return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
+  };
   /// Fucion para cambiar a interfaz de detalles de una actividad 
   //función para obtener datos desde la API
  const fetchActivitiesProject = async () => {
   try {
-    const response = await fetch(`${API_PROJECT_ACTIVITIES}/${projectId}`);
+    const response = await fetch(`${API_PROJECT_ACTIVITIES}/${idProject}`);
     if (!response.ok) {
       throw new Error("Error al obtener los Proyectos");
     }
     const data = await response.json();
     setActivitiesProjects(data.actividades);
+    
   } catch (err: any) {
     setError(err.message);
   } finally {
@@ -244,40 +272,82 @@ useEffect(() => {
     return pageButtons;
   };
   
+
   return (
-    <Card className="w-full p-4 bg-white dark:bg-gray-900">
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Lista de Tareas (6)</h2>
-        </div>
-        <div className="flex items-center justify-between gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Buscar tareas" className="pl-9" />
+    <div className="flex-1 bg-background py-4 pl-4  text-black dark:text-white">
+      <div className=" flex gap-4 items-center mx-auto text-sm breadcrumbs mb-6 text-muted-foreground">
+        <span>Inicio</span> {' > '} 
+        <span>Proyectos</span> {' > '} 
+        <span>Insertar</span>
+      </div>
+      <div className="w-full space-y-6">  
+        <div className="flex-1 w-[90%]  mx-auto flex flex-col justify-between ">
+        <div className="  w-[100%] flex flex-1 justify-around items-center">
+          <div className="flex w-[80%] h-[40%] flex-col justify-between items-start">
+          <h1 className="text-2xl font-semibold mb-3">Insertar Proyecto</h1>
+          <div className="w-full">
+            <label className="text-lg font-medium mb-3 block">
+              Escuela Profesional
+            </label>
+            <Input 
+              type="text"
+              id="name"
+              value={escuelaProfesional}
+              onChange={(e) => setEscuelaProfesional(e.target.value)}
+              placeholder="Nombre del Proyecto"
+              className="bg-background w-96 h-10 mb-3"
+              disabled
+            />
           </div>
-          <div className="flex items-center gap-2 text-sm">
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <ChevronDown className="h-4 w-4" />
-              <span>6 Tareas</span>
+
+          <div>
+            <label className="text-lg font-medium mb-3 block">
+              Insertar el plan
+            </label>
+            <Input 
+              type="file"
+              onChange={handleFileChange}
+              className="bg-background w-96  h-10"
+              disabled
+            />
+          </div>
+          </div>
+        </div>
+        </div>
+            <div className="w-[90%] mx-auto my-4">
+            <div className="flex justify-between items-center mb-6">
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input 
+                placeholder="Buscar..."
+                className="pl-8 w-[250px] bg-background"
+              />
             </div>
-            <Button variant="ghost" className="text-blue-600 hover:text-blue-700 p-0">
-              Ordenar
+            <Button className="bg-blue-500 hover:bg-blue-600 h-12 w-32 " onClick={insertActivity} >
+              Nueva Actividad
             </Button>
           </div>
-        </div>
-
-        <DynamicTable
-        configuration={configurationUser}
-        data={currentItems}
-        onSort={handleSort}
-      />
-       <div className="flex justify-center space-x-2 mt-4">
-        {renderPaginationButtons()}
+          <div className="bg-[#E3E6ED] rounded-lg ">
+              <DynamicTable
+                configuration={configurationUser}
+                data={currentItems}
+                onSort={handleSort}
+              />
+              </div>
+              <div className="flex justify-center space-x-2 mt-4">
+                {renderPaginationButtons()}
+              </div>
+          </div>
+          <div className="w-[90%] flex justify-end gap-8 items-center mx-auto">
+            <Button className="bg-red-500 hover:bg-red-600  w-32 h-14 " >
+              Cancelar Cambios
+            </Button>
+            <Button className="bg-green-500 hover:bg-green-600  w-32 h-14 " onClick={handleSaveChange} >
+              Guardar Cambios
+            </Button>
+          </div>
       </div>
-        <Button variant="ghost" className="w-full justify-start text-blue-600 hover:text-blue-700 px-0">
-          + Agregar nuevo plan
-        </Button>
-      </div>
-    </Card>
+    </div>
   )
 }
+
