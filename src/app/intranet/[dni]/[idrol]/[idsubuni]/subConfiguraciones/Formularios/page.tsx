@@ -1,10 +1,10 @@
 'use client'
-import { Search,X, PenSquare, Trash2, Circle, FilePenLine } from "lucide-react";
+import { Search,X, PenSquare, Trash2, Circle, CirclePlus,FilePenLine } from "lucide-react";
 import {useState, useContext, useEffect} from 'react'
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import {Table,TableBody,TableCell,TableHead,TableHeader,TableRow,} from "@/components/ui/table";
+import DynamicTable from "@/components/DynamicTable";
 import { API_FORM } from "@/config/apiconfig";
 import {AvisoContext} from '@/context/avisoContext'
 import { useParams, usePathname, useRouter } from "next/navigation";
@@ -160,13 +160,261 @@ export default function Component() {
   const [form, setForm] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingForm, setEditingForm] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const {mostrarAviso} = useContext<any>(AvisoContext);
-  /// navegacion rutas
-  const router = useRouter();
   const pathname = usePathname();
-  const {idForm} = useParams();
+  const router = useRouter();
+  const {dni, idsubuni} = useParams();
+  ///variables necesarios para la tabla dinámica
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(4);
+  const totalPages = Math.ceil(forms.length/itemsPerPage);
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
+if (loading) {
+  return (
+    <>
+      <div className="p-6 space-y-6">
+        {/* Breadcrumb skeleton */}
+        <div className="flex items-center gap-2 text-sm">
+          <Skeleton className="h-4 w-12" />
+          <Skeleton className="h-4 w-4" />
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-4 w-4" />
+          <Skeleton className="h-4 w-16" />
+        </div>
+
+        {/* Title skeleton */}
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-32" />
+
+          {/* New button skeleton */}
+          <Button variant="outline" disabled className="gap-2">
+            <Skeleton className="h-4 w-12" />
+          </Button>
+        </div>
+
+        {/* Table skeleton */}
+        <div className="rounded-lg border">
+          {/* Header */}
+          <div className="grid grid-cols-[100px_1fr_100px] bg-muted p-4 gap-4">
+            <Skeleton className="h-4 w-8" />
+            <Skeleton className="h-4 w-16" />
+            <Skeleton className="h-4 w-20" />
+          </div>
+
+          {/* Table row */}
+          <div className="grid grid-cols-[100px_1fr_100px] p-4 gap-4 items-center">
+            <Skeleton className="h-4 w-6" />
+            <Skeleton className="h-4 w-32" />
+            <div className="flex gap-2">
+              <Skeleton className="h-8 w-8" />
+              <Skeleton className="h-8 w-8" />
+            </div>
+          </div>
+        </div>
+
+        {/* Pagination skeleton */}
+        <div className="flex justify-center gap-2 mt-4">
+          <Skeleton className="h-8 w-8" />
+          <Skeleton className="h-8 w-8" />
+          <Skeleton className="h-8 w-8" />
+          <Skeleton className="h-8 w-8" />
+          <Skeleton className="h-8 w-8" />
+        </div>
+      </div>
+    </>
+  );
+}
+if (error) {
+  return <p>Error: {error}</p>;
+} 
+ //Configuracion de la tabla dinámica
+ 
+   // Función para acceder a propiedades anidadas
+   const getNestedProperty = (obj: any, key: string) => {
+     return key.split('.').reduce((value, part) => value && value[part], obj);
+   };
+ 
+   // Función para ordenar los datos
+   const getSortedData = () => {
+     if (!sortColumn) return forms;
+ 
+     return [...forms].sort((a, b) => {
+       const fieldA = getNestedProperty(a, sortColumn);
+       const fieldB = getNestedProperty(b, sortColumn);
+ 
+       if (fieldA === undefined || fieldB === undefined) return 0;
+ 
+       if (typeof fieldA === "string" && typeof fieldB === "string") {
+         return sortDirection === "asc"
+           ? fieldA.localeCompare(fieldB)
+           : fieldB.localeCompare(fieldA);
+       }
+       
+       if (typeof fieldA === "number" && typeof fieldB === "number") {
+         return sortDirection === "asc" ? fieldA - fieldB : fieldB - fieldA;
+       }
+ 
+       return 0;
+     });
+   };
+ 
+   const handleSort = (column: string) => {
+     setSortColumn(column);
+     setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+   };
+ 
+   const sortedProjects = getSortedData();
+ 
+   // Paginación
+   const indexOfLastItem = currentPage * itemsPerPage;
+   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+   const currentItems = sortedProjects.slice(indexOfFirstItem, indexOfLastItem);
+ 
+   const handlePageChange = (page: number) => {
+     setCurrentPage(page);
+   };
+ 
+   // Configuración de la tabla
+   const configurationUser = [
+     {
+       key: "index",
+       label: "ID",
+       render: (item: FormEntry) => <>{forms.indexOf(item) + 1}</>,
+       sortable:true,
+     },
+     {
+       key: "n_usu",
+       label: "Nombre",
+       render: (item: FormEntry) => item.nombre,
+       sortable: true,
+     },
+     {
+       key: "fechaCreacion",
+       label: "Fecha Creación",
+       render: (item: FormEntry) => item.fechaCreacion,
+       sortable: true,
+     },
+    {
+      key: "Abreviatura",
+      label: "Abreviatura",
+      render: (item: FormEntry) => item.abreviatura,
+      sortable: true,
+    },
+     {
+       key: "opciones",
+       label: "Opciones",
+       render: (item: FormEntry) => (
+         <>
+          <Button variant="ghost" size="icon" onClick={() => openEditModal(form)}>
+              <PenSquare className="h-5 w-5"  strokeWidth={2.5} />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={()=>deleteForm(item.idf)}>
+              <Trash2 className="h-5 w-5"  strokeWidth={2.5} />
+            </Button>
+            <Button variant="ghost" size="icon">
+              <Circle
+                className={`h-5 w-5 ${
+                  item.active ? "fill-primary" : ""
+                }`}
+                strokeWidth={2.5}
+              />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={()=>editForm(item.idf)} >
+              <FilePenLine className="h-5 w-5"  strokeWidth={2.5} />
+            </Button>
+         </>
+       ),
+     },
+   ];
+ 
+   const renderPaginationButtons = () => {
+     const pageButtons = [];
+ 
+     // Botón de "Anterior"
+     pageButtons.push(
+       <Button
+         key="prev"
+         variant="outline"
+         onClick={() => handlePageChange(currentPage - 1)}
+         disabled={currentPage === 1}
+         className="text-black dark:text-white h-10 w-24 "
+       >
+         Anterior
+       </Button>
+     );
+ 
+     // Mostrar la primera página siempre
+     if (currentPage > 3) {
+       pageButtons.push(
+         <Button
+           key={1}
+           variant="outline"
+           onClick={() => handlePageChange(1)}
+           className="h-10 w-14 "
+         >
+           <p className="text-black dark:text-white">1</p>
+         </Button>
+       );
+       pageButtons.push(<span key="start-ellipsis" className="px-2">...</span>);
+     }
+ 
+     // Rango de páginas cercanas a la actual
+     const maxVisiblePages = 3;
+     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+     let endPage = Math.min(totalPages, currentPage + Math.floor(maxVisiblePages / 2));
+ 
+     if (endPage - startPage < maxVisiblePages) {
+       startPage = Math.max(1, endPage - maxVisiblePages + 1);
+     }
+ 
+     for (let i = startPage; i <= endPage; i++) {
+       pageButtons.push(
+         <Button
+           key={i}
+           variant="outline"
+           onClick={() => handlePageChange(i)}
+           className={currentPage === i ? "bg-blue-500 text-white h-10 w-14 " : "text-black dark:text-white h-10 w-14 "}
+         >
+           {i}
+         </Button>
+       );
+     }
+ 
+     // Mostrar la última página siempre
+     if (currentPage < totalPages - 2) {
+       pageButtons.push(<span key="end-ellipsis" className="px-2">...</span>);
+       pageButtons.push(
+         <Button
+           key={totalPages}
+           variant="outline"
+           onClick={() => handlePageChange(totalPages)}
+           className='h-10 w-14 '
+         >
+           <p className="text-black dark:text-white">{totalPages}</p>
+         </Button>
+       );
+     }
+ 
+     // Botón de "Siguiente"
+     pageButtons.push(
+       <Button
+         key="next"
+         variant="outline"
+         size="sm"
+         onClick={() => handlePageChange(currentPage + 1)}
+         disabled={currentPage === totalPages}
+         className="text-black dark:text-white h-10 w-24  "
+       >
+         Siguiente
+       </Button>
+     );
+ 
+     return pageButtons;
+   };
  //función para obtener datos desde la API
  const fetchForms = async () => {
   try {
@@ -292,68 +540,28 @@ if (error) {
 }
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-4 space-y-4">
-      <h1 className="text-2xl font-bold">Edicion de formulario</h1>
+    <div className="w-[90%] max-w-6xl mx-auto p-4 text-black dark:text-white space-y-4">
+      <h1 className="text-2xl font-bold  ">Formularios</h1>
       <div className="flex justify-between items-center gap-4 flex-wrap">
-        <Button className="bg-blue-500 hover:bg-blue-600" >
-          + nuevo
-        </Button>
+      <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 "   >
+      <CirclePlus className="h-8 w-8 " />
+      <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
+          <p  className="font-bold" >Nuevo</p>
+      </Button>
         <div className="relative">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Buscar..." className="pl-8 w-[300px]" />
         </div>
       </div>
-      <div className="border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[80px]">ID</TableHead>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Fecha de creacion</TableHead>
-              <TableHead>Abreviatura</TableHead>
-              <TableHead className="text-right">Opciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {forms.map((form:any) => (
-              <TableRow key={form.idf}>
-                <TableCell>{form.idf}</TableCell>
-                <TableCell>{form.nombre}</TableCell>
-                <TableCell>{form.fechaCreacion}</TableCell>
-                <TableCell>{form.abreviatura}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => openEditModal(form)}>
-                      <PenSquare className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={()=>deleteForm(form.idf)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Circle
-                        className={`h-4 w-4 ${
-                          form.active ? "fill-primary" : ""
-                        }`}
-                      />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={()=>editForm(form.idf)} >
-                      <FilePenLine />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+      <div className="bg-[#E3E6ED] rounded-lg  ">
+      <DynamicTable
+        configuration={configurationUser}
+        data={currentItems}
+        onSort={handleSort}
+      />
       </div>
-      <div className="flex justify-end gap-2">
-        <Button variant="outline" disabled>
-          Anterior
-        </Button>
-        <Button variant="outline" className="px-4">
-          1
-        </Button>
-        <Button variant="outline">Siguiente</Button>
+      <div className="flex justify-center space-x-2 mt-4">
+        {renderPaginationButtons()}
       </div>
       {/*
     <EditModal isOpen={isModalOpen} closeModal={toggleModal} onSaveForm={saveForm} editingForm={editingForm} />
