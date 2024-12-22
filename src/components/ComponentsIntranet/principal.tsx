@@ -1,12 +1,20 @@
-import BreadcrumbItems from "@/components/breadcrumb";
+'use client'
+import {BreadcrumbWithDropdown} from "@/components/breadcrumb";
 import { EnCurso, Archivado, Pendiente, Completado } from "@/components/componentesGraficos/estadosProyecto";
 import Graficos from "@/components/componentesGraficos/graficos";
 import Dona from "@/components/componentesGraficos/graficoDona"
+import { usePathname } from "next/navigation";
 export default function Principal (){
+    ///navegacion rutas
+    const pathname = usePathname();
+    const breadcrumbData = [
+        { type: "link", label: "Inicio", href: pathname },
+        { type: "page", label: "Principal" },
+      ];
     return(
         <>
         <div className="self-start px-4 " >
-        <BreadcrumbItems items={["Inicio", "Principal"]}  />
+        <BreadcrumbWithDropdown items={breadcrumbData}  />
         </div>
         
         <div className="flex items-center justify-around space-x-2 mx-auto p-4">

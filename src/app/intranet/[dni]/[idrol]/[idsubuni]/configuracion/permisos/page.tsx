@@ -396,7 +396,7 @@ export default function Component() {
     },
     { type: "page", label: "Permisos" },
   ];
-
+  ////////////
   return (
     <div className="w-[90%] mx-auto  py-4  space-y-4 text-white min-h-screen">
       <BreadcrumbWithDropdown items={breadcrumbData} />

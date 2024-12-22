@@ -3,14 +3,14 @@ import { Button } from "@/components/ui/button";
 import React, { useState, useEffect, useContext } from "react";
 import { Input } from "@/components/ui/input";
 import { X, Edit, Trash2, List, CirclePlus } from "lucide-react";
-import BreadcrumbItems from "@/components/breadcrumb";
+import {BreadcrumbWithDropdown} from "@/components/breadcrumb";
 import { API_ROLES } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
 import DynamicTable from "@/components/DynamicTable";
 import {Rol} from "@/tipos/typos"
 import {AvisoContext} from '@/context/avisoContext'
 import PermissionsManager from '@/components/ComponentsIntranet/permisosmanages'
-
+import { usePathname } from "next/navigation";
 // Modal para agregar un nuevo Rol
 
 export const EditModal = ({
@@ -143,12 +143,11 @@ const ConfiRoles=()=>{
   const totalPages = Math.ceil(Data.length / itemsPerPage);
   const {mostrarAviso} = useContext<any>(AvisoContext);
   const [showPermissions, setShowPermissions] = useState(false) //para la interfaz de permisos asociados con los roles
-  
+  //navegacion rutas
+  const pathname = usePathname();
   const handleTogglePermissions = () => {
     setShowPermissions(!showPermissions)
   }
-  
-  
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -451,10 +450,35 @@ const ConfiRoles=()=>{
   if (error) {
     return <p>Error: {error}</p>;
   }
+  ///recortar rutas
+  const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
+    const partes = ruta.split('/'); // Divide la ruta en partes
+    const indice = partes.indexOf(segmento); // Encuentra el índice del segmento clave
+    if (indice === -1) return ruta; // Si no encuentra el segmento, retorna la ruta completa
+    return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
+  };
+  //recortamos las rutas requeridas
+  const roles = recortarRutaHastaSegmento(pathname, 'roles');
+  const subUnidades = recortarRutaHastaSegmento(pathname, 'subUnidades');
+  const usuarios = recortarRutaHastaSegmento(pathname, 'usuarios');
+  //definimos valores para el breadCrumb
+  const breadcrumbData = [
+    { type: "link", label: "Inicio", href: "/" },
+    {
+      type: "dropdown",
+      label: "Configuración",
+      items: [
+        { label: "Roles", href: roles },
+        { label: "Subunidades", href: subUnidades },
+        { label: "Usuarios", href: usuarios, external: true },
+      ],
+    },
+    { type: "page", label: "Permisos" },
+  ];
 
   return (
     <div className="mx-auto  py-4  space-y-4 w-[90%]  text-white min-h-screen">
-      <BreadcrumbItems items={["Inicio", "Administracion", "Roles"]} />
+      <BreadcrumbWithDropdown items={breadcrumbData} />
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-black dark:text-white">Roles</h1>
       </div>
