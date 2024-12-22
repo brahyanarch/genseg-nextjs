@@ -50,7 +50,6 @@ export default function ProjectForm() {
     const recortada = recortarRutaHastaSegmento(pathname, 'proyectos');
     router.push(recortada);
   }
-  //Tabla dinámica 
     ///recortar rutas
  const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
     const partes = ruta.split('/'); // Divide la ruta en partes
@@ -283,35 +282,9 @@ useEffect(() => {
       <div className="w-full space-y-6">  
         <div className="flex-1 w-[90%]  mx-auto flex flex-col justify-between ">
         <div className="  w-[100%] flex flex-1 justify-around items-center">
-          <div className="flex w-[80%] h-[40%] flex-col justify-between items-start">
-          <h1 className="text-2xl font-semibold mb-3">Insertar Proyecto</h1>
-          <div className="w-full">
-            <label className="text-lg font-medium mb-3 block">
-              Escuela Profesional
-            </label>
-            <Input 
-              type="text"
-              id="name"
-              value={escuelaProfesional}
-              onChange={(e) => setEscuelaProfesional(e.target.value)}
-              placeholder="Nombre del Proyecto"
-              className="bg-background w-96 h-10 mb-3"
-              disabled
-            />
-          </div>
-
-          <div>
-            <label className="text-lg font-medium mb-3 block">
-              Insertar el plan
-            </label>
-            <Input 
-              type="file"
-              onChange={handleFileChange}
-              className="bg-background w-96  h-10"
-              disabled
-            />
-          </div>
-          </div>
+          <h2>
+            Insertando Actividades del Proyecto {idProject}.
+          </h2>
         </div>
         </div>
             <div className="w-[90%] mx-auto my-4">
