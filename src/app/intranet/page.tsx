@@ -1,20 +1,26 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  API_ROLES,
-  API_SUBUNIDADES,
-  API_LOGIN,
-  API_ADMIN,
-} from "@/config/apiconfig";
+import {API_LOGIN, API_LOGIN_UNIQUE} from "@/config/apiconfig";
 import Image from 'next/image'
+interface Subunidad {
+  id_subuni: number;
+  n_subuni: string;
+}
+interface Role {
+  id_rol: number;
+  n_rol: string;
+}
+
 interface User {
   dni: string;
   rol_id: number;
   subunidad_id_subuni: number;
+  rol: Role;
+  sub_uni: Subunidad;
 }
 
 interface LoginResponse {
@@ -25,27 +31,10 @@ interface LoginResponse {
   admin: boolean;
 }
 
-interface Role {
-  id_rol: number;
-  n_rol: string;
-  abrev: string;
-}
-
-interface Subunidad {
-  id_subuni: number;
-  n_subuni: string;
-  abreviatura: string;
-}
-
 interface RoleProps {
   title: string;
   subtitle: string;
   onClick: () => void;
-}
-
-type Admin = {
-  id: number;
-  usuario: string;
 }
 
 function RoleCard({ title, subtitle, onClick }: RoleProps) {
@@ -68,30 +57,10 @@ const RoleSelectionPage: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [userRoles, setUserRoles] = useState<User[]>([]);
-  const [admin, setAdmin] = useState<Admin | null>(null);
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [subunidades, setSubunidades] = useState<Subunidad[]>([]);
+  const [admin, setAdmin] = useState<boolean | null>(null);
   const router = useRouter();
 
-  // Fetch roles y subunidades al cargar la página
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [rolesRes, subunidadesRes] = await Promise.all([
-          fetch(API_ROLES),
-          fetch(API_SUBUNIDADES),
-        ]);
-
-        setRoles(await rolesRes.json());
-        setSubunidades(await subunidadesRes.json());
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
+ 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -114,10 +83,9 @@ const RoleSelectionPage: React.FC = () => {
         
         if(data.admin)
           {
-            const dataAdmin: Admin = await response.json();
             localStorage.setItem("token", data.token);
-            setAdmin(dataAdmin);
-            router.push(`/intranet/privilegios`);
+            setAdmin(true);
+            return;
           }
           else {
           setUserRoles(data.users); // Actualiza roles de usuario normal
@@ -125,28 +93,46 @@ const RoleSelectionPage: React.FC = () => {
         return;
       } else {
         setError("Usuario no encontrado.");
-        console.warn("Usuario no encontrado.");
+        //console.warn("Usuario no encontrado.");
       }
     } catch (error: any) {
       setError("Error al logearse");
-      console.error("Error al logearse", error);
+      //console.error("Error al logearse", error);
     }
 
   };
 
-  const handleRoleSelection = (user: User) => {
-    router.push(`/intranet/${user.dni}/${user.rol_id}/${user.subunidad_id_subuni}`);
+  const handleRoleSelection = async (user: User) => {
+    try {
+      // Buscar en la API de usuarios normales
+      const response = await fetch(API_LOGIN_UNIQUE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          n_usu: user.dni,
+          dni: user.dni,
+          rol_id: user.rol_id,
+          subunidad_id_subuni: user.subunidad_id_subuni,
+        }),
+      });
+
+      if (response.ok) {
+        const data: LoginResponse = await response.json();
+        console.log(data);
+        localStorage.setItem("tokenus", data.token);
+      }
+        router.push(`/intranet/${user.dni}/${user.rol_id}/${user.subunidad_id_subuni}`);
+        return;
+      }catch (error: any) {
+      setError("Error al logearse");
+      //console.error("Error al logearse", error);
+    }
   };
 
-  const getRoleName = (rol_id: number) =>
-    roles.find((role) => role.id_rol === rol_id)?.n_rol || "Rol desconocido";
-
-  const getSubunidadName = (subunidad_id: number) =>
-    subunidades.find((sub) => sub.id_subuni === subunidad_id)?.n_subuni || `Subunidad ${subunidad_id}`;
-
-  // Redirigir directamente si es administrador
-  console.log(admin);
   useEffect(() => {
+
     if (admin) {
       //router.push(`/admin/dashboard/${admin.id}`);
       router.push(`/intranet/privilegios`);
@@ -160,11 +146,11 @@ const RoleSelectionPage: React.FC = () => {
         <div className="w-[50%] space-y-8">
           <h2 className="text-2xl font-bold">Selecciona un Rol y Subunidad</h2>
           <div className="grid grid-cols-3 gap-4">
-            {userRoles.map((user) => (
+            {userRoles.map((user, index) => (
               <RoleCard
                 key={`${user.dni}-${user.rol_id}-${user.subunidad_id_subuni}`}
-                title={getRoleName(user.rol_id)}
-                subtitle={getSubunidadName(user.subunidad_id_subuni)}
+                title={user.rol.n_rol}
+                subtitle={user.sub_uni.n_subuni}
                 onClick={() => handleRoleSelection(user)}
               />
             ))}
