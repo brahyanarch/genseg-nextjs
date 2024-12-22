@@ -48,6 +48,10 @@ const Menu = () => {
       onClick: toggleConfig,
       isOpen: isConfigOpen
     },
+    { icon: LayoutDashboard, 
+      label: "Pagina",
+      url: `/intranet/${dni}/${idrol}/${idsubuni}/pagina`
+    },
     { icon: FolderKanban, 
       label: "Proyectos",
       url: `/intranet/${dni}/${idrol}/${idsubuni}/proyectos` },
