@@ -74,20 +74,17 @@ const RoleSelectionPage: React.FC = () => {
           password: password,
         }),
       });
-
+      
       if (response.ok) {
         const data: LoginResponse = await response.json();
         
-        if(data.admin)
-          {
+        if(data.admin){
             localStorage.setItem("token", data.token);
             setAdmin(true);
             return;
-          }
-          else {
+        } else {
           setUserRoles(data.users); // Actualiza roles de usuario normal
-        }
-        return;
+        } 
       } else {
         setError("Usuario no encontrado.");
         //console.warn("Usuario no encontrado.");
