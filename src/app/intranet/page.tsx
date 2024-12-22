@@ -14,15 +14,14 @@ interface Role {
   id_rol: number;
   n_rol: string;
 }
-
 interface User {
+  n_usu: string;
   dni: string;
   rol_id: number;
   subunidad_id_subuni: number;
   rol: Role;
   sub_uni: Subunidad;
 }
-
 interface LoginResponse {
   token: string;
   users: User[];
@@ -30,13 +29,11 @@ interface LoginResponse {
   error?: string;
   admin: boolean;
 }
-
 interface RoleProps {
   title: string;
   subtitle: string;
   onClick: () => void;
 }
-
 function RoleCard({ title, subtitle, onClick }: RoleProps) {
   return (
     <Card
@@ -103,38 +100,36 @@ const RoleSelectionPage: React.FC = () => {
   };
 
   const handleRoleSelection = async (user: User) => {
+    setError(null); // Limpia errores previos
     try {
-      // Buscar en la API de usuarios normales
       const response = await fetch(API_LOGIN_UNIQUE, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          n_usu: user.dni,
+          n_usu: user.n_usu,
           dni: user.dni,
           rol_id: user.rol_id,
           subunidad_id_subuni: user.subunidad_id_subuni,
         }),
       });
-
+  
       if (response.ok) {
         const data: LoginResponse = await response.json();
-        console.log(data);
-        localStorage.setItem("tokenus", data.token);
-      }
+        localStorage.setItem("token", data.token);
         router.push(`/intranet/${user.dni}/${user.rol_id}/${user.subunidad_id_subuni}`);
-        return;
-      }catch (error: any) {
-      setError("Error al logearse");
-      //console.error("Error al logearse", error);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || "Error al seleccionar el rol");
+      }
+    } catch (error: any) {
+      setError("Error al comunicarse con la API");
     }
   };
 
   useEffect(() => {
-
     if (admin) {
-      //router.push(`/admin/dashboard/${admin.id}`);
       router.push(`/intranet/privilegios`);
     }
   }, [admin, router]);
