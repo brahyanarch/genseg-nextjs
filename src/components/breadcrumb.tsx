@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronDown, Slash } from "lucide-react";
+import { ChevronDown, Slash, ChevronRight } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -67,7 +67,7 @@ export function BreadcrumbWithDropdown({ items }:Data) {
             {/* Renderiza un separador excepto después del último elemento */}
             {index < items.length - 1 && (
               <BreadcrumbSeparator>
-                <Slash />
+                <ChevronRight />
               </BreadcrumbSeparator>
             )}
           </React.Fragment>
