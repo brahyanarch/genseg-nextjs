@@ -9,26 +9,29 @@ import {API_PROJECTS } from "@/config/apiconfig"
 
 export default function ProjectForm() {
   /// variables importantes
-  const [error, setError] = useState(null);
+  //const [error, setError] = useState(null);
   const {mostrarAviso} = useContext<any>(AvisoContext);
   const [escuelaProfesional, setEscuelaProfesional] = useState<string>();
-  const [planProyecto, setPlanProyecto] = useState(null);
+  const [planProyecto, setPlanProyecto] = useState<File | null>(null);
   const {idrol,idsubuni, dni} = useParams();
   const router = useRouter();
   const pathname = usePathname();
   //// funciones importantes
-  const handleFileChange = (event) => {
-    setPlanProyecto(event.target.value);
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setPlanProyecto(event.target.files[0]);
+    }
   };
-  const handleNewProyect = async (event: any) => {
+  const handleNewProyect = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      const newProject = {
-        plan:String(planProyecto), 
-        dni:dni, 
-        id_rol:Number(idrol), 
-        subunidad:Number(idsubuni), 
-        EP:escuelaProfesional
-      };
+      const formData = new FormData();
+      if (planProyecto) {
+        formData.append("plan", planProyecto);
+      }
+      formData.append("dni",String(dni));
+      formData.append("id_rol", String(idrol));
+      formData.append("subunidad", String(idsubuni));
+      formData.append("EP", String(escuelaProfesional));
       
       try {
         const response = await fetch(API_PROJECTS, {
@@ -36,7 +39,7 @@ export default function ProjectForm() {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(newProject)
+          body: formData
         });
   
         if (response.ok) {
@@ -92,9 +95,11 @@ export default function ProjectForm() {
           </div>
           </div>
         
-            <Button className="bg-blue-500 hover:bg-blue-600 self-end flex-1 w-32 h-14 " onClick={handleNewProyect} >
-              Crear Proyecto
-            </Button>
+            <form onSubmit={handleNewProyect} className="flex w-full justify-end">
+              <Button className="bg-blue-500 hover:bg-blue-600 self-end flex-1 w-32 h-14 " type="submit">
+                Crear Proyecto
+              </Button>
+            </form>
         </div>
         </div>
       </div>

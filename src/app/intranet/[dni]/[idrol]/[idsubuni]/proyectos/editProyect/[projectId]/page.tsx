@@ -64,7 +64,7 @@ export default function EditProject() {
     }
   
     const formData = new FormData();
-    formData.append("escuelaProfesional", escuelaP); // Valor modificado
+    formData.append("escuelaProfesional", String(escuelaP)); // Valor modificado
     if (plan) {
       formData.append("plan", plan); // Archivo nuevo si se seleccionó
     }
