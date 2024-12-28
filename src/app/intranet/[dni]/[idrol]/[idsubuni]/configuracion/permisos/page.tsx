@@ -403,10 +403,17 @@ export default function Component() {
       <div>
         <h1 className="text-2xl font-bold text-black dark:text-white">Permisos</h1>
       </div>
+<<<<<<< HEAD
       <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 " onClick={() => { setEditingPermission(null); toggleModal(); }} >
         <CirclePlus className="h-8 w-8 " />
         <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
         <p className="font-bold" >Nuevo</p>
+=======
+      <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 "  onClick={() => { setEditingPermission(null); toggleModal(); }} >
+        <CirclePlus className="h-8 w-8 " />
+        <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
+            <p  className="font-bold" >Nuevo</p>
+>>>>>>> c74f8c0359fdd7711832d58a248b42689f81a4e1
       </Button>
       <DynamicTable
         configuration={configurationUser}

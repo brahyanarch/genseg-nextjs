@@ -38,20 +38,15 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   };
   useEffect(() => {
     fetchUs(); // Obtener información del usuario
-
-
     setIsClient(true); // Indica que se está renderizando en el cliente
   }, []);
 
 
-  const handleMenuClick = (label: string) => {
-    console.log(`Navigating to ${label}`);
-    // Agregar lógica de navegación
-  };
   if (!isClient) return null;
-
+  console.log(User, " ");
   return (
     <div className="flex flex-col h-screen w-full bg-gray-200 dark:bg-gray-900">
+      
       <Navbar
         idrol={Number(idrol)} // Reemplaza con datos reales
         idsubuni={Number(idsubuni)} // Reemplaza con datos reales
