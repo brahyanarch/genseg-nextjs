@@ -1,8 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { TrendingUp } from "lucide-react"
+import { TrendingUp, Loader } from "lucide-react"
 import { Label, Pie, PieChart } from "recharts"
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import {
   Card,
@@ -18,15 +20,15 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
+import { API_PROJECTS_DONA } from "@/config/apiconfig";
+export const description = "Char tipo dina para los proyectos"
 
-export const description = "A donut chart with text"
-
-const chartData = [
+/*const chartData = [
   { browser: "Completado", visitors: 5, fill: "var(--color-chrome)" },
   { browser: "Pendiente", visitors: 3, fill: "var(--color-safari)" },
   { browser: "Archivado", visitors: 1, fill: "var(--color-firefox)" },
   { browser: "EnCurso", visitors: 2, fill: "var(--color-edge)" },
-]
+]*/
 
 const chartConfig = {
   visitors: {
@@ -50,77 +52,122 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export default function Component() {
-  const totalVisitors = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.visitors, 0)
-  }, [])
+type ProjectStates = {
+  Completado: number;
+  Pendiente: number;
+  Archivado: number;
+  Curso: number;
+  total: number
+};
 
+type ChartData = {
+  browser: string;
+  visitors: number;
+  fill: string;
+}[];
+
+export default function Component() {
+  const { idsubuni } = useParams();
+  const [chartData, setChartData] = useState<ChartData>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [total, setTotal] = useState<number>();
+  
+
+  const fetchProjects = async () => {
+    try {
+        const response = await fetch(`${API_PROJECTS_DONA}/${idsubuni}`);
+        if (!response.ok) throw new Error("Error al cargar proyectos");
+        const data: ProjectStates = await response.json();
+
+        // Transformar los datos para la gráfica
+        const formattedData: ChartData = [
+            { browser: "Completado", visitors: data.Completado, fill: "var(--color-chrome)" },
+            { browser: "Pendiente", visitors: data.Pendiente, fill: "var(--color-safari)" },
+            { browser: "Archivado", visitors: data.Archivado, fill: "var(--color-firefox)" },
+            { browser: "EnCurso", visitors: data.Curso, fill: "var(--color-edge)" },
+        ];
+
+        setTotal(data.total);
+        setChartData(formattedData);
+    } catch (error) {
+        console.error("Error fetching projects:", error);
+    }finally {
+      setIsLoading(false); // Finaliza el indicador de carga
+    }
+};
+
+useEffect(() => {
+    fetchProjects();
+}, []);
+const totalVisitors = React.useMemo(() => {
+  return chartData.reduce((acc, curr) => acc + curr.visitors, 0)
+}, [])
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Graficos tipo dona para los proyectos</CardTitle>
-        <CardDescription>Todos los proyectos</CardDescription>
+        <CardTitle>Gráfico de todos los proyectos</CardTitle>
+        <CardDescription>Número de estados por proyecto</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
-        >
-          <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Pie
-              data={chartData}
-              dataKey="visitors"
-              nameKey="browser"
-              innerRadius={60}
-              strokeWidth={5}
-            >
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
+        {isLoading ? (
+          <div className="flex justify-center items-center h-full">
+            <Loader className="animate-spin"/> {/* Muestra el spinner mientras carga */}
+          </div>
+        ) : (
+          <ChartContainer
+            config={chartConfig}
+            className="mx-auto aspect-square max-h-[250px]"
+          >
+            <PieChart>
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent  hideLabel className="rounded-lg bg-white p-2 shadow-md dark:bg-gray-800 dark:shadow-none"/>}
+              />
+              <Pie
+                data={chartData}
+                dataKey="visitors"
+                nameKey="browser"
+                innerRadius={60}
+                strokeWidth={5}
+              >
+                <Label
+                
+                  content={({ viewBox }) => {
+                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                      return (
+                        <text
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-foreground text-3xl font-bold "
+                          textAnchor="middle"
+                          dominantBaseline="middle"
                         >
-                          {totalVisitors.toLocaleString()}
-                          
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground "
-                        >
-                            
-                          Proyectos
-                        </tspan>
-                      </text>
-                    )
-                  }
-                }}
-              />
-            </Pie>
-          </PieChart>
-        </ChartContainer>
+                          <tspan
+                            x={viewBox.cx}
+                            y={viewBox.cy}
+                            className="fill-foreground text-3xl font-bold dark:fill-white"
+                          >
+                            {//totalVisitors.toLocaleString()
+                              
+                              total?.toString()
+                            }
+                          </tspan>
+                          <tspan
+                            x={viewBox.cx}
+                            y={(viewBox.cy || 0) + 24}
+                            className="fill-muted-foreground dark:fill-white"
+                          >
+                            Proyectos
+                          </tspan>
+                        </text>
+                      );
+                    }
+                  }}
+                />
+              </Pie>
+            </PieChart>
+          </ChartContainer>
+        )}
       </CardContent>
-      {/*<CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
-        </div>
-      </CardFooter>*/}
     </Card>
-  )
+  );
 }

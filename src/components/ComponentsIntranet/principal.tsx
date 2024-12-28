@@ -4,29 +4,78 @@ import { EnCurso, Archivado, Pendiente, Completado } from "@/components/componen
 import Graficos from "@/components/componentesGraficos/graficos";
 import Dona from "@/components/componentesGraficos/graficoDona"
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { API_ACTIVITIES } from "@/config/apiconfig";
+import { useParams } from "next/navigation";
+interface items {
+    label: string;
+    href: string;
+    external?: boolean;
+  }
+  interface Data {   
+    type: string;
+    label: string;
+    href?: string;
+    items?: items[];
+  }
+  
+  type AllActivities = {
+    Pendiente: number;
+    Completado: number;
+    Curso: number;
+    Archivado: number
+  }
+
 export default function Principal (){
-    ///navegacion rutas
+    const { idsubuni } = useParams();
+    const [activities, setactivities] = useState<AllActivities>({
+        Pendiente: 0,
+        Completado: 0,
+        Curso: 0,
+        Archivado: 0,
+    });
+    const [loading, setLoading] = useState(true);
+    
+
     const pathname = usePathname();
-    const breadcrumbData = [
+    const breadcrumbData:Data[] = [
         { type: "link", label: "Inicio", href: pathname },
         { type: "page", label: "Principal" },
       ];
+      const fetchActivities = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch(`${API_ACTIVITIES}/${idsubuni}`);
+            if (!response.ok) throw new Error("Error al cargar actividades");
+            const data: AllActivities = await response.json();
+            setactivities(data);
+        } catch (error) {
+            console.error("Error fetching activities:", error);
+            setactivities({ Pendiente: 0, Completado: 0, Curso: 0, Archivado: 0 });
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    useEffect(() => {
+        fetchActivities();
+      }, []);
     return(
         <>
-        <div className="self-start px-4 " >
+        <div className="self-start px-4" >
         <BreadcrumbWithDropdown items={breadcrumbData}  />
         </div>
         
         <div className="flex items-center justify-around space-x-2 mx-auto p-4">
 
         <Completado />
-        <p className="pr-7">5 proyectos compleados</p>
+        <p className="pr-7"> {activities?.Completado} Actividades Completados</p>
         <Pendiente />
-        <p className="pr-7">3 proyectos pendientes</p>
+        <p className="pr-7">{activities?.Pendiente} Actividades pendientes</p>
         <Archivado />
-        <p className="pr-7">1 proyectos archivados</p>
+        <p className="pr-7">{activities?.Archivado} Actividades archivados</p>
         <EnCurso />
-        <p className="pr-7">2 proyectos en curso</p>
+        <p className="pr-7">{activities?.Curso} Actividades en curso</p>
         </div>
 
         <Graficos />   

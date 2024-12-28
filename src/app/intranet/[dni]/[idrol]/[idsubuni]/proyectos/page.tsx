@@ -34,6 +34,9 @@ export default function Component() {
  const viewProject = (projectId:number) =>{
       router.push(`${pathname}/viewProject/${projectId}`);
  }
+ const editProject = (projectId:number) =>{
+  router.push(`${pathname}/editProyect/${projectId}`);
+ }
  //función para insertar un nuevo proyecto
  const insertProject = () =>{
     router.push(`${pathname}/insertProject`);
@@ -235,7 +238,7 @@ if (error) {
        label: "Opciones",
        render: (item: Project) => (
          <>
-           <Button variant="ghost" size="icon">
+           <Button variant="ghost" size="icon" onClick={()=>editProject(item.idproj)}>
              <Edit className="h-5 w-5"  strokeWidth={2.5} />
            </Button>
            <Button

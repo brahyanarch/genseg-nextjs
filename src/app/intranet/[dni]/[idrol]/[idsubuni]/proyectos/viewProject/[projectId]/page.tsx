@@ -16,7 +16,7 @@ interface ProjectDetails {
   dni: string;
   fInit: string;
   fFin: string;
-  escuelaP: string;
+  escuelaProfesional: string;
   idString: string;
   idproj: number;
   ir_rol:number;
@@ -66,6 +66,11 @@ export default function ProjectDetails() {
       <CardHeader>
         <CardTitle className="text-xl font-semibold">
           Limpieza del bosque (LP451)
+          <h2>
+            {projectDetails.map((project) => (
+              project.idString
+            ))   }
+          </h2>
           <button className="bg-red-600 absolute top-2 right-2 py-2 px-3 rounded-md" ><X className="w-5 h-5" /></button>
         </CardTitle>
         <Progress value={64} className="h-2 mt-2" />
@@ -76,13 +81,21 @@ export default function ProjectDetails() {
           <div className="flex items-center gap-2">
             <div className="text-sm">
               <div className="font-medium">Fecha Inicio</div>
-              <div className="text-muted-foreground py-2 px-4 rounded-lg border-2 border-gray-500 border-opacity-30 "><input type="date" ></input> </div>
+              <div className="text-muted-foreground py-2 px-4 rounded-lg border-2 border-gray-500 border-opacity-30 ">         
+                 {projectDetails.map((project) => (
+                    project.fInit
+                  ))   } 
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <div className="text-sm">
               <div className="font-medium">Fecha final</div>
-              <div className="text-muted-foreground py-2 px-4 rounded-lg border-2 border-gray-500 border-opacity-30"><input type="date" ></input></div>
+              <div className="text-muted-foreground py-2 px-4 rounded-lg border-2 border-gray-500 border-opacity-30">    
+                  {projectDetails.map((project) => (
+                    project.fFin
+                  ))   } 
+              </div>
             </div>
           </div>
         </div>
@@ -95,22 +108,31 @@ export default function ProjectDetails() {
         </div>
 
         <div>
-          <h3 className="font-medium mb-2">Estados</h3>
+          <h3 className="font-medium mb-2">Estado</h3>
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="bg-yellow-200">PENDIENTE</Badge>
-            <Badge variant="outline" className="bg-green-200">COMPLETADO</Badge>
-            <Badge variant="outline" className="bg-gray-200">ARCHIVADO</Badge>
+            <Badge variant="outline" className="bg-yellow-200">
+            {projectDetails.map((project) => (
+                    project.estado
+                  ))   } 
+              </Badge>
           </div>
         </div>
 
         <div>
-          <h3 className="font-medium mb-2">Descripción</h3>
-          <p className="text-sm text-muted-foreground">
-            El proyecto de limpieza en el bosque tiene como objetivo limpiar todo el bosque para el cumplimiento de uno de los requisitos para el licenciamiento de la universidad teniendo como objetivo principal la acreditación.
-          </p>
-          <button className="text-sm text-primary mt-2">leer más...</button>
+        <h3 className="font-medium mb-2">Escuela Profesional</h3>
+          <h4 className="text-sm text-muted-foreground">
+            {projectDetails.map((project) => (
+                    project.escuelaProfesional
+            ))} 
+          </h4>
+          <h3 className="font-medium mb-2">Plan de Proyecto</h3>
+          <h4 className="text-sm text-muted-foreground">
+            {projectDetails.map((project) => (
+                    project.plan
+            ))} 
+          </h4>
         </div>
-        <TaskList toggleOpenDetsAct={(id:number)=>toggleOpenDetailsActivities(id)} />
+        <TaskList toggleOpenDetsAct={(id:number)=>toggleOpenDetailsActivities(id)} typeEdit={false} />
       </CardContent>
       </div>
     </Card>

@@ -19,7 +19,7 @@ interface Activities {
   idres: number;
 }
 
-export function TaskList({toggleOpenDetsAct}) {
+export function TaskList({toggleOpenDetsAct, typeEdit}:any) {
 
   //variable importantes
   const [activitiesProject, setActivitiesProjects ] = useState<Activities[]>([]);
@@ -141,16 +141,22 @@ useEffect(() => {
       label: "Opciones",
       render: (item: Activities) => (
         <div className=" flex justify-center items-center">
-          <Button variant="ghost" size="icon">
-            <Edit className="h-5 w-5"  strokeWidth={2.5} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => console.log("Eliminar", item.id)}
-          >
-            <Trash2 className="h-5 w-5"  strokeWidth={2.5} />
-          </Button>
+          {
+            typeEdit && (
+              <>
+                <Button variant="ghost" size="icon">
+                  <Edit className="h-5 w-5"  strokeWidth={2.5} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => console.log("Eliminar", item.id)}
+                >
+                  <Trash2 className="h-5 w-5"  strokeWidth={2.5} />
+                </Button>
+              </>
+            )
+          }
           <Button variant="ghost" size="icon" onClick={()=>toggleOpenDetsAct(item.idActivi)} >
             <Eye className="h-5 w-5"  strokeWidth={2.5}  />
           </Button>
@@ -256,13 +262,13 @@ useEffect(() => {
             <Input placeholder="Buscar tareas" className="pl-9" />
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <ChevronDown className="h-4 w-4" />
-              <span>6 Tareas</span>
-            </div>
-            <Button variant="ghost" className="text-blue-600 hover:text-blue-700 p-0">
-              Ordenar
-            </Button>
+            {
+              typeEdit && (
+                <Button className="bg-blue-500 hover:bg-blue-600 h-12 w-32 "  >
+                  Nueva Actividad
+                </Button>
+              )
+            }
           </div>
         </div>
 
@@ -274,9 +280,6 @@ useEffect(() => {
        <div className="flex justify-center space-x-2 mt-4">
         {renderPaginationButtons()}
       </div>
-        <Button variant="ghost" className="w-full justify-start text-blue-600 hover:text-blue-700 px-0">
-          + Agregar nuevo plan
-        </Button>
       </div>
     </Card>
   )

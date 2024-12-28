@@ -273,13 +273,15 @@ export default function Component() {
       label: "Opciones",
       render: (item: Permisos) => (
         <>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon"
+          onClick={()=>openEditModal(item)}
+          >
             <Edit className="h-5 w-5" strokeWidth={2.5} />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => console.log("Eliminar", item.id)}
+            onClick={() => deletePermission(item.id)}
           >
             <Trash2 className="h-5 w-5" strokeWidth={2.5} />
           </Button>
