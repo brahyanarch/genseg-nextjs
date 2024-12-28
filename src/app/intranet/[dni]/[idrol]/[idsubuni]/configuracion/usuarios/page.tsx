@@ -1,17 +1,19 @@
 'use client'
 import { Button } from "@/components/ui/button"
-import { Edit,X, Trash2, CirclePlus } from "lucide-react"
-import {useState, useEffect, useContext} from "react"
+import { Edit, X, Trash2, CirclePlus } from "lucide-react"
+import { useState, useEffect, useContext } from "react"
 import { API_USERS } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
-import {AvisoContext} from '@/context/avisoContext'
+import { AvisoContext } from '@/context/avisoContext'
 import DynamicTable from "@/components/DynamicTable";
-import {User} from "@/tipos/typos"
+import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
+import { User } from "@/tipos/typos"
+import { usePathname } from "next/navigation";
 // Modal para agregar un nuevo Permiso
 export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) => {
   const [name, setName] = useState('');
   const [abbreviation, setAbbreviation] = useState('');
-  const {mostrarAviso} = useContext<any>(AvisoContext);
+  const { mostrarAviso } = useContext<any>(AvisoContext);
   useEffect(() => {
     if (editingUser) {
       setName(editingUser.n_usu);
@@ -21,7 +23,7 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    
+
     const updatedUser = {
       n_usu: name,  // nombre del usuario
       abrev: abbreviation,  // abreviatura (si corresponde)
@@ -49,7 +51,7 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
     } catch (error) {
       mostrarAviso('warning', 'Error al conectar con la API:', error);
     }
-};
+  };
 
 
   if (!isOpen) return null;
@@ -126,7 +128,8 @@ export default function Component() {
   const totalPages = Math.ceil(Users.length / itemsPerPage);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-
+  /// navegacion rutas
+  const pathname = usePathname();
   // Función para acceder a propiedades anidadas
   const getNestedProperty = (obj: any, key: string) => {
     return key.split('.').reduce((value, part) => value && value[part], obj);
@@ -147,7 +150,7 @@ export default function Component() {
           ? fieldA.localeCompare(fieldB)
           : fieldB.localeCompare(fieldA);
       }
-      
+
       if (typeof fieldA === "number" && typeof fieldB === "number") {
         return sortDirection === "asc" ? fieldA - fieldB : fieldB - fieldA;
       }
@@ -178,7 +181,7 @@ export default function Component() {
       key: "index",
       label: "ID",
       render: (item: User) => <>{Users.indexOf(item) + 1}</>,
-      sortable:true,
+      sortable: true,
     },
     {
       key: "n_usu",
@@ -201,7 +204,7 @@ export default function Component() {
     {
       key: "estado",
       label: "Estado",
-      render: (item: User) => (item.estado ? <Button className="bg-green-500" onClick={()=>toggleStateUser(item.dni,item.rol_id,item.subunidad_id_subuni)} >Activo</Button> : <Button className="bg-red-400"  onClick={()=>toggleStateUser(item.dni,item.rol_id,item.subunidad_id_subuni)}  >Desactivo</Button>),
+      render: (item: User) => (item.estado ? <Button className="bg-green-500" onClick={() => toggleStateUser(item.dni, item.rol_id, item.subunidad_id_subuni)} >Activo</Button> : <Button className="bg-red-400" onClick={() => toggleStateUser(item.dni, item.rol_id, item.subunidad_id_subuni)}  >Desactivo</Button>),
     },
     {
       key: "opciones",
@@ -209,14 +212,14 @@ export default function Component() {
       render: (item: User) => (
         <>
           <Button variant="ghost" size="icon" onClick={() => openEditModal(item)} >
-            <Edit className="h-5 w-5"  strokeWidth={2.5}   />
+            <Edit className="h-5 w-5" strokeWidth={2.5} />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => deleteUser(item.dni)}
           >
-            <Trash2 className="h-5 w-5"  strokeWidth={2.5}  />
+            <Trash2 className="h-5 w-5" strokeWidth={2.5} />
           </Button>
         </>
       ),
@@ -341,85 +344,85 @@ export default function Component() {
     setEditingUser(User);
     setIsModalOpen(true);
   };
- const saveUser = (savedUser: any) => {
-  setUsers((prevUsers) => {
-    // Si estás editando un usuario, actualiza el usuario correspondiente
-    if (editingUser) {
-      return prevUsers.map((user: any) =>
-        user.dni === savedUser.dni &&
-        user.rol_id === savedUser.rol_id &&
-        user.subunidad_id_subuni === savedUser.subunidad_id_subuni
-          ? savedUser
-          : user
-      );
-    } else {
-      return [...prevUsers, savedUser];
-    }
-  });
-  setEditingUser(null);
-  fetchUser();  // Recarga los usuarios actualizados
-};
-
-
-const deleteUser = async (id: string) => {
-  try {
-    const response = await fetch(`${API_USERS}/${id}`, {
-      method: 'DELETE',
+  const saveUser = (savedUser: any) => {
+    setUsers((prevUsers) => {
+      // Si estás editando un usuario, actualiza el usuario correspondiente
+      if (editingUser) {
+        return prevUsers.map((user: any) =>
+          user.dni === savedUser.dni &&
+            user.rol_id === savedUser.rol_id &&
+            user.subunidad_id_subuni === savedUser.subunidad_id_subuni
+            ? savedUser
+            : user
+        );
+      } else {
+        return [...prevUsers, savedUser];
+      }
     });
+    setEditingUser(null);
+    fetchUser();  // Recarga los usuarios actualizados
+  };
 
-    if (response.ok) {
-      // Actualiza la lista de usuarios eliminando el usuario
-      setUsers((prevUsers) => prevUsers.filter((user: any) => user.dni !== id));
-      console.log('Usuario eliminado correctamente');
-    } else {
-      console.error('Error al eliminar el usuario');
+
+  const deleteUser = async (id: string) => {
+    try {
+      const response = await fetch(`${API_USERS}/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        // Actualiza la lista de usuarios eliminando el usuario
+        setUsers((prevUsers) => prevUsers.filter((user: any) => user.dni !== id));
+        console.log('Usuario eliminado correctamente');
+      } else {
+        console.error('Error al eliminar el usuario');
+      }
+    } catch (error) {
+      console.error('Error al conectar con la API:', error);
     }
-  } catch (error) {
-    console.error('Error al conectar con la API:', error);
-  }
-};
-const toggleStateUser = async (dni: string, rol_id: number, subunidad_id_subuni: number) => {
-  try {
-    // Encuentra el usuario por su DNI
-    const user = Users.find((user) => user.dni === dni && user.rol_id === rol_id && user.subunidad_id_subuni===subunidad_id_subuni);
-    if (!user) throw new Error("Usuario no encontrado");
+  };
+  const toggleStateUser = async (dni: string, rol_id: number, subunidad_id_subuni: number) => {
+    try {
+      // Encuentra el usuario por su DNI
+      const user = Users.find((user) => user.dni === dni && user.rol_id === rol_id && user.subunidad_id_subuni === subunidad_id_subuni);
+      if (!user) throw new Error("Usuario no encontrado");
 
-    // Invertir el estado actual del usuario
-    const updatedUser = { ...user, estado: !user.estado };
+      // Invertir el estado actual del usuario
+      const updatedUser = { ...user, estado: !user.estado };
 
-    // Realiza la petición PUT para actualizar el estado del usuario
-    const response = await fetch(`${API_USERS}/toggle`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        dni: updatedUser.dni,
-        rol_id: rol_id, // Asume que rol_id y subunidad_id_subuni son parte de los datos del usuario
-        subunidad_id_subuni: subunidad_id_subuni,
-        estado: updatedUser.estado, // El estado que se invertirá
-      }),
-    });
+      // Realiza la petición PUT para actualizar el estado del usuario
+      const response = await fetch(`${API_USERS}/toggle`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          dni: updatedUser.dni,
+          rol_id: rol_id, // Asume que rol_id y subunidad_id_subuni son parte de los datos del usuario
+          subunidad_id_subuni: subunidad_id_subuni,
+          estado: updatedUser.estado, // El estado que se invertirá
+        }),
+      });
 
-    if (response.ok) {
-      const updatedData = await response.json();
-      // Actualiza el estado local de los usuarios en el frontend
-      setUsers((prevUsers) =>
-        prevUsers.map((u) =>
-          u.dni === dni && u.rol_id === rol_id && u.subunidad_id_subuni===subunidad_id_subuni
-            ? { ...u, estado: updatedUser.estado } // Cambia el estado del usuario
-            : u
-        )
-      );
-      console.log("Estado actualizado:", updatedData);
-    } else {
-      const errorData = await response.json();
-      console.error("Error al actualizar el estado del usuario:", errorData.message);
+      if (response.ok) {
+        const updatedData = await response.json();
+        // Actualiza el estado local de los usuarios en el frontend
+        setUsers((prevUsers) =>
+          prevUsers.map((u) =>
+            u.dni === dni && u.rol_id === rol_id && u.subunidad_id_subuni === subunidad_id_subuni
+              ? { ...u, estado: updatedUser.estado } // Cambia el estado del usuario
+              : u
+          )
+        );
+        console.log("Estado actualizado:", updatedData);
+      } else {
+        const errorData = await response.json();
+        console.error("Error al actualizar el estado del usuario:", errorData.message);
+      }
+    } catch (error) {
+      console.error("Error al cambiar el estado del usuario:", error);
     }
-  } catch (error) {
-    console.error("Error al cambiar el estado del usuario:", error);
-  }
-};
+  };
 
   if (loading) {
     return (
@@ -432,27 +435,52 @@ const toggleStateUser = async (dni: string, rol_id: number, subunidad_id_subuni:
   if (error) {
     return <p>Error: {error}</p>;
   }
-
+  ///recortar rutas
+  const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
+    const partes = ruta.split('/'); // Divide la ruta en partes
+    const indice = partes.indexOf(segmento); // Encuentra el índice del segmento clave
+    if (indice === -1) return ruta; // Si no encuentra el segmento, retorna la ruta completa
+    return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
+  };
+  //recortamos las rutas requeridas
+  const configuracion = recortarRutaHastaSegmento(pathname, 'configuracion');
+  const inicio = recortarRutaHastaSegmento(pathname, 'usuarios');
+  //definimos valores para el breadCrumb
+  const breadcrumbData = [
+    { type: "link", label: "Inicio", href: inicio },
+    {
+      type: "dropdown",
+      label: "Configuración",
+      items: [
+        { label: "Permisos", href: `${configuracion}/permisos` },
+        { label: "Roles", href: `${configuracion}/roles` },
+        { label: "SubUnidades", href: `${configuracion}/subUnidades` },
+      ],
+    },
+    { type: "page", label: "Usuarios" },
+  ];
+  ////////////
   return (
     <div className=" w-[90%] mx-auto  py-4  space-y-4 text-gray-800  dark:text-white min-h-screen">
+      <BreadcrumbWithDropdown items={breadcrumbData} />
       <div >
         <h1 className="text-2xl font-bold">Usuarios</h1>
       </div>
 
       <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 " onClick={() => {
-            setEditingUser(null);
-            toggleModal();
-          }} >
-      <CirclePlus className="h-8 w-8 " />
-      <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
-          <p  className="font-bold" >Nuevo</p>
-        </Button>
+        setEditingUser(null);
+        toggleModal();
+      }} >
+        <CirclePlus className="h-8 w-8 " />
+        <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
+        <p className="font-bold" >Nuevo</p>
+      </Button>
       <div className="bg-[#E3E6ED] rounded-lg ">
-      <DynamicTable
-        configuration={configurationUser}
-        data={currentItems}
-        onSort={handleSort}
-      />
+        <DynamicTable
+          configuration={configurationUser}
+          data={currentItems}
+          onSort={handleSort}
+        />
       </div>
       <div className="flex justify-center space-x-2 mt-4">
         {renderPaginationButtons()}

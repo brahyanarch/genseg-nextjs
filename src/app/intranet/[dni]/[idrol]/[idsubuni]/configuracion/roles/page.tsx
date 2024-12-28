@@ -3,12 +3,12 @@ import { Button } from "@/components/ui/button";
 import React, { useState, useEffect, useContext } from "react";
 import { Input } from "@/components/ui/input";
 import { X, Edit, Trash2, List, CirclePlus } from "lucide-react";
-import {BreadcrumbWithDropdown} from "@/components/breadcrumb";
+import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
 import { API_ROLES } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
 import DynamicTable from "@/components/DynamicTable";
-import {Rol} from "@/tipos/typos"
-import {AvisoContext} from '@/context/avisoContext'
+import { Rol } from "@/tipos/typos"
+import { AvisoContext } from '@/context/avisoContext'
 import PermissionsManager from '@/components/ComponentsIntranet/permisosmanages'
 import { usePathname } from "next/navigation";
 // Modal para agregar un nuevo Rol
@@ -21,21 +21,21 @@ export const EditModal = ({
 }: any) => {
   const [name, setName] = useState("");
   const [abbreviation, setAbbreviation] = useState("");
-  const {mostrarAviso} = useContext<any>(AvisoContext);
+  const { mostrarAviso } = useContext<any>(AvisoContext);
   useEffect(() => {
     if (editingRole) {
       setName(editingRole.n_rol);
       setAbbreviation(editingRole.abrev);
     }
   }, [editingRole]);
-  
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     const updatedRole = {
       n_rol: name,
       abrev: abbreviation,
     };
-    
+
     try {
       const response = await fetch(
         editingRole ? `${API_ROLES}/${editingRole.id_rol}` : API_ROLES,
@@ -47,7 +47,7 @@ export const EditModal = ({
           body: JSON.stringify(updatedRole),
         }
       );
-      
+
       if (response.ok) {
         const savedRole = await response.json();
         onSaveRole(savedRole);
@@ -60,9 +60,9 @@ export const EditModal = ({
       mostrarAviso('warning', 'Error al conectar con la API.');
     }
   };
-  
+
   if (!isOpen) return null;
-  
+
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="absolute inset-0 bg-black opacity-50"></div>
@@ -70,7 +70,7 @@ export const EditModal = ({
         <button
           onClick={closeModal}
           className="absolute top-2 right-2 text-gray-400 hover:text-white"
-          >
+        >
           <X size={24} />
         </button>
         <h2 className="text-2xl font-bold mb-4 text-white">
@@ -81,7 +81,7 @@ export const EditModal = ({
             <label
               htmlFor="name"
               className="block text-sm font-medium text-gray-300 mb-1"
-              >
+            >
               Nombre
             </label>
             <input
@@ -91,13 +91,13 @@ export const EditModal = ({
               onChange={(e) => setName(e.target.value)}
               placeholder="Sub administrador"
               className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
-              />
+            />
           </div>
           <div className="mb-8">
             <label
               htmlFor="abbreviation"
               className="block text-sm font-medium text-gray-300 mb-1"
-              >
+            >
               Abreviatura
             </label>
             <input
@@ -107,20 +107,20 @@ export const EditModal = ({
               onChange={(e) => setAbbreviation(e.target.value)}
               placeholder="SubAdm"
               className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
-              />
+            />
           </div>
           <div className="flex justify-end space-x-4">
             <button
               type="button"
               onClick={closeModal}
               className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-              >
+            >
               Cancelar
             </button>
             <button
               type="submit"
               className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-              >
+            >
               {editingRole ? "Actualizar" : "Guardar"}
             </button>
           </div>
@@ -130,7 +130,7 @@ export const EditModal = ({
   );
 };
 
-const ConfiRoles=()=>{
+const ConfiRoles = () => {
   const [Data, setData] = useState<Rol[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRole, setEditingRole] = useState(null);
@@ -141,7 +141,7 @@ const ConfiRoles=()=>{
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [itemsPerPage] = useState(4);
   const totalPages = Math.ceil(Data.length / itemsPerPage);
-  const {mostrarAviso} = useContext<any>(AvisoContext);
+  const { mostrarAviso } = useContext<any>(AvisoContext);
   const [showPermissions, setShowPermissions] = useState(false) //para la interfaz de permisos asociados con los roles
   //navegacion rutas
   const pathname = usePathname();
@@ -159,23 +159,23 @@ const ConfiRoles=()=>{
 
   const getSortedData = () => {
     if (!sortColumn) return Data;
-    
+
     return [...Data].sort((a, b) => {
       const fieldA = getNestedProperty(a, sortColumn);
       const fieldB = getNestedProperty(b, sortColumn);
-      
+
       if (fieldA === undefined || fieldB === undefined) return 0;
-      
+
       if (typeof fieldA === "string" && typeof fieldB === "string") {
         return sortDirection === "asc"
-        ? fieldA.localeCompare(fieldB)
-        : fieldB.localeCompare(fieldA);
+          ? fieldA.localeCompare(fieldB)
+          : fieldB.localeCompare(fieldA);
       }
-      
+
       if (typeof fieldA === "number" && typeof fieldB === "number") {
         return sortDirection === "asc" ? fieldA - fieldB : fieldB - fieldA;
       }
-      
+
       return 0;
     });
   };
@@ -296,29 +296,29 @@ const ConfiRoles=()=>{
       render: (item: Rol) => (
         <>
           <Button variant="ghost" size="icon" onClick={() => openEditModal(item)}>
-            <Edit className="h-5 w-5"  strokeWidth={2.5}  />
+            <Edit className="h-5 w-5" strokeWidth={2.5} />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => deleteRoles(item.id_rol)}
           >
-            <Trash2 className="h-5 w-5"  strokeWidth={2.5} />
+            <Trash2 className="h-5 w-5" strokeWidth={2.5} />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={handleTogglePermissions}
           >
-            <List  className="h-5 w-5"  strokeWidth={2.5}  />
+            <List className="h-5 w-5" strokeWidth={2.5} />
           </Button>
           {showPermissions && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-background rounded-lg shadow-lg">
-            <PermissionsManager onClose={() => setShowPermissions(false)} id_rol={item.id_rol}/>
-          </div>
-        </div>
-      )}
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-background rounded-lg shadow-lg">
+                <PermissionsManager onClose={() => setShowPermissions(false)} id_rol={item.id_rol} />
+              </div>
+            </div>
+          )}
         </>
       ),
     },
@@ -352,7 +352,7 @@ const ConfiRoles=()=>{
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
-  const openEditModal = (role:boolean) => {
+  const openEditModal = (role: boolean) => {
     setEditingRole(role);
     setIsModalOpen(true);
   };
@@ -458,24 +458,23 @@ const ConfiRoles=()=>{
     return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
   };
   //recortamos las rutas requeridas
-  const roles = recortarRutaHastaSegmento(pathname, 'roles');
-  const subUnidades = recortarRutaHastaSegmento(pathname, 'subUnidades');
-  const usuarios = recortarRutaHastaSegmento(pathname, 'usuarios');
+  const configuracion = recortarRutaHastaSegmento(pathname, 'configuracion');
+  const inicio = recortarRutaHastaSegmento(pathname, 'usuarios');
   //definimos valores para el breadCrumb
   const breadcrumbData = [
-    { type: "link", label: "Inicio", href: "/" },
+    { type: "link", label: "Inicio", href: inicio },
     {
       type: "dropdown",
       label: "Configuración",
       items: [
-        { label: "Roles", href: roles },
-        { label: "Subunidades", href: subUnidades },
-        { label: "Usuarios", href: usuarios, external: true },
+        { label: "Permisos", href: `${configuracion}/permisos` },
+        { label: "Subunidades", href: `${configuracion}/subUnidades` },
+        { label: "Usuarios", href: `${configuracion}/usuarios` },
       ],
     },
-    { type: "page", label: "Permisos" },
+    { type: "page", label: "Roles" },
   ];
-
+  ////////////
   return (
     <div className="mx-auto  py-4  space-y-4 w-[90%]  text-white min-h-screen">
       <BreadcrumbWithDropdown items={breadcrumbData} />
@@ -483,14 +482,14 @@ const ConfiRoles=()=>{
         <h1 className="text-2xl font-bold text-black dark:text-white">Roles</h1>
       </div>
       <div className="flex justify-between">
-        <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 "            onClick={() => {
-            setEditingRole(null);
-            toggleModal();
-          }} >
-      <CirclePlus className="h-8 w-8 " />
-      <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
-          <p  className="font-bold" >Nuevo</p>
-      </Button>
+        <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 " onClick={() => {
+          setEditingRole(null);
+          toggleModal();
+        }} >
+          <CirclePlus className="h-8 w-8 " />
+          <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
+          <p className="font-bold" >Nuevo</p>
+        </Button>
         <Input className="w-64" placeholder="Buscar..." />
       </div>
       <div className="bg-[#E3E6ED] rounded-lg">
@@ -500,10 +499,10 @@ const ConfiRoles=()=>{
           onSort={handleSort}
         />
       </div>
-      
+
       <div className="flex justify-center space-x-2 mt-4">
-          {renderPaginationButtons()}
-        </div>
+        {renderPaginationButtons()}
+      </div>
 
       <EditModal
         isOpen={isModalOpen}

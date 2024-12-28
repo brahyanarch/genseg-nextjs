@@ -1,20 +1,20 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { X, Edit, Trash2, CirclePlus } from "lucide-react";
-import { useState, useEffect,useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { API_PERMISOS } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
-import {BreadcrumbWithDropdown} from "@/components/breadcrumb";
-import {AvisoContext} from '@/context/avisoContext'
+import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
+import { AvisoContext } from '@/context/avisoContext'
 import DynamicTable from "@/components/DynamicTable";
-import {Permisos} from "@/tipos/typos"
+import { Permisos } from "@/tipos/typos"
 import { usePathname } from "next/navigation";
 
 // Modal para agregar o editar un Permiso
 export const EditModal = ({ isOpen, closeModal, onSavePermission, editingPermission }: any) => {
   const [name, setName] = useState('');
   const [abbreviation, setAbbreviation] = useState('');
-  const {mostrarAviso} = useContext<any>(AvisoContext);
+  const { mostrarAviso } = useContext<any>(AvisoContext);
 
   useEffect(() => {
     if (editingPermission) {
@@ -22,7 +22,6 @@ export const EditModal = ({ isOpen, closeModal, onSavePermission, editingPermiss
       setAbbreviation(editingPermission.abreviatura);
     }
   }, [editingPermission]);
-
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     const updatedPermission = {
@@ -117,7 +116,7 @@ export default function Component() {
   //const [Permisos, setPermisos] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPermission, setEditingPermission] = useState(null);
-  const {mostrarAviso} = useContext<any>(AvisoContext);
+  const { mostrarAviso } = useContext<any>(AvisoContext);
 
   const [Users, setUsers] = useState<Permisos[]>([]);
   const [loading, setLoading] = useState(true);
@@ -159,9 +158,9 @@ export default function Component() {
   };
 
   const savePermission = (savedPermission: any) => {
-    setUsers((prevPermisos:any) => {
+    setUsers((prevPermisos: any) => {
       if (editingPermission) {
-        return prevPermisos.map((permiso: any) => 
+        return prevPermisos.map((permiso: any) =>
           permiso.id_per === savedPermission.id_per ? savedPermission : permiso
         );
       } else {
@@ -170,7 +169,7 @@ export default function Component() {
     });
     setEditingPermission(null);
     fetchPermisos();
-    
+
   };
 
   const deletePermission = async (id: number) => {
@@ -180,7 +179,7 @@ export default function Component() {
       });
 
       if (response.ok) {
-        setUsers((prevPermisos) => prevPermisos.filter((permiso:any) => permiso.id_per !== id));
+        setUsers((prevPermisos) => prevPermisos.filter((permiso: any) => permiso.id_per !== id));
         mostrarAviso('succefull', 'Permiso Eliminado correctamente.');
         fetchPermisos();
       } else {
@@ -203,7 +202,7 @@ export default function Component() {
     return <p>Error: {error}</p>;
   }
 
-  
+
   // Función para acceder a propiedades anidadas
   const getNestedProperty = (obj: any, key: string) => {
     return key.split('.').reduce((value, part) => value && value[part], obj);
@@ -224,7 +223,7 @@ export default function Component() {
           ? fieldA.localeCompare(fieldB)
           : fieldB.localeCompare(fieldA);
       }
-      
+
       if (typeof fieldA === "number" && typeof fieldB === "number") {
         return sortDirection === "asc" ? fieldA - fieldB : fieldB - fieldA;
       }
@@ -255,7 +254,7 @@ export default function Component() {
       key: "index",
       label: "ID",
       render: (item: Permisos) => <>{Users.indexOf(item) + 1}</>,
-      sortable:true,
+      sortable: true,
     },
     {
       key: "n_usu",
@@ -275,14 +274,14 @@ export default function Component() {
       render: (item: Permisos) => (
         <>
           <Button variant="ghost" size="icon">
-            <Edit className="h-5 w-5"  strokeWidth={2.5} />
+            <Edit className="h-5 w-5" strokeWidth={2.5} />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => console.log("Eliminar", item.id)}
           >
-            <Trash2 className="h-5 w-5"  strokeWidth={2.5}  />
+            <Trash2 className="h-5 w-5" strokeWidth={2.5} />
           </Button>
         </>
       ),
@@ -372,26 +371,25 @@ export default function Component() {
     return pageButtons;
   };
   ///recortar rutas
- const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
+  const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
     const partes = ruta.split('/'); // Divide la ruta en partes
     const indice = partes.indexOf(segmento); // Encuentra el índice del segmento clave
     if (indice === -1) return ruta; // Si no encuentra el segmento, retorna la ruta completa
     return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
   };
   //recortamos las rutas requeridas
-  const roles = recortarRutaHastaSegmento(pathname, 'roles');
-  const subUnidades = recortarRutaHastaSegmento(pathname, 'subUnidades');
-  const usuarios = recortarRutaHastaSegmento(pathname, 'usuarios');
+  const configuracion = recortarRutaHastaSegmento(pathname, 'configuracion');
+  const inicio = recortarRutaHastaSegmento(pathname, 'usuarios');
   //definimos valores para el breadCrumb
   const breadcrumbData = [
-    { type: "link", label: "Inicio", href: "/" },
+    { type: "link", label: "Inicio", href: inicio },
     {
       type: "dropdown",
       label: "Configuración",
       items: [
-        { label: "Roles", href: roles },
-        { label: "Subunidades", href: subUnidades },
-        { label: "Usuarios", href: usuarios, external: true },
+        { label: "Roles", href: `${configuracion}/roles` },
+        { label: "Subunidades", href: `${configuracion}/subUnidades` },
+        { label: "Usuarios", href: `${configuracion}/usuarios` },
       ],
     },
     { type: "page", label: "Permisos" },
@@ -403,10 +401,10 @@ export default function Component() {
       <div>
         <h1 className="text-2xl font-bold text-black dark:text-white">Permisos</h1>
       </div>
-      <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 "  onClick={() => { setEditingPermission(null); toggleModal(); }} >
-      <CirclePlus className="h-8 w-8 " />
-      <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
-          <p  className="font-bold" >Nuevo</p>
+      <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 " onClick={() => { setEditingPermission(null); toggleModal(); }} >
+        <CirclePlus className="h-8 w-8 " />
+        <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
+        <p className="font-bold" >Nuevo</p>
       </Button>
       <DynamicTable
         configuration={configurationUser}

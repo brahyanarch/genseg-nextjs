@@ -1,21 +1,20 @@
 'use client';
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
 import { X, Edit, Trash2, CirclePlus } from "lucide-react";
-import { useState, useEffect,useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { API_SUBUNIDADES } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
-import BreadcrumbItems from "@/components/breadcrumb";
-import {AvisoContext} from '@/context/avisoContext'
+import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
+import { AvisoContext } from '@/context/avisoContext'
 import DynamicTable from "@/components/DynamicTable";
-import {Subunidad} from "@/tipos/typos"
+import { Subunidad } from "@/tipos/typos"
+import { usePathname } from "next/navigation";
 
 // Modal para agregar un nuevo Permiso
 export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnidad }: any) => {
   const [name, setName] = useState('');
   const [abbreviation, setAbbreviation] = useState('');
-  const {mostrarAviso} = useContext<any>(AvisoContext);
+  const { mostrarAviso } = useContext<any>(AvisoContext);
   useEffect(() => {
     if (editingSubUnidad) {
       setName(editingSubUnidad.n_subuni);
@@ -120,12 +119,14 @@ export default function Component() {
   const [editingRole, setEditingRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const {mostrarAviso} = useContext<any>(AvisoContext);
+  const { mostrarAviso } = useContext<any>(AvisoContext);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [itemsPerPage] = useState(4);
   const totalPages = Math.ceil(Data.length / itemsPerPage);
+  ///navegacion de rutas
+  const pathname = usePathname();
   // Funcion asíncrona para obtener los datos
   // Función para acceder a propiedades anidadas
   const getNestedProperty = (obj: any, key: string) => {
@@ -146,7 +147,7 @@ export default function Component() {
           ? fieldA.localeCompare(fieldB)
           : fieldB.localeCompare(fieldA);
       }
-      
+
       if (typeof fieldA === "number" && typeof fieldB === "number") {
         return sortDirection === "asc" ? fieldA - fieldB : fieldB - fieldA;
       }
@@ -163,7 +164,7 @@ export default function Component() {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = sortedData.slice(indexOfFirstItem, indexOfLastItem);
-  
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -193,14 +194,14 @@ export default function Component() {
       render: (item: Subunidad) => (
         <>
           <Button variant="ghost" size="icon" onClick={() => openEditModal(item)}>
-            <Edit className="h-5 w-5"  strokeWidth={2.5}  />
+            <Edit className="h-5 w-5" strokeWidth={2.5} />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => deleteSubUnidad(item.id_subuni)}
-            >
-            <Trash2 className="h-5 w-5"  strokeWidth={2.5}  />
+          >
+            <Trash2 className="h-5 w-5" strokeWidth={2.5} />
           </Button>
         </>
       ),
@@ -291,7 +292,7 @@ export default function Component() {
 
     return pageButtons;
   };
-  
+
   const fetchSubUnidad = async () => {
     try {
       const response = await fetch(API_SUBUNIDADES);
@@ -319,9 +320,9 @@ export default function Component() {
     setIsModalOpen(true);
   };
   const saveSubUnidad = (savedSubUnidad: any) => {
-    setData((prevSubUnidad:any) => {
+    setData((prevSubUnidad: any) => {
       if (editingSubUnidad) {
-        return prevSubUnidad.map((subUnidad: any) => 
+        return prevSubUnidad.map((subUnidad: any) =>
           subUnidad.id_subuni === savedSubUnidad.id_subuni ? savedSubUnidad : subUnidad
         );
       } else {
@@ -330,7 +331,7 @@ export default function Component() {
     });
     setEditingSubUnidad(null);
     fetchSubUnidad();
-    
+
   };
 
   const deleteSubUnidad = async (id: number) => {
@@ -341,11 +342,11 @@ export default function Component() {
 
       if (response.ok) {
         // Actualiza la lista de permisos eliminando el permiso
-        setData((prevSubUnidad) => prevSubUnidad.filter((subUnidad:any) => subUnidad.id_subuni !== id));
+        setData((prevSubUnidad) => prevSubUnidad.filter((subUnidad: any) => subUnidad.id_subuni !== id));
         mostrarAviso('succefull', 'SubUnidad Eliminado correctamente.');
         fetchSubUnidad();
-        
-        setData((prevSubUnidad) => prevSubUnidad.filter((subUnidad:any) => subUnidad.id_subuni !== id));
+
+        setData((prevSubUnidad) => prevSubUnidad.filter((subUnidad: any) => subUnidad.id_subuni !== id));
         console.log('Permiso eliminado correctamente');
       } else {
         console.error('Error al eliminar el permiso');
@@ -355,7 +356,7 @@ export default function Component() {
       mostrarAviso('warning', 'Error al conectar con la API:', error);
     }
 
-  fetchSubUnidad()
+    fetchSubUnidad()
   };
 
   if (loading) {
@@ -369,20 +370,44 @@ export default function Component() {
   if (error) {
     return <p>Error: {error}</p>;
   }
+  ///recortar rutas
+  const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
+    const partes = ruta.split('/'); // Divide la ruta en partes
+    const indice = partes.indexOf(segmento); // Encuentra el índice del segmento clave
+    if (indice === -1) return ruta; // Si no encuentra el segmento, retorna la ruta completa
+    return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
+  };
+  //recortamos las rutas requeridas
+  const configuracion = recortarRutaHastaSegmento(pathname, 'configuracion');
+  const inicio = recortarRutaHastaSegmento(pathname, 'usuarios');
+  //definimos valores para el breadCrumb
+  const breadcrumbData = [
+    { type: "link", label: "Inicio", href: inicio },
+    {
+      type: "dropdown",
+      label: "Configuración",
+      items: [
+        { label: "Permisos", href: `${configuracion}/permisos` },
+        { label: "Roles", href: `${configuracion}/roles` },
+        { label: "Usuarios", href: `${configuracion}/usuarios` },
+      ],
+    },
+    { type: "page", label: "SubUbidades" },
+  ];
+  ////////////
 
-  
 
   return (
     <div className="w-[90%] mx-auto  py-4  space-y-4 text-white min-h-screen">
-      <BreadcrumbItems items={["Inicio", "Configuración", "Sub Unidad"]} />
+      <BreadcrumbWithDropdown items={breadcrumbData} />
       <div>
         <h1 className="text-2xl font-bold text-black dark:text-white">Sub Unidad</h1>
       </div>
-        <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 " onClick={toggleModal} >
-      <CirclePlus className="h-8 w-8 " />
-      <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
-          <p  className="font-bold" >Nuevo</p>
-        </Button>
+      <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 " onClick={toggleModal} >
+        <CirclePlus className="h-8 w-8 " />
+        <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
+        <p className="font-bold" >Nuevo</p>
+      </Button>
       <div className="bg-[#E3E6ED] rounded-lg">
         <DynamicTable
           configuration={configurationData}
@@ -391,8 +416,8 @@ export default function Component() {
         />
       </div>
       <div className="flex justify-center space-x-2 mt-4">
-          {renderPaginationButtons()}
-        </div>
+        {renderPaginationButtons()}
+      </div>
       <EditModal isOpen={isModalOpen} closeModal={toggleModal} onSaveSubUnidad={saveSubUnidad} editingSubUnidad={editingSubUnidad} />
     </div>
   );

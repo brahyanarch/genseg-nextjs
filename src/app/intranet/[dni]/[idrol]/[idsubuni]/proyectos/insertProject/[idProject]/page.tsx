@@ -2,8 +2,8 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {AvisoContext} from "@/context/avisoContext"
-import { Edit,Search, Trash2, MoreVertical,Eye, CirclePlus } from "lucide-react";
+import { AvisoContext } from "@/context/avisoContext"
+import { Edit, Search, Trash2, MoreVertical, Eye, CirclePlus } from "lucide-react";
 import DynamicTable from "@/components/DynamicTable";
 import { useState, useContext, useEffect } from "react"
 import { useParams, usePathname, useRouter } from "next/navigation"
@@ -24,15 +24,15 @@ interface Activities {
 
 export default function ProjectForm() {
   /// variables importantes
-  const [activitiesProject, setActivitiesProjects ] = useState<Activities[]>([]);
+  const [activitiesProject, setActivitiesProjects] = useState<Activities[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const {mostrarAviso} = useContext<any>(AvisoContext);
+  const { mostrarAviso } = useContext<any>(AvisoContext);
   const [escuelaProfesional, setEscuelaProfesional] = useState<string>();
   const [planProyecto, setPlanProyecto] = useState(null);
-  const {idProject} = useParams();
-   ///variables necesarios para la tabla dinámica
-   const [currentPage, setCurrentPage] = useState(1);
+  const { idProject } = useParams();
+  ///variables necesarios para la tabla dinámica
+  const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(4);
   const totalPages = Math.ceil(activitiesProject.length / itemsPerPage);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
@@ -43,15 +43,15 @@ export default function ProjectForm() {
   const handleFileChange = (event) => {
     setPlanProyecto(event.target.value);
   };
-  const insertActivity = ()=>{
+  const insertActivity = () => {
     router.push(`${pathname}/insertActivity`);
   }
   const handleSaveChange = () => {
     const recortada = recortarRutaHastaSegmento(pathname, 'proyectos');
     router.push(recortada);
   }
-    ///recortar rutas
- const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
+  ///recortar rutas
+  const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
     const partes = ruta.split('/'); // Divide la ruta en partes
     const indice = partes.indexOf(segmento); // Encuentra el índice del segmento clave
     if (indice === -1) return ruta; // Si no encuentra el segmento, retorna la ruta completa
@@ -59,25 +59,25 @@ export default function ProjectForm() {
   };
   /// Fucion para cambiar a interfaz de detalles de una actividad 
   //función para obtener datos desde la API
- const fetchActivitiesProject = async () => {
-  try {
-    const response = await fetch(`${API_PROJECT_ACTIVITIES}/${idProject}`);
-    if (!response.ok) {
-      throw new Error("Error al obtener los Proyectos");
+  const fetchActivitiesProject = async () => {
+    try {
+      const response = await fetch(`${API_PROJECT_ACTIVITIES}/${idProject}`);
+      if (!response.ok) {
+        throw new Error("Error al obtener los Proyectos");
+      }
+      const data = await response.json();
+      setActivitiesProjects(data.actividades);
+
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-    const data = await response.json();
-    setActivitiesProjects(data.actividades);
-    
-  } catch (err: any) {
-    setError(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
-// useEffect para obtener los roles desde la API al montar el componente
-useEffect(() => {
-  fetchActivitiesProject();
-}, []);
+  };
+  // useEffect para obtener los roles desde la API al montar el componente
+  useEffect(() => {
+    fetchActivitiesProject();
+  }, []);
 
 
   // Función para acceder a propiedades anidadas
@@ -100,7 +100,7 @@ useEffect(() => {
           ? fieldA.localeCompare(fieldB)
           : fieldB.localeCompare(fieldA);
       }
-      
+
       if (typeof fieldA === "number" && typeof fieldB === "number") {
         return sortDirection === "asc" ? fieldA - fieldB : fieldB - fieldA;
       }
@@ -131,7 +131,7 @@ useEffect(() => {
       key: "index",
       label: "ID",
       render: (item: Activities) => <>{activitiesProject.indexOf(item) + 1}</>,
-      sortable:true,
+      sortable: true,
     },
     {
       key: "n_usu",
@@ -169,17 +169,17 @@ useEffect(() => {
       render: (item: Activities) => (
         <div className=" flex justify-center items-center">
           <Button variant="ghost" size="icon">
-            <Edit className="h-5 w-5"  strokeWidth={2.5} />
+            <Edit className="h-5 w-5" strokeWidth={2.5} />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => console.log("Eliminar", item.id)}
           >
-            <Trash2 className="h-5 w-5"  strokeWidth={2.5} />
+            <Trash2 className="h-5 w-5" strokeWidth={2.5} />
           </Button>
-          <Button variant="ghost" size="icon" onClick={()=>toggleOpenDetsAct(item.idActivi)} >
-            <Eye className="h-5 w-5"  strokeWidth={2.5}  />
+          <Button variant="ghost" size="icon" onClick={() => toggleOpenDetsAct(item.idActivi)} >
+            <Eye className="h-5 w-5" strokeWidth={2.5} />
           </Button>
         </div>
       ),
@@ -270,28 +270,28 @@ useEffect(() => {
 
     return pageButtons;
   };
-  
+
 
   return (
     <div className="flex-1 bg-background py-4 pl-4  text-black dark:text-white">
       <div className=" flex gap-4 items-center mx-auto text-sm breadcrumbs mb-6 text-muted-foreground">
-        <span>Inicio</span> {' > '} 
-        <span>Proyectos</span> {' > '} 
+        <span>Inicio</span> {' > '}
+        <span>Proyectos</span> {' > '}
         <span>Insertar</span>
       </div>
-      <div className="w-full space-y-6">  
+      <div className="w-full space-y-6">
         <div className="flex-1 w-[90%]  mx-auto flex flex-col justify-between ">
-        <div className="  w-[100%] flex flex-1 justify-around items-center">
-          <h2>
-            Insertando Actividades del Proyecto {idProject}.
-          </h2>
+          <div className="  w-[100%] flex flex-1 justify-around items-center">
+            <h2>
+              Insertando Actividades del Proyecto {idProject}.
+            </h2>
+          </div>
         </div>
-        </div>
-            <div className="w-[90%] mx-auto my-4">
-            <div className="flex justify-between items-center mb-6">
+        <div className="w-[90%] mx-auto my-4">
+          <div className="flex justify-between items-center mb-6">
             <div className="relative">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input 
+              <Input
                 placeholder="Buscar..."
                 className="pl-8 w-[250px] bg-background"
               />
@@ -301,24 +301,24 @@ useEffect(() => {
             </Button>
           </div>
           <div className="bg-[#E3E6ED] rounded-lg ">
-              <DynamicTable
-                configuration={configurationUser}
-                data={currentItems}
-                onSort={handleSort}
-              />
-              </div>
-              <div className="flex justify-center space-x-2 mt-4">
-                {renderPaginationButtons()}
-              </div>
+            <DynamicTable
+              configuration={configurationUser}
+              data={currentItems}
+              onSort={handleSort}
+            />
           </div>
-          <div className="w-[90%] flex justify-end gap-8 items-center mx-auto">
-            <Button className="bg-red-500 hover:bg-red-600  w-32 h-14 " >
-              Cancelar Cambios
-            </Button>
-            <Button className="bg-green-500 hover:bg-green-600  w-32 h-14 " onClick={handleSaveChange} >
-              Guardar Cambios
-            </Button>
+          <div className="flex justify-center space-x-2 mt-4">
+            {renderPaginationButtons()}
           </div>
+        </div>
+        <div className="w-[90%] flex justify-end gap-8 items-center mx-auto">
+          <Button className="bg-red-500 hover:bg-red-600  w-32 h-14 " >
+            Cancelar Cambios
+          </Button>
+          <Button className="bg-green-500 hover:bg-green-600  w-32 h-14 " onClick={handleSaveChange} >
+            Guardar Cambios
+          </Button>
+        </div>
       </div>
     </div>
   )

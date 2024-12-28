@@ -14,6 +14,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Link from "next/link";
+
 interface items {
   label: string;
   href: string;
@@ -28,7 +30,7 @@ interface Data {
 
 export function BreadcrumbWithDropdown({ items }:Data) {
   return (
-    <Breadcrumb>
+    <Breadcrumb className="text-base font-semibold " >
       <BreadcrumbList>
         {items.map((item, index) => (
           <React.Fragment key={index}>
@@ -47,27 +49,27 @@ export function BreadcrumbWithDropdown({ items }:Data) {
                     {item.items.map((dropdownItem, i) => (
                       <DropdownMenuItem key={i}>
                         {dropdownItem.external ? (
-                          <a
+                          <Link
                             href={dropdownItem.href}
                             target="_blank"
                             rel="noopener noreferrer"
                           >
                             {dropdownItem.label}
-                          </a>
+                          </Link>
                         ) : (
-                          <a href={dropdownItem.href}>{dropdownItem.label}</a>
+                          <Link href={dropdownItem.href}>{dropdownItem.label}</Link>
                         )}
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
-              {item.type === "page" && <BreadcrumbPage>{item.label}</BreadcrumbPage>}
+              {item.type === "page" && <BreadcrumbPage className="text-blue-600 font-semibold" >{item.label}</BreadcrumbPage>}
             </BreadcrumbItem>
             {/* Renderiza un separador excepto después del último elemento */}
             {index < items.length - 1 && (
               <BreadcrumbSeparator>
-                <Slash />
+                <Slash strokeWidth={3} />
               </BreadcrumbSeparator>
             )}
           </React.Fragment>
