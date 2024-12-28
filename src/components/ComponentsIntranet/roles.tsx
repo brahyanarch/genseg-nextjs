@@ -110,9 +110,9 @@ const Roles: React.FC<RolesProps> = ({
   }, []);
 
   return (
-    <div className="absolute right-2 z-10 top-12 w-[300px] bg-gray-900 text-white rounded-lg">
+    <div className="absolute right-2 z-10 top-12 w-[300px] bg-gray-200 dark:bg-gray-900 text-black dark:text-white rounded-lg">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">Roles</CardTitle>
+        <CardTitle className="text-lg font-semibold ">Roles</CardTitle>
       </CardHeader>
       <CardContent>
         {error ? (
@@ -120,8 +120,8 @@ const Roles: React.FC<RolesProps> = ({
         ) : rolesUser.length <1 ? ( // Mostrar Skeleton si rolesUser es null o undefined
           <div className="grid grid-cols-2 gap-2">
             {[1, 2, 3, 4].map((item) => ( // Renderizar 4 skeletons como placeholders
-              <div key={item} className="flex flex-col items-center p-2 bg-gray-800 rounded-lg animate-pulse">
-                <Skeleton className="h-4 w-full bg-slate-700 " />
+              <div key={item} className="flex flex-col items-center p-2 bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse">
+                <Skeleton className="h-4 w-full bg-slate-300 dark:bg-slate-700 " />
               </div>
             ))}
           </div>
@@ -136,8 +136,8 @@ const Roles: React.FC<RolesProps> = ({
                   onClick={() => handleClick(role)}
                   className={`flex flex-col items-center p-2 ${
                     isActive
-                      ? "bg-gray-800 hover:bg-slate-600 hover:text-slate-500 text-white cursor-default" // Estilo para el activo
-                      : "bg-gray-800 hover:bg-gray-700 cursor-pointer" // Estilo para los que se pueden hacer clic
+                      ? "bg-gray-100 dark:bg-gray-800 hover:bg-slate-600 hover:text-slate-500 text-black dark:text-white cursor-default" // Estilo para el activo
+                      : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-700 cursor-pointer" // Estilo para los que se pueden hacer clic
                   } rounded-lg`}
                 >
                   <div

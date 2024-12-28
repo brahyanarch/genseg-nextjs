@@ -23,6 +23,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { API_USERS } from "@/config/apiconfig";
 import { User as Us } from "@/tipos/typos";
+import { useParams } from "next/navigation";
 
 interface ComponentProps {
   idRol?: number;
@@ -125,83 +126,85 @@ export function Notificacion() {
   );
 }
 
-export function Perfil({name}: {name:string} ) {
+export function Perfil({ name }: { name: string }) {
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
-  const [Us, setUs] = useState<Us[]>([]);
+  const [Us, setUs] = useState<Us | null>(null);
+  const { dni } = useParams<{ dni: string }>();
 
   // Función para alternar la visibilidad de la ventana flotante
   const toggleProfileMenu = () => {
     setIsProfileOpen(!isProfileOpen);
   };
 
+  // Función para obtener los datos del usuario
   const fetchUs = async () => {
+    if (!dni) {
+      console.warn("DNI no está definido. No se hará la solicitud.");
+      return;
+    }
+
     try {
-      const response = await fetch(`${API_USERS}/{}`);
+      console.log("Iniciando llamada a la API con URL:", `${API_USERS}/${dni}`);
+      const response = await fetch(`${API_USERS}/${dni}`);
       if (!response.ok) {
-        throw new Error('Error al obtener los usuarios');
+        throw new Error(`Error al obtener los usuarios: ${response.status}`);
       }
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        setUs(data);
-      } else {
-        console.error('Respuesta de API no válida:', data);
-      }
+      const data: Us = await response.json();
+      console.log("Datos recibidos:", data);
+      setUs(data);
     } catch (err: any) {
-      console.error(err.message);
+      console.error("Error capturado:", err.message);
     }
   };
-  // Cerrar el menú si el usuario hace clic fuera de él
+
+  // useEffect para manejar la lógica de inicialización y clic fuera del menú
   useEffect(() => {
-    //fetchUs();
+    fetchUs(); // Llamar a la API al inicializar el componente
+
     const handleClickOutside = (event: MouseEvent) => {
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false);
       }
     };
-    
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [dni]); // Ejecutar cuando cambie dni
+
+  console.log(Us, "Usuario def", "dni", dni);
 
   return (
     <div ref={profileMenuRef}>
       {/* Botón de perfil */}
-        
-        <Avatar onClick={toggleProfileMenu} className="cursor-pointer">
-                <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                <AvatarFallback>{name}</AvatarFallback>
-              </Avatar>
-      
+      <Avatar onClick={toggleProfileMenu} className="cursor-pointer">
+        <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
+        <AvatarFallback>{(Us?.n_usu?.[0])?.toUpperCase() || "N"}</AvatarFallback>
+      </Avatar>
+
       <div>
         {isProfileOpen && (
-          <div className="absolute z-30 right-2 w-64 bg-gray-900 text-white p-4 rounded-lg">
+          <div className="absolute z-30 right-2 w-64 bg-gray-100 text-black p-4 rounded-lg dark:bg-gray-800 dark:text-white">
             <div className="flex items-center mb-6">
               <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-xl font-bold mr-3">
-                M
+              {(Us?.n_usu?.[0])?.toUpperCase() || "N"}
               </div>
               <div>
-                <h2 className="font-semibold">{name}</h2>
+                <h2 className="font-semibold">{(Us?.n_usu) || "N"}</h2>
               </div>
             </div>
             <nav>
               <ul className="space-y-2">
                 <li>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start text-white"
-                  >
+                  <Button variant="ghost" className="w-full justify-start text-black hover:bg-slate-900 hover:text-white dark:text-white">
                     <User className="mr-2 h-4 w-4" />
                     Perfil
                   </Button>
                 </li>
                 <li>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start text-white"
-                  >
+                  <Button variant="ghost" className="w-full justify-start text-black hover:bg-slate-900 hover:text-white dark:text-white">
                     <HelpCircle className="mr-2 h-4 w-4" />
                     Centro de ayuda
                   </Button>
@@ -209,10 +212,7 @@ export function Perfil({name}: {name:string} ) {
               </ul>
             </nav>
             <div className="mt-6">
-              <Button
-                variant="secondary"
-                className="w-full bg-gray-800 hover:bg-gray-700 text-white"
-              >
+              <Button variant="secondary" className="w-full bg-gray-800 hover:bg-gray-700 text-white">
                 <LogOut className="mr-2 h-4 w-4" />
                 <Link href="/">Cerrar Sesión</Link>
               </Button>
@@ -315,7 +315,7 @@ const Component: React.FC<ComponentProps> = ({
       role.n_rol
     ) : (
       <div className="flex">
-        <Skeleton className="h-4 w-full bg-slate-700 " />
+        <Skeleton className="h-4 w-full bg-slate-100 dark:bg-slate-700 " />
       </div>
     );
   };
