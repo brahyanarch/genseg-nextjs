@@ -26,7 +26,7 @@ interface Data {
   items?: items[];
 }
 
-export function BreadcrumbWithDropdown({ items }:Data) {
+export default function BreadcrumbWithDropdown({ items }:Data) {
   return (
     <Breadcrumb>
       <BreadcrumbList>
