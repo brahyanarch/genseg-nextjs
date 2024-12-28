@@ -124,7 +124,10 @@ export default function ProjectForm() {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
-
+  const formatearFecha = (fecha:string) =>{
+    const fechaFormateada = new Date(fecha).toISOString().split('T')[0];
+    return fechaFormateada;
+   }
   // Configuración de la tabla
   const configurationUser = [
     {
@@ -148,13 +151,13 @@ export default function ProjectForm() {
     {
       key: "dateNow",
       label: "Fecha Inicio",
-      render: (item: Activities) => item.fInit,
+      render: (item: Activities) => formatearFecha(item.fInit),
       sortable: true,
     },
     {
       key: "dateNow",
       label: "Fecha Final",
-      render: (item: Activities) => item.fFin,
+      render: (item: Activities) => formatearFecha(item.fFin),
       sortable: true,
     },
     {

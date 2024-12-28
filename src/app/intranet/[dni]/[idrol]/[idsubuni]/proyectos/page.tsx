@@ -13,7 +13,7 @@ interface Project {
     escuelaProfesional: string;
     fInit: string;
     fFin: string;
-    name: string;
+    idString: string;
   }
 export default function Component() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -200,7 +200,12 @@ if (error) {
    const handlePageChange = (page: number) => {
      setCurrentPage(page);
    };
- 
+   const formatearFecha = (fecha:string) =>{
+    const fechaFormateada = new Date(fecha).toISOString().split('T')[0];
+    return fechaFormateada;
+   }
+
+
    // Configuración de la tabla
    const configurationUser = [
      {
@@ -218,13 +223,13 @@ if (error) {
      {
        key: "fechaIncio",
        label: "Fecha Inicio",
-       render: (item: Project) => item.fInit,
+       render: (item: Project) => formatearFecha(item.fInit),
        sortable: true,
      },
      {
       key: "fechaFinal",
       label: "Fecha Final",
-      render: (item: Project) => item.fFin,
+      render: (item: Project) => formatearFecha(item.fFin),
       sortable: true,
     },
     {
