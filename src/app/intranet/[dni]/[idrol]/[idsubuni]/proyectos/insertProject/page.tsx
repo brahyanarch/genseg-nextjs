@@ -26,7 +26,7 @@ export default function ProjectForm() {
       event.preventDefault();
       const formData = new FormData();
       if (planProyecto) {
-        formData.append("plan", planProyecto);
+        formData.append("file", planProyecto);
       }
       formData.append("dni",String(dni));
       formData.append("id_rol", String(idrol));
@@ -36,9 +36,6 @@ export default function ProjectForm() {
       try {
         const response = await fetch(API_PROJECTS, {
           method:'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
           body: formData
         });
   
