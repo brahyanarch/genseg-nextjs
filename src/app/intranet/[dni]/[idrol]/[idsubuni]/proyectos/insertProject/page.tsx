@@ -13,6 +13,7 @@ export default function ProjectForm() {
   const {mostrarAviso} = useContext<any>(AvisoContext);
   const [escuelaProfesional, setEscuelaProfesional] = useState<string>();
   const [planProyecto, setPlanProyecto] = useState<File | null>(null);
+  const [dirFile, setDirFile] = useState<string>("");
   const {idrol,idsubuni, dni} = useParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -42,9 +43,13 @@ export default function ProjectForm() {
         if (response.ok) {
           const resIdProject = await response.json();
           mostrarAviso('succefull', 'Proyecto guardado correctamente.');
+          setDirFile(resIdProject.url);
           if(resIdProject.idproj!== undefined){
             router.push(`${pathname}/${resIdProject.idproj}`);
+            console.log(resIdProject.url)
           }
+          console.log("este es el archivo enviado")
+          console.log(planProyecto)
           
          
         } else {
@@ -81,6 +86,7 @@ export default function ProjectForm() {
           </div>
 
           <div>
+
             <label className="text-lg font-medium mb-3 block">
               Insertar el plan
             </label>

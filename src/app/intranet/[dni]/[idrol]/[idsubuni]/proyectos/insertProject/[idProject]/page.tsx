@@ -3,11 +3,11 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { AvisoContext } from "@/context/avisoContext"
-import { Edit, Search, Trash2, MoreVertical, Eye, CirclePlus } from "lucide-react";
+import { Edit, Search, Trash2 } from "lucide-react";
 import DynamicTable from "@/components/DynamicTable";
 import { useState, useContext, useEffect } from "react"
 import { useParams, usePathname, useRouter } from "next/navigation"
-import { API_PROJECT_ACTIVITIES } from "@/config/apiconfig"
+import { API_PROJECT_ACTIVITIES, API_ACTIVITIES } from "@/config/apiconfig"
 
 interface Activities {
   idActivi: number;
@@ -28,8 +28,6 @@ export default function ProjectForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { mostrarAviso } = useContext<any>(AvisoContext);
-  const [escuelaProfesional, setEscuelaProfesional] = useState<string>();
-  const [planProyecto, setPlanProyecto] = useState(null);
   const { idProject } = useParams();
   ///variables necesarios para la tabla dinámica
   const [currentPage, setCurrentPage] = useState(1);
@@ -39,13 +37,35 @@ export default function ProjectForm() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const router = useRouter();
   const pathname = usePathname();
-  //// funciones importantes
-  const handleFileChange = (event) => {
-    setPlanProyecto(event.target.value);
-  };
+
+  //función para insertar una actividad
   const insertActivity = () => {
     router.push(`${pathname}/insertActivity`);
   }
+
+  //función para eliminar una actividad
+  const deleteActivity = async (id: number) => {
+    try {
+      const response = await fetch(`${API_ACTIVITIES}/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        const actividadesNuevas = await response.json();
+        /*setActivitiesProjects((prevProjects: Activities[]) =>
+          prevProjects.filter((form: Activities) => form.idActivi !== id)
+        );*/
+        setActivitiesProjects(actividadesNuevas.actividades);
+        mostrarAviso('succefull', 'Actividad Eliminado correctamente.');
+        fetchActivitiesProject();
+      } else {
+        mostrarAviso('warning', 'Error al eliminar el Actividad.');
+      }
+    } catch (error) {
+      mostrarAviso('warning', "Error al conectar con la API:", error);
+    }
+  };
+
   const handleSaveChange = () => {
     const recortada = recortarRutaHastaSegmento(pathname, 'proyectos');
     router.push(recortada);
@@ -124,10 +144,10 @@ export default function ProjectForm() {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
-  const formatearFecha = (fecha:string) =>{
+  const formatearFecha = (fecha: string) => {
     const fechaFormateada = new Date(fecha).toISOString().split('T')[0];
     return fechaFormateada;
-   }
+  }
   // Configuración de la tabla
   const configurationUser = [
     {
@@ -177,12 +197,9 @@ export default function ProjectForm() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => console.log("Eliminar", item.id)}
+            onClick={() => deleteActivity(item.idActivi)}
           >
             <Trash2 className="h-5 w-5" strokeWidth={2.5} />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => toggleOpenDetsAct(item.idActivi)} >
-            <Eye className="h-5 w-5" strokeWidth={2.5} />
           </Button>
         </div>
       ),

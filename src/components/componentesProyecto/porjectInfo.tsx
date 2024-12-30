@@ -1,11 +1,12 @@
 'use client'
 import { Card } from "@/components/ui/card"
-import { Edit, Trash2, Eye,Search, ChevronDown } from "lucide-react";
+import { Edit, Trash2, Eye, Search } from "lucide-react";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {useState, useEffect} from "react"
-import { API_PROJECT_ACTIVITIES } from "@/config/apiconfig";
-import {usePathname, useRouter, useParams } from "next/navigation"
+import { AvisoContext } from "@/context/avisoContext"
+import { useState, useEffect, useContext } from "react"
+import { API_PROJECT_ACTIVITIES, API_ACTIVITIES } from "@/config/apiconfig";
+import { usePathname, useRouter, useParams } from "next/navigation"
 import DynamicTable from "@/components/DynamicTable";
 //
 interface Activities {
@@ -19,40 +20,61 @@ interface Activities {
   idres: number;
 }
 
-export function TaskList({toggleOpenDetsAct, typeEdit}:any) {
+export function TaskList({ toggleOpenDetsAct, typeEdit }: any) {
 
   //variable importantes
-  const [activitiesProject, setActivitiesProjects ] = useState<Activities[]>([]);
+  const [activitiesProject, setActivitiesProjects] = useState<Activities[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState(null);
+  const { mostrarAviso } = useContext<any>(AvisoContext);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(4);
   const totalPages = Math.ceil(activitiesProject.length / itemsPerPage);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const {projectId} = useParams();
+  const { projectId } = useParams();
   /// Fucion para cambiar a interfaz de detalles de una actividad 
   //función para obtener datos desde la API
- const fetchActivitiesProject = async () => {
-  try {
-    const response = await fetch(`${API_PROJECT_ACTIVITIES}/${projectId}`);
-    if (!response.ok) {
-      throw new Error("Error al obtener los Proyectos");
+  const fetchActivitiesProject = async () => {
+    try {
+      const response = await fetch(`${API_PROJECT_ACTIVITIES}/${projectId}`);
+      if (!response.ok) {
+        throw new Error("Error al obtener las Actividades");
+      }
+      const data = await response.json();
+      setActivitiesProjects(data.actividades);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-    const data = await response.json();
-    setActivitiesProjects(data.actividades);
-  } catch (err: any) {
-    setError(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
-// useEffect para obtener los roles desde la API al montar el componente
-useEffect(() => {
-  fetchActivitiesProject();
-}, []);
+  };
+  // useEffect para obtener los roles desde la API al montar el componente
+  useEffect(() => {
+    fetchActivitiesProject();
+  }, []);
 
 
+  //función para eliminar una actividad
+  const deleteActivity = async (id: number) => {
+    try {
+      const response = await fetch(`${API_ACTIVITIES}/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setActivitiesProjects((prevProjects: Activities[]) =>
+          prevProjects.filter((form: Activities) => form.idActivi !== id)
+        );
+        mostrarAviso('succefull', 'Actividad Eliminado correctamente.');
+        fetchActivitiesProject();
+      } else {
+        mostrarAviso('warning', 'Error al eliminar el Actividad.');
+      }
+    } catch (error) {
+      mostrarAviso('warning', "Error al conectar con la API:", error);
+    }
+  };
   // Función para acceder a propiedades anidadas
   const getNestedProperty = (obj: any, key: string) => {
     return key.split('.').reduce((value, part) => value && value[part], obj);
@@ -73,7 +95,7 @@ useEffect(() => {
           ? fieldA.localeCompare(fieldB)
           : fieldB.localeCompare(fieldA);
       }
-      
+
       if (typeof fieldA === "number" && typeof fieldB === "number") {
         return sortDirection === "asc" ? fieldA - fieldB : fieldB - fieldA;
       }
@@ -98,17 +120,17 @@ useEffect(() => {
     setCurrentPage(page);
   };
   //formatear fecha
-  const formatearFecha = (fecha:string) =>{
+  const formatearFecha = (fecha: string) => {
     const fechaFormateada = new Date(fecha).toISOString().split('T')[0];
     return fechaFormateada;
-   }
+  }
   // Configuración de la tabla
   const configurationUser = [
     {
       key: "index",
       label: "ID",
       render: (item: Activities) => <>{activitiesProject.indexOf(item) + 1}</>,
-      sortable:true,
+      sortable: true,
     },
     {
       key: "n_usu",
@@ -149,20 +171,20 @@ useEffect(() => {
             typeEdit && (
               <>
                 <Button variant="ghost" size="icon">
-                  <Edit className="h-5 w-5"  strokeWidth={2.5} />
+                  <Edit className="h-5 w-5" strokeWidth={2.5} />
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => console.log("Eliminar", item.id)}
+                  onClick={() => deleteActivity(item.idActivi)}
                 >
-                  <Trash2 className="h-5 w-5"  strokeWidth={2.5} />
+                  <Trash2 className="h-5 w-5" strokeWidth={2.5} />
                 </Button>
               </>
             )
           }
-          <Button variant="ghost" size="icon" onClick={()=>toggleOpenDetsAct(item.idActivi)} >
-            <Eye className="h-5 w-5"  strokeWidth={2.5}  />
+          <Button variant="ghost" size="icon" onClick={() => toggleOpenDetsAct(item.idActivi)} >
+            <Eye className="h-5 w-5" strokeWidth={2.5} />
           </Button>
         </div>
       ),
@@ -253,7 +275,7 @@ useEffect(() => {
 
     return pageButtons;
   };
-  
+
   return (
     <Card className="w-full p-4 bg-white dark:bg-gray-900">
       <div className="space-y-4">
@@ -277,13 +299,13 @@ useEffect(() => {
         </div>
 
         <DynamicTable
-        configuration={configurationUser}
-        data={currentItems}
-        onSort={handleSort}
-      />
-       <div className="flex justify-center space-x-2 mt-4">
-        {renderPaginationButtons()}
-      </div>
+          configuration={configurationUser}
+          data={currentItems}
+          onSort={handleSort}
+        />
+        <div className="flex justify-center space-x-2 mt-4">
+          {renderPaginationButtons()}
+        </div>
       </div>
     </Card>
   )

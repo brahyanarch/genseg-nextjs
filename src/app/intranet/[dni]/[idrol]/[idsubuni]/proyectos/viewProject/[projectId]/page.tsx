@@ -6,7 +6,7 @@ import { X} from 'lucide-react'
 import { TaskList} from '@/components/componentesProyecto/porjectInfo'
 import Image from 'next/image'
 import {useState, useEffect} from "react"
-import { API_PROJECT_ACTIVITIES } from "@/config/apiconfig";
+import { API_PROJECT_ACTIVITIES, API_URL } from "@/config/apiconfig";
 import {usePathname, useRouter, useParams } from "next/navigation"
 ///
 interface ProjectDetails {
@@ -54,7 +54,11 @@ export default function ProjectDetails() {
  useEffect(() => {
   fetchProjectsDetails();
   }, []);
-
+//formatear fecha
+const formatearFecha = (fecha:string) =>{
+  const fechaFormateada = new Date(fecha).toISOString().split('T')[0];
+  return fechaFormateada;
+  }
 
   return (
     <>
@@ -83,7 +87,7 @@ export default function ProjectDetails() {
               <div className="font-medium">Fecha Inicio</div>
               <div className="text-muted-foreground py-2 px-4 rounded-lg border-2 border-gray-500 border-opacity-30 ">         
                  {projectDetails.map((project) => (
-                    project.fInit
+                    formatearFecha(project.fInit)
                   ))   } 
               </div>
             </div>
@@ -93,7 +97,7 @@ export default function ProjectDetails() {
               <div className="font-medium">Fecha final</div>
               <div className="text-muted-foreground py-2 px-4 rounded-lg border-2 border-gray-500 border-opacity-30">    
                   {projectDetails.map((project) => (
-                    project.fFin
+                    formatearFecha(project.fFin)
                   ))   } 
               </div>
             </div>
@@ -127,6 +131,9 @@ export default function ProjectDetails() {
           </h4>
           <h3 className="font-medium mb-2">Plan de Proyecto</h3>
           <h4 className="text-sm text-muted-foreground">
+            <a href={`${API_URL}/${projectDetails.map((project) => (
+                    project.plan
+            ))}`} target="_blank" rel="noopener noreferrer">Vizualizar</a>
             {projectDetails.map((project) => (
                     project.plan
             ))} 

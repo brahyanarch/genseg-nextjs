@@ -7,7 +7,7 @@ import { X } from 'lucide-react'
 import { TaskList } from '@/components/componentesProyecto/porjectInfo'
 import Image from 'next/image'
 import { useState, useEffect } from "react"
-import { API_PROJECT_ACTIVITIES } from "@/config/apiconfig";
+import { API_PROJECT_ACTIVITIES, API_PROJECTS } from "@/config/apiconfig";
 import { usePathname, useRouter, useParams } from "next/navigation"
 ///
 interface ProjectDetails {
@@ -33,7 +33,7 @@ export default function EditProject() {
   const [existingPlan, setExistingPlan] = useState<string>("");
   const route = useRouter();
   const pathname = usePathname();
-  const { projectId, idrol,idsubuni, dni } = useParams();
+  const { projectId } = useParams();
   /// Fucion para cambiar a interfaz de detalles de una actividad
   const toggleOpenDetailsActivities = (activityId: number) => {
     route.push(`${pathname}/viewActivity/${activityId}`);
@@ -58,29 +58,26 @@ export default function EditProject() {
   };
   //Editar Proyecto
   const saveChanges = async () => {
-    if (!dni || !idrol || !idsubuni) {
-      alert("Faltan datos obligatorios.");
-      return;
-    }
   
     const formData = new FormData();
-    formData.append("escuelaProfesional", String(escuelaP)); // Valor modificado
+    formData.append("EP", String(escuelaP)); // Valor modificado
     if (plan) {
-      formData.append("plan", plan); // Archivo nuevo si se seleccionó
+      formData.append("file", plan); // Archivo nuevo si se seleccionó
     }
-    formData.append("dni", String(dni));
-    formData.append("id_rol", String(idrol)); // Asegurar que sean strings
-    formData.append("subunidad", String(idsubuni));
   
     try {
-      const response = await fetch(`${API_PROJECT_ACTIVITIES}/${projectId}`, {
+      const response = await fetch(`${API_PROJECTS}/${projectId}`, {
         method: "PUT",
         body: formData, // Enviar el objeto FormData directamente
       });
   
-      if (!response.ok) throw new Error("Error al guardar los cambios.");
-      alert("Cambios guardados exitosamente.");
-      fetchProjectsDetails(); // Recargar los detalles actualizados
+      if (response.ok){
+        alert("Cambios guardados exitosamente.");
+        fetchProjectsDetails(); // Recargar los detalles actualizados
+      }
+      else {
+          alert('Error al guardar el proyecto.');
+        }
     } catch (err: any) {
       alert(`Error: ${err.message}`);
     }
@@ -91,7 +88,10 @@ export default function EditProject() {
     fetchProjectsDetails();
   }, []);
 
-
+  const formatearFecha = (fecha:string) =>{
+    const fechaFormateada = new Date(fecha).toISOString().split('T')[0];
+    return fechaFormateada;
+    }
 
   return (
     <>
@@ -107,6 +107,7 @@ export default function EditProject() {
                 {projectDetails.map((project) => (
                   project.idString
                 ))}
+                
               </h2>
               <button className="bg-red-600 absolute top-2 right-2 py-2 px-3 rounded-md" ><X className="w-5 h-5" /></button>
             </CardTitle>
@@ -120,7 +121,7 @@ export default function EditProject() {
                   <div className="font-medium">Fecha Inicio</div>
                   <div className="text-muted-foreground py-2 px-4 rounded-lg border-2 border-gray-500 border-opacity-30 ">
                     {projectDetails.map((project) => (
-                      project.fInit
+                      formatearFecha(project.fInit)
                     ))}
                   </div>
                 </div>
@@ -130,7 +131,7 @@ export default function EditProject() {
                   <div className="font-medium">Fecha final</div>
                   <div className="text-muted-foreground py-2 px-4 rounded-lg border-2 border-gray-500 border-opacity-30">
                     {projectDetails.map((project) => (
-                      project.fFin
+                      formatearFecha(project.fFin)
                     ))}
                   </div>
                 </div>

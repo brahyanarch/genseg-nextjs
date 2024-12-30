@@ -34,6 +34,7 @@ export default function Component() {
  const viewProject = (projectId:number) =>{
       router.push(`${pathname}/viewProject/${projectId}`);
  }
+ //función para editar un proyecto
  const editProject = (projectId:number) =>{
   router.push(`${pathname}/editProyect/${projectId}`);
  }
@@ -62,7 +63,7 @@ export default function Component() {
     fetchProjects();
   }, []);
 
-//función para eliminar un Rolgit
+//función para eliminar un proyecto
 const deleteProject = async (id: number) => {
   try {
     const response = await fetch(`${API_PROJECTS}/${id}`, {
@@ -249,7 +250,7 @@ if (error) {
            <Button
              variant="ghost"
              size="icon"
-             onClick={() => console.log("Eliminar", item.id)}
+             onClick={() => deleteProject(item.idproj)}
            >
              <Trash2 className="h-5 w-5"  strokeWidth={2.5}  />
            </Button>

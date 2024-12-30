@@ -15,7 +15,7 @@ export default function ActivityForm() {
    const [nombreActividad, setNombreActividad] = useState();
    const [fechaInicio,setFechaInicio] = useState();
    const [fechaFinal, setFechaFinal] = useState();
-   const [answers, setAnswers] = useState({}); // Estado para almacenar respuestas
+   const [answers, setAnswers] = useState<{ [key: number]: string | File | number[] }>({}); // Estado para almacenar respuestas
    const {idProject} = useParams();
    const pathname = usePathname(); 
    const router = useRouter();
@@ -23,8 +23,14 @@ export default function ActivityForm() {
    const handleChange = (id:number, value:string) => {
      setAnswers((prev) => ({ ...prev, [id]: value }));
    };
+   const handleChangeFile = (id: number, file: File | null) => {
+
+    if (file) {
+      setAnswers((prev) => ({ ...prev, [id]: file }));
+    }
+  };
    /// casos de single choice
-   const handleSingleChange = (id:number, value:string) => {
+   const handleSingleChange = (id:number, value:number) => {
     setAnswers((prev) => ({
       ...prev,
       [id]: [value], // Guarda el ID seleccionado como un array
@@ -55,40 +61,63 @@ export default function ActivityForm() {
     router.push(recortada);
   } 
   
-   //
-     const handleSubmitAnswers = async (event: any) => {
-         event.preventDefault();
-         const finalResponses = {
-          "name":nombreActividad,
-          "fInit":fechaInicio,
-          "fFin":fechaFinal,
-          "responses":{
-          ...answers
-        },
-          "idproj": Number(idProject),
-        };
-        console.log(finalResponses);
-         try {
-           const response = await fetch(API_ACTIVITIES, {
-             method:'POST',
-             headers: {
-               'Content-Type': 'application/json'
-             },
-             body: JSON.stringify(finalResponses)
-           });
-     
-           if (response.ok) {
-             const resIdProject = await response.json();
-             mostrarAviso('succefull', 'Respuestas guardado correctamente.');
-             router.back();
-             //setIdProject(resIdProject);
-           } else {
-             mostrarAviso('warning', 'Error al guardar las respuestas.');
-           }
-         } catch (error) {
-           mostrarAviso('warning', `Error al conectar con la API:${error}`);
-         }
-       };
+  const handleSubmitAnswers = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+  
+    // Crear el objeto FormData
+    const formData = new FormData();
+
+    // Agregar datos básicos
+    formData.append("name", String(nombreActividad)); // Nombre de la actividad
+    formData.append("fInit", String(fechaInicio));    // Fecha de inicio
+    formData.append("fFin", String(fechaFinal));      // Fecha final
+    formData.append("idproj", String(idProject));     // ID del proyecto
+    
+    // Crear un objeto para almacenar las respuestas
+    const responses = {};
+    
+    // Recorrer las respuestas y agregarlas al objeto responses
+    Object.entries(answers).forEach(([key, value]) => {
+      if (value instanceof File) {
+        // Si el valor es un archivo, lo agregamos con el tipo "file"
+        responses[key] = "file";
+        formData.append(`${key}`, value); // Agregar el archivo al FormData
+      } else {
+        // Si no es un archivo, simplemente lo agregamos como está
+        responses[key] = value;
+      }
+    });
+    
+    // Agregar el objeto de respuestas al FormData como JSON string
+    formData.append("responses", JSON.stringify(responses));
+    
+  
+    // Enviar la solicitud al backend
+    try {
+      const response = await fetch(API_ACTIVITIES, {
+        method: 'POST',
+        body: formData, // Enviar el FormData como cuerpo
+      });
+  
+      if (response.ok) {
+        const resIdProject = await response.json();
+        mostrarAviso('succefull', 'Respuestas guardadas correctamente.');
+        router.back(); // Volver a la ruta anterior
+        formData.forEach((value, key) => {
+          console.log(`${key}:`, value);
+        });
+      } else {
+        mostrarAviso('warning', 'Error al guardar las respuestas.');
+        formData.forEach((value, key) => {
+          console.log(`${key}:`, value);
+        });
+      }
+    } catch (error) {
+      mostrarAviso('warning', `Error al conectar con la API: ${error}`);
+    }
+  };
+  
+  
      /// obtener las preguntas del formulario
      const fetchQuestions = async () => {
       try {
@@ -240,7 +269,7 @@ export default function ActivityForm() {
                   <input
                     type="file"
                     className="border rounded p-2 w-full"
-                    onChange={(e) => handleChange(question.id, e.target.value)}
+                    onChange={(e) => handleChangeFile(question.id, e.target.files?.[0] || null)}
                     required
                   />
                 </div>
