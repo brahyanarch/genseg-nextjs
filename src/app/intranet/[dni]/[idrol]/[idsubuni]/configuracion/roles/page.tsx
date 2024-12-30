@@ -11,6 +11,10 @@ import { Rol } from "@/tipos/typos"
 import { AvisoContext } from '@/context/avisoContext'
 import PermissionsManager from '@/components/ComponentsIntranet/permisosmanages'
 import { usePathname } from "next/navigation";
+
+// Notificaciones
+import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
 // Modal para agregar un nuevo Rol
 
 export const EditModal = ({
@@ -31,33 +35,75 @@ export const EditModal = ({
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    const updatedRole = {
-      n_rol: name,
-      abrev: abbreviation,
-    };
 
-    try {
-      const response = await fetch(
-        editingRole ? `${API_ROLES}/${editingRole.id_rol}` : API_ROLES,
-        {
-          method: editingRole ? "PUT" : "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedRole),
+    // Confirmación de SweetAlert antes de guardar
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Este cambio será guardado.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, guardar',
+      cancelButtonText: 'No, cancelar',
+    });
+
+    // Si el usuario acepta, se procede a guardar
+    if (result.isConfirmed) {
+      const updatedRole = {
+        n_rol: name,
+        abrev: abbreviation,
+      };
+
+      try {
+        const response = await fetch(
+          editingRole ? `${API_ROLES}/${editingRole.id_rol}` : API_ROLES,
+          {
+            method: editingRole ? 'PUT' : 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedRole),
+          }
+        );
+
+        if (response.ok) {
+          const savedRole = await response.json();
+          onSaveRole(savedRole);
+
+          // Mostrar un SweetAlert de éxito
+          Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: 'Rol guardado correctamente.',
+            confirmButtonText: 'OK'
+          });
+
+          closeModal();  // Cerrar modal
+        } else {
+          // Si el servidor no responde bien, mostrar un SweetAlert de error
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un problema al guardar el rol.',
+            confirmButtonText: 'OK'
+          });
         }
-      );
-
-      if (response.ok) {
-        const savedRole = await response.json();
-        onSaveRole(savedRole);
-        mostrarAviso('succefull', 'Rol guardado correctamente.');
-        closeModal();
-      } else {
-        mostrarAviso('warning', 'Error al guardar el Rol.');
+      } catch (error) {
+        // Si hay un error de conexión, mostrar un SweetAlert de error
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error al conectar con la API.',
+          confirmButtonText: 'OK'
+        });
       }
-    } catch (error) {
-      mostrarAviso('warning', 'Error al conectar con la API.');
+    } else {
+      // Si el usuario cancela
+      Swal.fire({
+        icon: 'info',
+        title: 'Operación cancelada',
+        text: 'El rol no fue guardado.',
+        confirmButtonText: 'OK'
+      });
     }
   };
 
@@ -298,13 +344,19 @@ const ConfiRoles = () => {
           <Button variant="ghost" size="icon" onClick={() => openEditModal(item)}>
             <Edit className="h-5 w-5" strokeWidth={2.5} />
           </Button>
+
+
+
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => deleteRoles(item.id_rol)}
+            onClick={() => deleteRoles(item.id_rol)}  // Llama a la función deleteRoles con el ID del rol
           >
             <Trash2 className="h-5 w-5" strokeWidth={2.5} />
           </Button>
+
+
+
           <Button
             variant="ghost"
             size="icon"
@@ -372,24 +424,64 @@ const ConfiRoles = () => {
   };
   //función para eliminar un Rol
   const deleteRoles = async (id: number) => {
-    try {
-      const response = await fetch(`${API_ROLES}/${id}`, {
-        method: "DELETE",
-      });
+    // Confirmación de SweetAlert antes de eliminar
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Este rol será eliminado permanentemente.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'No, cancelar',
+    });
 
-      if (response.ok) {
-        setData((prevRoles) =>
-          prevRoles.filter((rol) => rol.id_rol !== id)
-        );
-        mostrarAviso('succefull', 'Rol Eliminado correctamente.');
-        fetchRoles();
-      } else {
-        mostrarAviso('warning', 'Error al eliminar el Rol.');
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(`${API_ROLES}/${id}`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          // El rol fue eliminado correctamente
+          setData((prevRoles) => prevRoles.filter((rol) => rol.id_rol !== id));
+
+          // Mostrar un SweetAlert de éxito
+          Swal.fire({
+            icon: 'success',
+            title: '¡Eliminado!',
+            text: 'El rol fue eliminado correctamente.',
+            confirmButtonText: 'OK'
+          });
+
+          fetchRoles(); // Recargar los roles desde la API
+        } else {
+          // Si el servidor no responde correctamente
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un problema al eliminar el rol.',
+            confirmButtonText: 'OK'
+          });
+        }
+      } catch (error) {
+        // Si ocurre un error de conexión
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error al conectar con la API.',
+          confirmButtonText: 'OK'
+        });
       }
-    } catch (error) {
-      mostrarAviso('warning', "Error al conectar con la API:", error);
+    } else {
+      // Si el usuario cancela la operación
+      Swal.fire({
+        icon: 'info',
+        title: 'Operación cancelada',
+        text: 'El rol no fue eliminado.',
+        confirmButtonText: 'OK'
+      });
     }
   };
+
 
   if (loading) {
     return (
