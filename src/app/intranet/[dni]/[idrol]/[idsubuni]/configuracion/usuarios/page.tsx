@@ -9,6 +9,7 @@ import DynamicTable from "@/components/DynamicTable";
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
 import { User } from "@/tipos/typos"
 import { usePathname } from "next/navigation";
+import Swal from 'sweetalert2';
 // Modal para agregar un nuevo Permiso
 export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) => {
   const [name, setName] = useState('');
@@ -21,35 +22,53 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
     }
   }, [editingUser]);
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const updatedUser = {
-      n_usu: name,  // nombre del usuario
-      abrev: abbreviation,  // abreviatura (si corresponde)
-      rol_id: editingUser?.rol_id,  // rol_id, lo debes pasar como está en el objeto de usuario
-      subunidad_id_subuni: editingUser?.subunidad_id_subuni,  // subunidad_id_subuni
-    };
-
-    try {
-      const response = await fetch(editingUser ? `${API_USERS}/${editingUser.dni}` : API_USERS, {
-        method: editingUser ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updatedUser)
-      });
-
-      if (response.ok) {
-        const savedUser = await response.json();
-        onSaveUser(savedUser);
-        mostrarAviso('succefull', 'Usuario guardado correctamente.');
-        closeModal();
-      } else {
-        mostrarAviso('warning', 'Error al guardar el Usuario.');
+  
+    // Abre el SweetAlert para confirmar la acción
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: '¡Este cambio no se puede deshacer!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, guardar',
+      cancelButtonText: 'Cancelar',
+    });
+  
+    if (result.isConfirmed) {
+      // Aquí construimos el objeto con los datos a guardar
+      const updatedUser = {
+        n_usu: name,  // nombre del usuario
+        abrev: abbreviation,  // abreviatura (si corresponde)
+        rol_id: editingUser?.rol_id,  // rol_id, lo debes pasar como está en el objeto de usuario
+        subunidad_id_subuni: editingUser?.subunidad_id_subuni,  // subunidad_id_subuni
+      };
+  
+      try {
+        const response = await fetch(editingUser ? `${API_USERS}/${editingUser.dni}` : API_USERS, {
+          method: editingUser ? 'PUT' : 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedUser),
+        });
+  
+        if (response.ok) {
+          const savedUser = await response.json();
+          onSaveUser(savedUser);
+          Swal.fire('Guardado!', 'El usuario se ha guardado correctamente.', 'success');
+          closeModal();
+        } else {
+          Swal.fire('Error', 'Hubo un problema al guardar el usuario.', 'error');
+        }
+      } catch (error) {
+        Swal.fire('Error', 'Error al conectar con la API: ' + error, 'error');
       }
-    } catch (error) {
-      mostrarAviso('warning', 'Error al conectar con la API:', error);
+    } else {
+      // Si el usuario cancela la operación
+      Swal.fire('Cancelado', 'El usuario no fue guardado.', 'info');
     }
   };
 

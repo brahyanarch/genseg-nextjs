@@ -9,6 +9,8 @@ import { AvisoContext } from '@/context/avisoContext'
 import DynamicTable from "@/components/DynamicTable";
 import { Subunidad } from "@/tipos/typos"
 import { usePathname } from "next/navigation";
+import Swal from 'sweetalert2';
+
 
 // Modal para agregar un nuevo Permiso
 export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnidad }: any) => {
@@ -23,32 +25,59 @@ export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnida
   }, [editingSubUnidad]);
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    const updatedSubUnidad = {
-      nombre: name,
-      abreviatura: abbreviation
-    };
-
-    try {
-      const response = await fetch(editingSubUnidad ? `${API_SUBUNIDADES}/${editingSubUnidad.id_subuni}` : API_SUBUNIDADES, {
-        method: editingSubUnidad ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updatedSubUnidad)
-      });
-
-      if (response.ok) {
-        const savedPermission = await response.json();
-        onSaveSubUnidad(savedPermission);
-        mostrarAviso('succefull', 'SubUnidad guardado correctamente.');
-        closeModal();
-      } else {
-        mostrarAviso('warning', 'Error al guardar la SubUnidad');
+  
+    // Confirmación antes de guardar con SweetAlert2
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: '¿Deseas guardar esta subunidad?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, guardar',
+      cancelButtonText: 'Cancelar',
+    });
+  
+    if (result.isConfirmed) {
+      const updatedSubUnidad = {
+        nombre: name,
+        abreviatura: abbreviation,
+      };
+  
+      try {
+        const response = await fetch(
+          editingSubUnidad ? `${API_SUBUNIDADES}/${editingSubUnidad.id_subuni}` : API_SUBUNIDADES,
+          {
+            method: editingSubUnidad ? 'PUT' : 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedSubUnidad),
+          }
+        );
+  
+        if (response.ok) {
+          const savedSubUnidad = await response.json();
+          onSaveSubUnidad(savedSubUnidad);
+          
+          // Muestra un mensaje de éxito usando SweetAlert2
+          await Swal.fire('Guardado!', 'La subunidad ha sido guardada correctamente.', 'success');
+          closeModal();
+        } else {
+          // Muestra un mensaje de error usando SweetAlert2 si la operación falla
+          await Swal.fire('Error', 'Hubo un problema al guardar la subunidad.', 'error');
+        }
+      } catch (error) {
+        // Muestra un mensaje de error si ocurre un problema de conexión
+        await Swal.fire('Error', 'Error al conectar con la API: ' + error, 'error');
       }
-    } catch (error) {
-      mostrarAviso('warning', 'Error al conectar con la API:', error);
+    } else {
+      // Muestra un mensaje de cancelación usando SweetAlert2 si el usuario cancela
+      await Swal.fire('Cancelado', 'No se realizaron cambios.', 'info');
     }
   };
+  
+  
 
   if (!isOpen) return null;
 
@@ -335,29 +364,47 @@ export default function Component() {
   };
 
   const deleteSubUnidad = async (id: number) => {
-    try {
-      const response = await fetch(`${API_SUBUNIDADES}/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        // Actualiza la lista de permisos eliminando el permiso
-        setData((prevSubUnidad) => prevSubUnidad.filter((subUnidad: any) => subUnidad.id_subuni !== id));
-        mostrarAviso('succefull', 'SubUnidad Eliminado correctamente.');
-        fetchSubUnidad();
-
-        setData((prevSubUnidad) => prevSubUnidad.filter((subUnidad: any) => subUnidad.id_subuni !== id));
-        console.log('Permiso eliminado correctamente');
-      } else {
-        console.error('Error al eliminar el permiso');
-        mostrarAviso('warning', 'Error al eliminar la SubUnidad');
+    // Confirmación antes de eliminar con SweetAlert2
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: '¡Esta acción no se puede deshacer!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+    });
+  
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(`${API_SUBUNIDADES}/${id}`, {
+          method: 'DELETE',
+        });
+  
+        if (response.ok) {
+          // Elimina la subunidad de la lista
+          setData((prevSubUnidad) => prevSubUnidad.filter((subUnidad: any) => subUnidad.id_subuni !== id));
+          
+          // Muestra un mensaje de éxito usando SweetAlert2
+          await Swal.fire('Eliminado!', 'La subunidad ha sido eliminada correctamente.', 'success');
+          fetchSubUnidad(); // Vuelve a obtener las subunidades
+        } else {
+          // Muestra un mensaje de error usando SweetAlert2 si la eliminación falla
+          await Swal.fire('Error', 'Hubo un problema al eliminar la subunidad.', 'error');
+        }
+      } catch (error) {
+        // Muestra un mensaje de error si ocurre un problema en la conexión
+        await Swal.fire('Error', 'Error al conectar con la API: ' + error, 'error');
       }
-    } catch (error) {
-      mostrarAviso('warning', 'Error al conectar con la API:', error);
+    } else {
+      // Muestra un mensaje de cancelación usando SweetAlert2 si el usuario cancela
+      await Swal.fire('Cancelado', 'La subunidad no fue eliminada.', 'info');
     }
-
-    fetchSubUnidad()
   };
+  
+  
+  
 
   if (loading) {
     return (
