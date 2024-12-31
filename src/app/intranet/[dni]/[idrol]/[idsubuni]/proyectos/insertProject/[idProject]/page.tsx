@@ -19,12 +19,23 @@ interface Activities {
   idproj: number;
   idres: number;
 }
+interface ProjectDetails {
+  plan: string;
+  estado: string;
+  fInit: string;
+  fFin: string;
+  idString: string;
+  prgest: {
+    nmPE: string;
+  };
+}
 
 
 
 export default function ProjectForm() {
   /// variables importantes
   const [activitiesProject, setActivitiesProjects] = useState<Activities[]>([]);
+      const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { mostrarAviso } = useContext<any>(AvisoContext);
@@ -42,7 +53,10 @@ export default function ProjectForm() {
   const insertActivity = () => {
     router.push(`${pathname}/insertActivity`);
   }
-
+  //función para editar una actividad
+  const editActivity = (id: number) => {
+    router.push(`${pathname}/editActivity/${id}`);
+  }
   //función para eliminar una actividad
   const deleteActivity = async (id: number) => {
     try {
@@ -87,6 +101,7 @@ export default function ProjectForm() {
       }
       const data = await response.json();
       setActivitiesProjects(data.actividades);
+      setProjectDetails(data.datasProject);
 
     } catch (err: any) {
       setError(err.message);
@@ -165,7 +180,7 @@ export default function ProjectForm() {
     {
       key: "abrev.abrev",
       label: "Escuela Profesional",
-      render: (item: Activities) => item.idString,
+      render: () => projectDetails?.prgest?.nmPE || "Sin escuela profesional",
       sortable: true,
     },
     {
@@ -191,7 +206,7 @@ export default function ProjectForm() {
       label: "Opciones",
       render: (item: Activities) => (
         <div className=" flex justify-center items-center">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" onClick={()=>{editActivity(item.idActivi)}} >
             <Edit className="h-5 w-5" strokeWidth={2.5} />
           </Button>
           <Button

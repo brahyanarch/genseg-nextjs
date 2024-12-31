@@ -11,10 +11,12 @@ const Menu = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isSubConfigOpen, setIsSubConfigOpen] = useState(false);
+  const [isPaginaOpen, setIsPaginaOpen] = useState(false);
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
   const toggleConfig = () => setIsConfigOpen(!isConfigOpen);
   const toggleSubConfig = () => setIsSubConfigOpen(!isSubConfigOpen);
+  const togglePagina = () => setIsPaginaOpen(!isPaginaOpen);
 
   const pathname = usePathname();
   const { idrol, idsubuni, dni } = useParams();
@@ -52,7 +54,18 @@ const Menu = () => {
     {
       icon: LayoutDashboard,
       label: "Pagina",
-      url: `/intranet/${dni}/${idrol}/${idsubuni}/pagina`
+      url: `#`,
+      subItems: [
+        {
+          label: "Carrusel",
+          url: `/intranet/${dni}/${idrol}/${idsubuni}/pagina/carrusel`
+        }, {
+          label: "Avisos",
+          url: `/intranet/${dni}/${idrol}/${idsubuni}/pagina/avisos`
+        },
+      ],
+      onClick: togglePagina,
+      isOpen: isPaginaOpen,
     },
     {
       icon: FolderKanban,

@@ -16,7 +16,7 @@ export default function ActivityForm() {
    const [fechaInicio,setFechaInicio] = useState();
    const [fechaFinal, setFechaFinal] = useState();
    const [answers, setAnswers] = useState<{ [key: number]: string | File | number[] }>({}); // Estado para almacenar respuestas
-   const {idProject, idsubuni} = useParams();
+   const {idProject, idActivity} = useParams();
    const pathname = usePathname(); 
    const router = useRouter();
    // Manejar cambios en las respuestas
@@ -94,8 +94,8 @@ export default function ActivityForm() {
   
     // Enviar la solicitud al backend
     try {
-      const response = await fetch(API_ACTIVITIES, {
-        method: 'POST',
+      const response = await fetch(`${API_ACTIVITIES}/${idActivity}`, {
+        method: 'PUT',
         body: formData, // Enviar el FormData como cuerpo
       });
   
@@ -117,29 +117,34 @@ export default function ActivityForm() {
     }
   };
   
-  
-     /// obtener las preguntas del formulario
-     const fetchQuestions = async () => {
+  useEffect(() => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(`${API_FORM}/${idsubuni}`);
-        if (!response.ok) {
-          throw new Error('Error al obtener las preguntas');
+        const [questionsResponse, answersResponse] = await Promise.all([
+          fetch(API_FORM),
+          fetch(API_ACTIVITIES), // Cambiar si tienes un endpoint diferente para respuestas
+        ]);
+  
+        if (!questionsResponse.ok || !answersResponse.ok) {
+          throw new Error("Error al obtener los datos");
         }
-        const data = await response.json();
-        setQuestions(data);
+  
+        const questionsData = await questionsResponse.json();
+        const answersData = await answersResponse.json();
+  
+        setQuestions(questionsData);
+        setAnswers(answersData); // Asume que las respuestas están en el formato correcto
       } catch (err: any) {
-        mostrarAviso('warning',err.message );
-      } finally {
-        console.log("Todo completo");
+        mostrarAviso("warning", err.message);
       }
     };
-      ///obtener las preguntas existentes en la base de datos desde la API
-  useEffect(() => {
-    fetchQuestions();
+  
+    fetchData();
   }, []);
+  
 
   return (
-    <div className="min-h-screen bg-background text-black dark:text-white p-6">
+    <div className="min-h-screen bg-background p-6">
       <div className="text-sm breadcrumbs mb-6 text-muted-foreground">
         <span>Inicio</span> {' > '} 
         <span>Proyectos</span> {' > '} 
@@ -156,7 +161,7 @@ export default function ActivityForm() {
             <Input 
               id="activity-name"
               placeholder="Nombre de la actividad"
-              className="bg-background text-black dark:text-white"
+              className="bg-background"
               value={nombreActividad}
               onChange={(e) => setNombreActividad(e.target.value)}
             />
@@ -170,7 +175,7 @@ export default function ActivityForm() {
               placeholder="Fecha inicial"
               value={fechaInicio}
               onChange={(e) => setFechaInicio(e.target.value)}
-              className="bg-background text-black dark:text-white"
+              className="bg-background"
             />
           </div>
 
@@ -180,7 +185,7 @@ export default function ActivityForm() {
               id="end-date"
               type="date"
               placeholder="Fecha final"
-              className="bg-background text-black dark:text-white"
+              className="bg-background"
               value={fechaFinal}
               onChange={(e) => setFechaFinal(e.target.value)}
             />
@@ -193,7 +198,7 @@ export default function ActivityForm() {
                   <label className="block font-medium">{question.questionText}</label>
                   <input
                     type="text"
-                    className="border rounded p-2 w-full bg-background text-black dark:text-white"
+                    className="border rounded p-2 w-full bg-background"
                     placeholder="Escribe tu respuesta"
                     value={answers[question.id] || ""}
                     required
@@ -208,7 +213,7 @@ export default function ActivityForm() {
                   <label className="block font-medium bg-background">{question.questionText}</label>
                   <input
                     type="date"
-                    className="border rounded p-2 w-full bg-background text-black dark:text-white"
+                    className="border rounded p-2 w-full bg-background"
                     value={answers[question.id] || ""}
                     required
                     onChange={(e) => handleChange(question.id, e.target.value)}
@@ -225,7 +230,7 @@ export default function ActivityForm() {
                       <label className="flex items-center gap-2">
                         <input
                           type="checkbox"
-                          className="border rounded text-black dark:text-white"
+                          className="border rounded"
                           id={`${question.id}-${option.idop}`} // Vincula correctamente con el ID
                           value={option.idop}
                           checked={answers[question.id]?.includes(option.idop) || false} // Comprueba contra option.id
@@ -245,7 +250,7 @@ export default function ActivityForm() {
                     <label className="block font-medium">{question.questionText}</label>
                     {question.options?.map((option) => (
                       <div key={option.idop}>
-                        <label className="flex items-center gap-2 text-black dark:text-white">
+                        <label className="flex items-center gap-2">
                           <input
                             type="radio"
                             name={`singleChoice-${question.id}`}

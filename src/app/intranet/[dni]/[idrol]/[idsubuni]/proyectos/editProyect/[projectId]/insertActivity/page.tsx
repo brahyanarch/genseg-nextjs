@@ -16,7 +16,7 @@ export default function ActivityForm() {
    const [fechaInicio,setFechaInicio] = useState();
    const [fechaFinal, setFechaFinal] = useState();
    const [answers, setAnswers] = useState<{ [key: number]: string | File | number[] }>({}); // Estado para almacenar respuestas
-   const {idProject, idsubuni} = useParams();
+   const {projectId, idsubuni} = useParams();
    const pathname = usePathname(); 
    const router = useRouter();
    // Manejar cambios en las respuestas
@@ -57,7 +57,7 @@ export default function ActivityForm() {
     return partes.slice(0, indice + 2).join('/'); // Toma hasta el segmento + un nivel
   };
   const handleCancelActivity = ()=>{
-    const recortada = recortarRutaHastaSegmento(pathname, 'insertProject');
+    const recortada = recortarRutaHastaSegmento(pathname, 'editProyect');
     router.push(recortada);
   } 
   
@@ -71,7 +71,7 @@ export default function ActivityForm() {
     formData.append("name", String(nombreActividad)); // Nombre de la actividad
     formData.append("fInit", String(fechaInicio));    // Fecha de inicio
     formData.append("fFin", String(fechaFinal));      // Fecha final
-    formData.append("idproj", String(idProject));     // ID del proyecto
+    formData.append("idproj", String(projectId));     // ID del proyecto
     
     // Crear un objeto para almacenar las respuestas
     const responses = {};
@@ -139,7 +139,7 @@ export default function ActivityForm() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-black dark:text-white p-6">
+    <div className="min-h-screen bg-background p-6">
       <div className="text-sm breadcrumbs mb-6 text-muted-foreground">
         <span>Inicio</span> {' > '} 
         <span>Proyectos</span> {' > '} 
@@ -156,7 +156,7 @@ export default function ActivityForm() {
             <Input 
               id="activity-name"
               placeholder="Nombre de la actividad"
-              className="bg-background text-black dark:text-white"
+              className="bg-background"
               value={nombreActividad}
               onChange={(e) => setNombreActividad(e.target.value)}
             />
@@ -170,7 +170,7 @@ export default function ActivityForm() {
               placeholder="Fecha inicial"
               value={fechaInicio}
               onChange={(e) => setFechaInicio(e.target.value)}
-              className="bg-background text-black dark:text-white"
+              className="bg-background"
             />
           </div>
 
@@ -180,7 +180,7 @@ export default function ActivityForm() {
               id="end-date"
               type="date"
               placeholder="Fecha final"
-              className="bg-background text-black dark:text-white"
+              className="bg-background"
               value={fechaFinal}
               onChange={(e) => setFechaFinal(e.target.value)}
             />
@@ -193,7 +193,7 @@ export default function ActivityForm() {
                   <label className="block font-medium">{question.questionText}</label>
                   <input
                     type="text"
-                    className="border rounded p-2 w-full bg-background text-black dark:text-white"
+                    className="border rounded p-2 w-full bg-background"
                     placeholder="Escribe tu respuesta"
                     value={answers[question.id] || ""}
                     required
@@ -208,7 +208,7 @@ export default function ActivityForm() {
                   <label className="block font-medium bg-background">{question.questionText}</label>
                   <input
                     type="date"
-                    className="border rounded p-2 w-full bg-background text-black dark:text-white"
+                    className="border rounded p-2 w-full bg-background"
                     value={answers[question.id] || ""}
                     required
                     onChange={(e) => handleChange(question.id, e.target.value)}
@@ -225,7 +225,7 @@ export default function ActivityForm() {
                       <label className="flex items-center gap-2">
                         <input
                           type="checkbox"
-                          className="border rounded text-black dark:text-white"
+                          className="border rounded"
                           id={`${question.id}-${option.idop}`} // Vincula correctamente con el ID
                           value={option.idop}
                           checked={answers[question.id]?.includes(option.idop) || false} // Comprueba contra option.id
@@ -245,7 +245,7 @@ export default function ActivityForm() {
                     <label className="block font-medium">{question.questionText}</label>
                     {question.options?.map((option) => (
                       <div key={option.idop}>
-                        <label className="flex items-center gap-2 text-black dark:text-white">
+                        <label className="flex items-center gap-2">
                           <input
                             type="radio"
                             name={`singleChoice-${question.id}`}

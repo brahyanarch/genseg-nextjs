@@ -33,6 +33,7 @@ export const API_PROJECTS_DONA = `${API_URL}/api/project/dona`;
 export const API_GET_PROJECTS = `${API_URL}/api/project/user`;
 export const API_PROJECT_ACTIVITIES = `${API_URL}/api/project`;
 export const API_PROJECTS_SUBUNIDAD = `${API_URL}/api/project`;
+export const API_ESCUELA_PROFESIONAL = `${API_URL}/api/programaestudio`;
 //rutas admin general
 export const API_ADMIN = `${API_URL}/auth/login`;
 //rutas edicion de formulario
