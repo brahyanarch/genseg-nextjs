@@ -19,11 +19,21 @@ interface Activities {
   idproj: number;
   idres: number;
 }
-
+interface ProjectDetails {
+  plan: string;
+  estado: string;
+  fInit: string;
+  fFin: string;
+  idString: string;
+  prgest: {
+    nmPE: string;
+  };
+}
 export function TaskList({ toggleOpenDetsAct, typeEdit }: any) {
 
   //variable importantes
   const [activitiesProject, setActivitiesProjects] = useState<Activities[]>([]);
+  const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState(null);
   const { mostrarAviso } = useContext<any>(AvisoContext);
@@ -33,6 +43,8 @@ export function TaskList({ toggleOpenDetsAct, typeEdit }: any) {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const { projectId } = useParams();
+  const router = useRouter();
+  const pathname = usePathname();
   /// Fucion para cambiar a interfaz de detalles de una actividad 
   //función para obtener datos desde la API
   const fetchActivitiesProject = async () => {
@@ -43,6 +55,7 @@ export function TaskList({ toggleOpenDetsAct, typeEdit }: any) {
       }
       const data = await response.json();
       setActivitiesProjects(data.actividades);
+      setProjectDetails(data.datasProject);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -54,7 +67,14 @@ export function TaskList({ toggleOpenDetsAct, typeEdit }: any) {
     fetchActivitiesProject();
   }, []);
 
-
+  //función para editar una actividad
+  const editActivity = (id: number) => {
+    router.push(`${pathname}/editActivity/${id}`);
+  }
+  //función para añadir una actividad
+  const insertActivity = () => {
+    router.push(`${pathname}/insertActivity`);
+  }
   //función para eliminar una actividad
   const deleteActivity = async (id: number) => {
     try {
@@ -141,7 +161,7 @@ export function TaskList({ toggleOpenDetsAct, typeEdit }: any) {
     {
       key: "abrev.abrev",
       label: "Escuela Profesional",
-      render: (item: Activities) => item.idString,
+      render: () => projectDetails?.prgest?.nmPE || "Sin escuela profesional",
       sortable: true,
     },
     {
@@ -170,7 +190,7 @@ export function TaskList({ toggleOpenDetsAct, typeEdit }: any) {
           {
             typeEdit && (
               <>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" onClick={() => editActivity(item.idActivi)} >
                   <Edit className="h-5 w-5" strokeWidth={2.5} />
                 </Button>
                 <Button
@@ -280,17 +300,17 @@ export function TaskList({ toggleOpenDetsAct, typeEdit }: any) {
     <Card className="w-full p-4 bg-white dark:bg-gray-900">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Lista de Tareas (6)</h2>
+          <h2 className="text-xl font-semibold">Lista de Actividades ({activitiesProject.length})</h2>
         </div>
         <div className="flex items-center justify-between gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Buscar tareas" className="pl-9" />
+            <Input placeholder="Buscar tareas" className="pl-9 w-[50%]" />
           </div>
           <div className="flex items-center gap-2 text-sm">
             {
               typeEdit && (
-                <Button className="bg-blue-500 hover:bg-blue-600 h-12 w-32 "  >
+                <Button className="bg-blue-500 hover:bg-blue-600 h-12 w-32 " onClick={insertActivity} >
                   Nueva Actividad
                 </Button>
               )

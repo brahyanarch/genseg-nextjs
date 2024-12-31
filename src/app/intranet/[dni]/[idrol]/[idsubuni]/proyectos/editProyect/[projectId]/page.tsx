@@ -3,11 +3,26 @@ import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { X } from 'lucide-react'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { TaskList } from '@/components/componentesProyecto/porjectInfo'
 import Image from 'next/image'
-import { useState, useEffect } from "react"
-import { API_PROJECT_ACTIVITIES, API_PROJECTS } from "@/config/apiconfig";
+import { useState, useEffect, useContext } from "react"
+import { AvisoContext } from "@/context/avisoContext";
+import { API_PROJECT_ACTIVITIES, API_PROJECTS, API_URL, API_ESCUELA_PROFESIONAL } from "@/config/apiconfig";
 import { usePathname, useRouter, useParams } from "next/navigation"
 ///
 interface ProjectDetails {
@@ -23,14 +38,33 @@ interface ProjectDetails {
   ir_rol: number;
   idsubuni: number;
 }
+/// Interface escuela profesional
+interface Escuelas {
+  idpe: number;
+  nmPE: string;
+  idesc: number;
+}
+interface ProjectDetails {
+  plan: string;
+  estado: string;
+  fInit: string;
+  fFin: string;
+  idString: string;
+  prgest: {
+    nmPE: string;
+  };
+}
 export default function EditProject() {
 
-  const [projectDetails, setProjectDetails] = useState<ProjectDetails[]>([]);
+  const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>();
+  const { mostrarAviso } = useContext<any>(AvisoContext);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState(null);
   const [escuelaP, setEscuelaP] = useState<string>("");
+  const [escuelas, setEscuelas] = useState<Escuelas[]>([]);
   const [plan, setPlan] = useState<File | null>(null);
   const [existingPlan, setExistingPlan] = useState<string>("");
+  const [comboboxOpen, setComboboxOpen] = useState(false);
   const route = useRouter();
   const pathname = usePathname();
   const { projectId } = useParams();
@@ -46,9 +80,9 @@ export default function EditProject() {
         throw new Error("Error al obtener los Proyectos");
       }
       const data = await response.json();
-      setProjectDetails(data.datos);
-      setEscuelaP(data.datos[0].escuelaProfesional)
-      setExistingPlan(data.datos[0].plan)
+      setProjectDetails(data.datasProject);
+      setEscuelaP(data.datasProject.prgest.nmPE);
+      setExistingPlan(data.datasProject.plan)
 
     } catch (err: any) {
       setError(err.message);
@@ -60,7 +94,7 @@ export default function EditProject() {
   const saveChanges = async () => {
   
     const formData = new FormData();
-    formData.append("EP", String(escuelaP)); // Valor modificado
+    formData.append("idpe", String(escuelaP)); // Valor modificado
     if (plan) {
       formData.append("file", plan); // Archivo nuevo si se seleccionó
     }
@@ -82,16 +116,37 @@ export default function EditProject() {
       alert(`Error: ${err.message}`);
     }
   };
+  const getAllEscuelas = async () => {
+    try {
+      const response = await fetch(API_ESCUELA_PROFESIONAL);
+      if (response.ok) {
+        const data = await response.json();
+        setEscuelas(data);
+      } else {
+        mostrarAviso("warning", "Error al cargar las escuelas profesionales.");
+      }
+    } catch (error) {
+      mostrarAviso("warning", `Error al conectar con la API: ${error}`);
+    }
+  };
   
   // useEffect para obtener los roles desde la API al montar el componente
   useEffect(() => {
     fetchProjectsDetails();
-  }, []);
+    getAllEscuelas();
+  }, [projectId]);
 
-  const formatearFecha = (fecha:string) =>{
-    const fechaFormateada = new Date(fecha).toISOString().split('T')[0];
-    return fechaFormateada;
-    }
+  const formatearFecha = (fecha: string) => {
+    return new Date(fecha).toLocaleDateString();
+  };
+
+  if (loading) {
+    return <p>Cargando...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   return (
     <>
@@ -102,14 +157,7 @@ export default function EditProject() {
         <div className=" w-[90%] mx-auto" >
           <CardHeader>
             <CardTitle className="text-xl font-semibold">
-              Limpieza del bosque (LP451)
-              <h2>
-                {projectDetails.map((project) => (
-                  project.idString
-                ))}
-                
-              </h2>
-              <button className="bg-red-600 absolute top-2 right-2 py-2 px-3 rounded-md" ><X className="w-5 h-5" /></button>
+            Proyecto: {projectDetails?.idString || "Sin ID"}
             </CardTitle>
             <Progress value={64} className="h-2 mt-2" />
             <span className="text-sm text-muted-foreground mt-1">64%</span>
@@ -120,9 +168,7 @@ export default function EditProject() {
                 <div className="text-sm">
                   <div className="font-medium">Fecha Inicio</div>
                   <div className="text-muted-foreground py-2 px-4 rounded-lg border-2 border-gray-500 border-opacity-30 ">
-                    {projectDetails.map((project) => (
-                      formatearFecha(project.fInit)
-                    ))}
+                  {formatearFecha(projectDetails?.fInit || "")}
                   </div>
                 </div>
               </div>
@@ -130,9 +176,7 @@ export default function EditProject() {
                 <div className="text-sm">
                   <div className="font-medium">Fecha final</div>
                   <div className="text-muted-foreground py-2 px-4 rounded-lg border-2 border-gray-500 border-opacity-30">
-                    {projectDetails.map((project) => (
-                      formatearFecha(project.fFin)
-                    ))}
+                  {formatearFecha(projectDetails?.fFin || "")}
                   </div>
                 </div>
               </div>
@@ -149,18 +193,71 @@ export default function EditProject() {
               <h3 className="font-medium mb-2">Estado</h3>
               <div className="flex flex-wrap gap-2">
                 <Badge variant="outline" className="bg-yellow-200">
-                  {projectDetails.map((project) => (
-                    project.estado
-                  ))}
+                {projectDetails?.estado || "Sin estado"}
                 </Badge>
               </div>
             </div>
             <div>
               <div className="dark:texto-white texto md">
                 <h3 className="font-medium mb-2">Escuela Profesional</h3>
-                <input type="text" value={escuelaP} className="text-black" onChange={(e) => setEscuelaP(e.target.value)} />
+                <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={comboboxOpen}
+                      className="w-96 justify-between h-10 border-2 dark:border-gray-300"
+                    >
+                      {escuelaP
+                        ? escuelas.find((esc) => esc.idpe === parseInt(escuelaP))?.nmPE
+                        : "Seleccione una opción"}
+                      <ChevronsUpDown className="opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-96 p-0">
+                    <Command>
+                      <CommandInput
+                        placeholder="Buscar escuela profesional..."
+                        className="h-9"
+                      />
+                      <CommandList>
+                        <CommandEmpty>No se encontraron resultados.</CommandEmpty>
+                        <CommandGroup>
+                          {escuelas.map((escuela) => (
+                            <CommandItem
+                              key={escuela.idpe}
+                              value={escuela.idpe.toString()}
+                              onSelect={() => {
+                                setEscuelaP(
+                                  escuela.idpe.toString()
+                                );
+                                setComboboxOpen(false);
+                              }}
+                            >
+                              {escuela.nmPE}
+                              <Check
+                                className={cn(
+                                  "ml-auto",
+                                  escuelaP === escuela.idpe.toString()
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
                 <h3 className="font-medium mb-2">Plan de Proyecto</h3>
-                <p>{existingPlan}</p>
+                              <a
+                                href={`${API_URL}/${existingPlan}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                Ver plan existente
+                              </a>
                 <input type="file" name="" id="" onChange={(e) => setPlan(e.target.files?.[0] || null)} />
               </div>
               <Button className="bg-blue-500 hover:bg-blue-600 h-12 w-32 " onClick={saveChanges}  >
