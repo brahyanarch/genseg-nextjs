@@ -58,7 +58,7 @@ export const QuestionItem: React.FC<QuestionItemProps> = ({ question, updateQues
           <SelectItem value="singleChoice">Selección única</SelectItem>
           <SelectItem value="multipleChoice">Selección múltiple</SelectItem>
           <SelectItem value="archive">Archivo</SelectItem>
-          <SelectItem value="fecha">Fecha</SelectItem>
+          <SelectItem value="date">Fecha</SelectItem>
         </SelectContent>
       </Select>
       {(question.type === 'dropdown' || question.type === 'multipleChoice' || question.type === 'singleChoice') && (

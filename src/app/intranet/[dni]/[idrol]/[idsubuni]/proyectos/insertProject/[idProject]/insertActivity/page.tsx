@@ -94,7 +94,7 @@ export default function ActivityForm() {
   
     // Enviar la solicitud al backend
     try {
-      const response = await fetch(API_ACTIVITIES, {
+      const response = await fetch(`${API_ACTIVITIES}/${idsubuni}`, {
         method: 'POST',
         body: formData, // Enviar el FormData como cuerpo
       });
