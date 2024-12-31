@@ -309,7 +309,7 @@ export default function Component() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => deletePermission(item.id)}
+            onClick={() => deletePermission(item.id_per)}
           >
             <Trash2 className="h-5 w-5" strokeWidth={2.5} />
           </Button>

@@ -45,7 +45,7 @@ export default function Principal (){
       const fetchActivities = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`${API_ACTIVITIES}/${idsubuni}`);
+            const response = await fetch(`${API_ACTIVITIES}/subunidad/${idsubuni}`);
             if (!response.ok) throw new Error("Error al cargar actividades");
             const data: AllActivities = await response.json();
             setactivities(data);
@@ -69,13 +69,13 @@ export default function Principal (){
         <div className="flex items-center justify-around space-x-2 mx-auto p-4">
 
         <Completado />
-        <p className="pr-7"> {activities?.Completado} Actividades Completados</p>
+        <p className="pr-7"> {activities?.Completado || 0} Actividades Completados</p>
         <Pendiente />
-        <p className="pr-7">{activities?.Pendiente} Actividades pendientes</p>
+        <p className="pr-7">{activities?.Pendiente||0} Actividades pendientes</p>
         <Archivado />
-        <p className="pr-7">{activities?.Archivado} Actividades archivados</p>
+        <p className="pr-7">{activities?.Archivado||0} Actividades archivados</p>
         <EnCurso />
-        <p className="pr-7">{activities?.Curso} Actividades en curso</p>
+        <p className="pr-7">{activities?.Curso||0} Actividades en curso</p>
         </div>
 
         <Graficos />   

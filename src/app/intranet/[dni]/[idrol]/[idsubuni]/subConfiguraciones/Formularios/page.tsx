@@ -5,40 +5,41 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import DynamicTable from "@/components/DynamicTable";
-import { API_FORM } from "@/config/apiconfig";
+import { API_FORM , API_GET_FORM_BY_SUBUNI} from "@/config/apiconfig";
 import { AvisoContext } from '@/context/avisoContext'
 import { useParams, usePathname, useRouter } from "next/navigation";
-interface FormEntry {
+type FormEntry = {
   idf: number;
-  nombre: string;
-  fechaCreacion: string;
-  abreviatura: string;
-  active: boolean;
+  nmForm: string;
+  estado: boolean;
+  abre: string;
+  Fcreate: string;
+  Fupdate: string;
 }
 ///datos locales para la prueba
-const forms: FormEntry[] = [
+/*const forms: FormEntry[] = [
   {
     idf: 1,
-    nombre: "Formulario proyecto 2024",
-    fechaCreacion: "12-02-2024",
-    abreviatura: "F120224",
-    active: true,
+    nmForm: "Formulario proyecto 2024",
+    Fcreate: "12-02-2024",
+    abre: "F120224",
+    estado: true,
   },
   {
     idf: 2,
-    nombre: "Formulario proyecto 2",
-    fechaCreacion: "13-02-2024",
-    abreviatura: "F130224",
-    active: false,
+    nmForm: "Formulario proyecto 2",
+    Fcreate: "13-02-2024",
+    abre: "F130224",
+    estado: false,
   },
   {
     idf: 3,
-    nombre: "Formulario proyecto 3",
-    fechaCreacion: "14-02-2024",
-    abreviatura: "F140224",
-    active: false,
+    nmForm: "Formulario proyecto 3",
+    Fcreate: "14-02-2024",
+    abre: "F140224",
+    estado: false,
   },
-];
+];*/
 // modal para editar o añadir  un formulario
 export const EditModal = ({
   isOpen,
@@ -157,7 +158,7 @@ export const EditModal = ({
   );
 };
 export default function Component() {
-  const [form, setForm] = useState([]);
+  const [form, setForm] = useState<FormEntry[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingForm, setEditingForm] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -169,7 +170,7 @@ export default function Component() {
   ///variables necesarios para la tabla dinámica
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(4);
-  const totalPages = Math.ceil(forms.length / itemsPerPage);
+  const totalPages = Math.ceil(form.length / itemsPerPage);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -240,9 +241,9 @@ export default function Component() {
 
   // Función para ordenar los datos
   const getSortedData = () => {
-    if (!sortColumn) return forms;
+    if (!sortColumn) return form;
 
-    return [...forms].sort((a, b) => {
+    return [...form].sort((a, b) => {
       const fieldA = getNestedProperty(a, sortColumn);
       const fieldB = getNestedProperty(b, sortColumn);
 
@@ -283,25 +284,25 @@ export default function Component() {
     {
       key: "index",
       label: "ID",
-      render: (item: FormEntry) => <>{forms.indexOf(item) + 1}</>,
+      render: (item: FormEntry) => <>{form.indexOf(item) + 1}</>,
       sortable: true,
     },
     {
       key: "n_usu",
       label: "Nombre",
-      render: (item: FormEntry) => item.nombre,
+      render: (item: FormEntry) => item.nmForm,
       sortable: true,
     },
     {
       key: "fechaCreacion",
       label: "Fecha Creación",
-      render: (item: FormEntry) => item.fechaCreacion,
+      render: (item: FormEntry) => item.Fcreate,
       sortable: true,
     },
     {
       key: "Abreviatura",
       label: "Abreviatura",
-      render: (item: FormEntry) => item.abreviatura,
+      render: (item: FormEntry) => item.abre,
       sortable: true,
     },
     {
@@ -317,7 +318,7 @@ export default function Component() {
           </Button>
           <Button variant="ghost" size="icon">
             <Circle
-              className={`h-5 w-5 ${item.active ? "fill-primary" : ""
+              className={`h-5 w-5 ${item.estado ? "fill-primary" : ""
                 }`}
               strokeWidth={2.5}
             />
@@ -417,7 +418,7 @@ export default function Component() {
   //función para obtener datos desde la API
   const fetchForms = async () => {
     try {
-      const response = await fetch(API_FORM);
+      const response = await fetch(`${API_GET_FORM_BY_SUBUNI}/${idsubuni}`);
       if (!response.ok) {
         throw new Error("Error al obtener los Formularios");
       }

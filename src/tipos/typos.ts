@@ -22,10 +22,9 @@ export type User = {
 };
 
 export type Permisos = {
-  id: number;
+  id_per: number;
   n_per: string;
   abreviatura: string;
-
 }
 export type Activities = {
   id: number;
