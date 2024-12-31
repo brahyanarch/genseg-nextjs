@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useParams } from 'next/navigation';
-
+import { API_URL } from "@/config/apiconfig";
 export type QuestionType = 'text' | 'multipleChoice' | 'singleChoice' | 'dropdown' | 'date' | 'archive';
 
 export interface Question {
@@ -137,7 +137,7 @@ export const DynamicForm: React.FC = () => {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await fetch(`https://2nlfx0w1-3000.brs.devtunnels.ms/api/form/preguntas/${idForm}`);
+        const response = await fetch(`${API_URL}/api/form/preguntas/${idForm}`);
         const data = await response.json();
         const formattedQuestions = data.map((q: any) => ({
           id: q.id.toString(),
