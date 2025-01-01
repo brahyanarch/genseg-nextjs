@@ -2,12 +2,12 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { AvisoContext } from "@/context/avisoContext"
 import { Edit, Search, Trash2 } from "lucide-react";
 import DynamicTable from "@/components/DynamicTable";
-import { useState, useContext, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useParams, usePathname, useRouter } from "next/navigation"
 import { API_PROJECT_ACTIVITIES, API_ACTIVITIES } from "@/config/apiconfig"
+import Swal from 'sweetalert2';
 
 interface Activities {
   idActivi: number;
@@ -35,10 +35,7 @@ interface ProjectDetails {
 export default function ProjectForm() {
   /// variables importantes
   const [activitiesProject, setActivitiesProjects] = useState<Activities[]>([]);
-      const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const { mostrarAviso } = useContext<any>(AvisoContext);
+  const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>(null);
   const { idProject } = useParams();
   ///variables necesarios para la tabla dinámica
   const [currentPage, setCurrentPage] = useState(1);
@@ -59,30 +56,123 @@ export default function ProjectForm() {
   }
   //función para eliminar una actividad
   const deleteActivity = async (id: number) => {
-    try {
-      const response = await fetch(`${API_ACTIVITIES}/${id}`, {
-        method: "DELETE",
-      });
+    // Confirmación de SweetAlert antes de eliminar
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Esta Actividad será eliminado permanentemente.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'No, cancelar',
+    });
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(`${API_ACTIVITIES}/${id}`, {
+          method: "DELETE",
+        });
 
-      if (response.ok) {
-        const actividadesNuevas = await response.json();
-        /*setActivitiesProjects((prevProjects: Activities[]) =>
-          prevProjects.filter((form: Activities) => form.idActivi !== id)
-        );*/
-        setActivitiesProjects(actividadesNuevas.actividades);
-        mostrarAviso('succefull', 'Actividad Eliminado correctamente.');
-        fetchActivitiesProject();
-      } else {
-        mostrarAviso('warning', 'Error al eliminar el Actividad.');
+        if (response.ok) {
+          const actividadesNuevas = await response.json();
+          /*setActivitiesProjects((prevProjects: Activities[]) =>
+            prevProjects.filter((form: Activities) => form.idActivi !== id)
+          );*/
+          setActivitiesProjects(actividadesNuevas.actividades);
+          // Mostrar un SweetAlert de éxito
+          Swal.fire({
+            icon: 'success',
+            title: '¡Eliminado!',
+            text: 'La Actividad fue eliminado correctamente.',
+            confirmButtonText: 'OK'
+          });
+          fetchActivitiesProject();
+        } else {
+          // Si el servidor no responde correctamente
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un problema al eliminar la Actividad.',
+            confirmButtonText: 'OK'
+          });
+        }
+      } catch (error) {
+        // Si ocurre un error de conexión
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: `Error al conectar con la API. ${error}`,
+          confirmButtonText: 'OK'
+        });
       }
-    } catch (error) {
-      mostrarAviso('warning', "Error al conectar con la API:", error);
+    } else {
+      // Si el usuario cancela la operación
+      Swal.fire({
+        icon: 'info',
+        title: 'Operación cancelada',
+        text: 'La actividad no fue eliminado.',
+        confirmButtonText: 'OK'
+      });
     }
   };
 
-  const handleSaveChange = () => {
-    const recortada = recortarRutaHastaSegmento(pathname, 'proyectos');
-    router.push(recortada);
+  const handleSaveChange = async () => {
+    // Confirmación de SweetAlert antes de eliminar
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Estos cambios serán guardados.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, guardar cambios',
+      cancelButtonText: 'No guardar cambios',
+    });
+    if (result.isConfirmed) {
+      const recortada = recortarRutaHastaSegmento(pathname, 'proyectos');
+      router.push(recortada);
+        // Mostrar un SweetAlert de éxito
+        Swal.fire({
+          icon: 'success',
+          title: '¡Éxito!',
+          text: 'Los cambios fueron guardados correctamente.',
+          confirmButtonText: 'OK'
+        });
+    } else {
+      // Si el usuario cancela la operación
+      Swal.fire({
+        icon: 'info',
+        title: 'Operación cancelada',
+        text: 'Los cambios no fueron guardados.',
+        confirmButtonText: 'OK'
+      });
+    }
+  }
+  const handleCancelChange = async () => {
+    // Confirmación de SweetAlert antes de eliminar
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Estos cambios serán Eliminados.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Eliminar cambios',
+      cancelButtonText: 'No Eliminar cambios',
+    });
+    if (result.isConfirmed) {
+      const recortada = recortarRutaHastaSegmento(pathname, 'proyectos');
+      router.push(recortada);
+      // Mostrar un SweetAlert de éxito
+      Swal.fire({
+        icon: 'success',
+        title: '¡Éxito!',
+        text: 'Los cambios fueron Eliminados correctamente.',
+        confirmButtonText: 'OK'
+      });
+    } else {
+      // Si el usuario cancela la operación
+      Swal.fire({
+        icon: 'info',
+        title: 'Operación cancelada',
+        text: 'Los cambios no fueron guardados.',
+        confirmButtonText: 'OK'
+      });
+    }
   }
   ///recortar rutas
   const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
@@ -96,17 +186,28 @@ export default function ProjectForm() {
   const fetchActivitiesProject = async () => {
     try {
       const response = await fetch(`${API_PROJECT_ACTIVITIES}/${idProject}`);
-      if (!response.ok) {
-        throw new Error("Error al obtener los Proyectos");
-      }
-      const data = await response.json();
-      setActivitiesProjects(data.actividades);
-      setProjectDetails(data.datasProject);
+      if (response.ok) {
+        const data = await response.json();
+        setActivitiesProjects(data.actividades);
+        setProjectDetails(data.datasProject);
 
+      } else {
+        // Si el servidor no responde correctamente
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Hubo un problema al obtener las actividades del Proyecto.',
+          confirmButtonText: 'OK'
+        });
+      }
     } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      // Si ocurre un error de conexión
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: `Error al conectar con la API. ${err}`,
+        confirmButtonText: 'OK'
+      });
     }
   };
   // useEffect para obtener los roles desde la API al montar el componente
@@ -206,7 +307,7 @@ export default function ProjectForm() {
       label: "Opciones",
       render: (item: Activities) => (
         <div className=" flex justify-center items-center">
-          <Button variant="ghost" size="icon" onClick={()=>{editActivity(item.idActivi)}} >
+          <Button variant="ghost" size="icon" onClick={() => { editActivity(item.idActivi) }} >
             <Edit className="h-5 w-5" strokeWidth={2.5} />
           </Button>
           <Button
@@ -255,7 +356,7 @@ export default function ProjectForm() {
     // Rango de páginas cercanas a la actual
     const maxVisiblePages = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, currentPage + Math.floor(maxVisiblePages / 2));
+    const endPage = Math.min(totalPages, currentPage + Math.floor(maxVisiblePages / 2));
 
     if (endPage - startPage < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
@@ -347,7 +448,7 @@ export default function ProjectForm() {
           </div>
         </div>
         <div className="w-[90%] flex justify-end gap-8 items-center mx-auto">
-          <Button className="bg-red-500 hover:bg-red-600  w-32 h-14 " >
+          <Button className="bg-red-500 hover:bg-red-600  w-32 h-14 " onClick={handleCancelChange} >
             Cancelar Cambios
           </Button>
           <Button className="bg-green-500 hover:bg-green-600  w-32 h-14 " onClick={handleSaveChange} >

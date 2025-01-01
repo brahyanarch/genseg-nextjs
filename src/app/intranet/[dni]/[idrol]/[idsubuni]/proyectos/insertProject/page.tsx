@@ -2,8 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AvisoContext } from "@/context/avisoContext";
-import { useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Command,
   CommandEmpty,
@@ -21,6 +20,7 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { API_PROJECTS, API_ESCUELA_PROFESIONAL } from "@/config/apiconfig";
+import Swal from 'sweetalert2';
 
 /// Interface escuela profesional
 interface Escuelas {
@@ -31,7 +31,6 @@ interface Escuelas {
 
 export default function ProjectForm() {
   /// Variables importantes
-  const { mostrarAviso } = useContext<any>(AvisoContext);
   const [escuelas, setEscuelas] = useState<Escuelas[]>([]);
   const [escuelaProfesional, setEscuelaProfesional] = useState<string>("");
   const [planProyecto, setPlanProyecto] = useState<File | null>(null);
@@ -48,16 +47,27 @@ export default function ProjectForm() {
   };
 
   const getAllEscuelas = async () => {
+    
     try {
       const response = await fetch(API_ESCUELA_PROFESIONAL);
       if (response.ok) {
         const data = await response.json();
         setEscuelas(data);
       } else {
-        mostrarAviso("warning", "Error al cargar las escuelas profesionales.");
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error al cargar las escuelas profesionales.',
+          confirmButtonText: 'OK'
+        });
       }
     } catch (error) {
-      mostrarAviso("warning", `Error al conectar con la API: ${error}`);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: `Error al conectar con la API: ${error}`,
+        confirmButtonText: 'OK'
+      });
     }
   };
 
@@ -80,18 +90,36 @@ export default function ProjectForm() {
 
       if (response.ok) {
         const resIdProject = await response.json();
-        mostrarAviso("succefull", "Proyecto guardado correctamente.");
+          // Mostrar un SweetAlert de éxito
+          Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: 'El Proyecto fue creado correctamente.',
+            confirmButtonText: 'OK'
+          });
         if (resIdProject.idproj !== undefined) {
           router.push(`${pathname}/${resIdProject.idproj}`);
         }
       } else {
-        mostrarAviso("warning", "Error al guardar el proyecto.");
+        // Si el servidor no responde correctamente
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Hubo un problema al crear el Proyecto.',
+          confirmButtonText: 'OK'
+        });
         formData.forEach((value, key) => {
           console.log(`${key}:`, value);
         });
       }
     } catch (error) {
-      mostrarAviso("warning", `Error al conectar con la API: ${error}`);
+      // Si ocurre un error de conexión
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: `Error al conectar con la API. ${error}`,
+        confirmButtonText: 'OK'
+      });
     }
   };
 

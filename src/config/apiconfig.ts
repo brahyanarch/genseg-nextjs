@@ -1,5 +1,6 @@
 // config/apiConfig.ts
-export const API_URL = "https://2nlfx0w1-3000.brs.devtunnels.ms";
+//export const API_URL = "https://2nlfx0w1-3000.brs.devtunnels.ms";
+export const API_URL = "https://c5977l35-3000.brs.devtunnels.ms";
 //const API_URL = "http://localhost:3000";
 /**
  * Función que genera una URL para la API con base en una ruta dinámica y un dni.

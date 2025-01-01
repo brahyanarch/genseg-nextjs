@@ -20,10 +20,10 @@ import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { TaskList } from '@/components/componentesProyecto/porjectInfo'
 import Image from 'next/image'
-import { useState, useEffect, useContext } from "react"
-import { AvisoContext } from "@/context/avisoContext";
+import { useState, useEffect } from "react"
 import { API_PROJECT_ACTIVITIES, API_PROJECTS, API_URL, API_ESCUELA_PROFESIONAL } from "@/config/apiconfig";
 import { usePathname, useRouter, useParams } from "next/navigation"
+import Swal from 'sweetalert2';
 ///
 interface ProjectDetails {
   plan: string;
@@ -57,7 +57,6 @@ interface ProjectDetails {
 export default function EditProject() {
 
   const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>();
-  const { mostrarAviso } = useContext<any>(AvisoContext);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState(null);
   const [escuelaP, setEscuelaP] = useState<string>("");
@@ -86,6 +85,14 @@ export default function EditProject() {
 
     } catch (err: any) {
       setError(err.message);
+      // Si ocurre un error de conexión
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: `Error al conectar con la API. ${err.message
+        }`,
+        confirmButtonText: 'OK'
+      });
     } finally {
       setLoading(false);
     }
@@ -106,11 +113,23 @@ export default function EditProject() {
       });
   
       if (response.ok){
-        alert("Cambios guardados exitosamente.");
+        // Mostrar un SweetAlert de éxito
+        Swal.fire({
+          icon: 'success',
+          title: '¡Éxito!',
+          text: 'El proyecto fue editado correctamente.',
+          confirmButtonText: 'OK'
+        });
         fetchProjectsDetails(); // Recargar los detalles actualizados
       }
       else {
-          alert('Error al guardar el proyecto.');
+        // Si el servidor no responde correctamente
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error al Editar el proyecto.',
+          confirmButtonText: 'OK'
+        });
         }
     } catch (err: any) {
       alert(`Error: ${err.message}`);
@@ -123,10 +142,22 @@ export default function EditProject() {
         const data = await response.json();
         setEscuelas(data);
       } else {
-        mostrarAviso("warning", "Error al cargar las escuelas profesionales.");
+        // Si ocurre un error de conexión
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: `Error al cargar las escuelas profesionales.`,
+          confirmButtonText: 'OK'
+        });
       }
     } catch (error) {
-      mostrarAviso("warning", `Error al conectar con la API: ${error}`);
+      // Si ocurre un error de conexión
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: `Error al conectar con la API. ${error}`,
+        confirmButtonText: 'OK'
+      });
     }
   };
   
@@ -134,7 +165,7 @@ export default function EditProject() {
   useEffect(() => {
     fetchProjectsDetails();
     getAllEscuelas();
-  }, [projectId]);
+  }, [escuelaP]);
 
   const formatearFecha = (fecha: string) => {
     return new Date(fecha).toLocaleDateString();
@@ -197,7 +228,7 @@ export default function EditProject() {
                 </Badge>
               </div>
             </div>
-            <div>
+            <div className="flex w-full justify-between items-center">
               <div className="dark:texto-white texto md">
                 <h3 className="font-medium mb-2">Escuela Profesional</h3>
                 <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
@@ -250,17 +281,26 @@ export default function EditProject() {
                     </Command>
                   </PopoverContent>
                 </Popover>
-                <h3 className="font-medium mb-2">Plan de Proyecto</h3>
-                              <a
-                                href={`${API_URL}/${existingPlan}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                Ver plan existente
-                              </a>
-                <input type="file" name="" id="" onChange={(e) => setPlan(e.target.files?.[0] || null)} />
+                <div>
+                    <div className="w-auto justify-between h-16 border-2 dark:border-gray-300 my-2 px-3 py-2 rounded-md">
+                    <h3 className="font-medium mb-1">Plan de Proyecto</h3>
+                      <a
+                        href={`${API_URL}/${existingPlan}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mb-1"
+                      >
+                        Ver plan existente
+                      </a>
+                    </div>
+                    <div className="w-auto justify-between h-16 border-2 p-3 dark:border-gray-300 rounded-md px-3 py-2 my-2">
+                       <input type="file" name="" id="" onChange={(e) => setPlan(e.target.files?.[0] || null)} />
+                    </div>
+                </div>
+                
+                
               </div>
-              <Button className="bg-blue-500 hover:bg-blue-600 h-12 w-32 " onClick={saveChanges}  >
+              <Button className="bg-blue-500 hover:bg-blue-600 h-12 w-32 self-end mr-3" onClick={saveChanges}  >
                 guardar cambios
               </Button>
             </div>

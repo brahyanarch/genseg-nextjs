@@ -3,11 +3,11 @@ import { Card } from "@/components/ui/card"
 import { Edit, Trash2, Eye, Search } from "lucide-react";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { AvisoContext } from "@/context/avisoContext"
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect} from "react"
 import { API_PROJECT_ACTIVITIES, API_ACTIVITIES } from "@/config/apiconfig";
 import { usePathname, useRouter, useParams } from "next/navigation"
 import DynamicTable from "@/components/DynamicTable";
+import Swal from 'sweetalert2';
 //
 interface Activities {
   idActivi: number;
@@ -34,9 +34,6 @@ export function TaskList({ toggleOpenDetsAct, typeEdit }: any) {
   //variable importantes
   const [activitiesProject, setActivitiesProjects] = useState<Activities[]>([]);
   const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState(null);
-  const { mostrarAviso } = useContext<any>(AvisoContext);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(4);
   const totalPages = Math.ceil(activitiesProject.length / itemsPerPage);
@@ -57,10 +54,14 @@ export function TaskList({ toggleOpenDetsAct, typeEdit }: any) {
       setActivitiesProjects(data.actividades);
       setProjectDetails(data.datasProject);
     } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    // Si ocurre un error de conexión
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: `Error al conectar con la API. ${err}`,
+      confirmButtonText: 'OK'
+    });
+    } 
   };
   // useEffect para obtener los roles desde la API al montar el componente
   useEffect(() => {
@@ -77,6 +78,16 @@ export function TaskList({ toggleOpenDetsAct, typeEdit }: any) {
   }
   //función para eliminar una actividad
   const deleteActivity = async (id: number) => {
+    // Confirmación de SweetAlert antes de eliminar
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: "La Actividad será eliminada permanentemente.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'No, cancelar',
+    });
+    if (result.isConfirmed) {
     try {
       const response = await fetch(`${API_ACTIVITIES}/${id}`, {
         method: "DELETE",
@@ -86,13 +97,39 @@ export function TaskList({ toggleOpenDetsAct, typeEdit }: any) {
         setActivitiesProjects((prevProjects: Activities[]) =>
           prevProjects.filter((form: Activities) => form.idActivi !== id)
         );
-        mostrarAviso('succefull', 'Actividad Eliminado correctamente.');
+          // Mostrar un SweetAlert de éxito
+          Swal.fire({
+            icon: 'success',
+            title: '¡Eliminado!',
+            text: 'La Actividad fue eliminado correctamente.',
+            confirmButtonText: 'OK'
+          });
         fetchActivitiesProject();
       } else {
-        mostrarAviso('warning', 'Error al eliminar el Actividad.');
+          // Si el servidor no responde correctamente
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un problema al eliminar la Actividad.',
+            confirmButtonText: 'OK'
+          });
       }
     } catch (error) {
-      mostrarAviso('warning', "Error al conectar con la API:", error);
+        // Si ocurre un error de conexión
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: `Error al conectar con la API. ${error}`,
+          confirmButtonText: 'OK'
+        });
+    }} else {
+      // Si el usuario cancela la operación
+      Swal.fire({
+        icon: 'info',
+        title: 'Operación cancelada',
+        text: 'La Actividad no fue eliminada.',
+        confirmButtonText: 'OK'
+      });
     }
   };
   // Función para acceder a propiedades anidadas
@@ -245,7 +282,7 @@ export function TaskList({ toggleOpenDetsAct, typeEdit }: any) {
     // Rango de páginas cercanas a la actual
     const maxVisiblePages = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, currentPage + Math.floor(maxVisiblePages / 2));
+    const endPage = Math.min(totalPages, currentPage + Math.floor(maxVisiblePages / 2));
 
     if (endPage - startPage < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
