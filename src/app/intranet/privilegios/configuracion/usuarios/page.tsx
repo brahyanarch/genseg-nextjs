@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button"
 import { Edit, X, Trash2, CirclePlus } from "lucide-react"
 import { useState, useEffect } from "react"
-import { API_USERS } from "@/config/apiconfig";
+import { API_USERS, API_CREATE_USERS } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
 import DynamicTable from "@/components/DynamicTable";
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
@@ -56,7 +56,7 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
       };
   
       try {
-        const response = await fetch(editingUser ? `${API_USERS}/${editingUser.dni}` : API_USERS, {
+        const response = await fetch(editingUser ? `${API_CREATE_USERS}/${editingUser.dni}` : API_CREATE_USERS, {
           method: editingUser ? 'PUT' : 'POST',
           headers: {
             'Content-Type': 'application/json',

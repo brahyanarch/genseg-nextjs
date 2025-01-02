@@ -25,6 +25,7 @@ export const API_LOGIN = `${API_URL}/api/auth/login`;
 export const API_LOGIN_UNIQUE = `${API_URL}/api/auth/login/unique`;
 export const API_PERMISOS = `${API_URL}/api/permisos`;
 export const API_USERS = `${API_URL}/api/auth/user`;
+export const API_CREATE_USERS = `${API_URL}/api/auth/register`;
 export const API_FORM = `${API_URL}/api/project/form`;
 export const API_GET_FORM_BY_SUBUNI = `${API_URL}/api/form`;
 export const API_ACTIVITIES = `${API_URL}/api/actividad`;

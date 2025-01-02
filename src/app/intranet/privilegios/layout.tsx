@@ -56,7 +56,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         darkMode={darkMode}
       />
       <div className="flex flex-1 overflow-hidden">
-        <Menu admi={false} />
+        <Menu admi={true}/>
         <main className="flex-1 overflow-auto bg-white dark:bg-gray-900">{children}</main>
       </div>
     </div>

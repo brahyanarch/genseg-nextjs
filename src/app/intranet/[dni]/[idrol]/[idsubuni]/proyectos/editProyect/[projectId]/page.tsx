@@ -80,7 +80,8 @@ export default function EditProject() {
       }
       const data = await response.json();
       setProjectDetails(data.datasProject);
-      setEscuelaP(data.datasProject.prgest.nmPE);
+      setEscuelaP(data.datasProject.prgest.idpe.toString());
+
       setExistingPlan(data.datasProject.plan)
 
     } catch (err: any) {
@@ -90,7 +91,7 @@ export default function EditProject() {
         icon: 'error',
         title: 'Error',
         text: `Error al conectar con la API. ${err.message
-        }`,
+          }`,
         confirmButtonText: 'OK'
       });
     } finally {
@@ -99,20 +100,21 @@ export default function EditProject() {
   };
   //Editar Proyecto
   const saveChanges = async () => {
-  
+
     const formData = new FormData();
-    formData.append("idpe", String(escuelaP)); // Valor modificado
+    formData.append("idpe", String(escuelaP)); // Valor actualizado
+
     if (plan) {
       formData.append("file", plan); // Archivo nuevo si se seleccionó
     }
-  
+
     try {
       const response = await fetch(`${API_PROJECTS}/${projectId}`, {
         method: "PUT",
         body: formData, // Enviar el objeto FormData directamente
       });
-  
-      if (response.ok){
+
+      if (response.ok) {
         // Mostrar un SweetAlert de éxito
         Swal.fire({
           icon: 'success',
@@ -130,7 +132,7 @@ export default function EditProject() {
           text: 'Error al Editar el proyecto.',
           confirmButtonText: 'OK'
         });
-        }
+      }
     } catch (err: any) {
       alert(`Error: ${err.message}`);
     }
@@ -160,12 +162,12 @@ export default function EditProject() {
       });
     }
   };
-  
+
   // useEffect para obtener los roles desde la API al montar el componente
   useEffect(() => {
     fetchProjectsDetails();
     getAllEscuelas();
-  }, [escuelaP]);
+  }, []);
 
   const formatearFecha = (fecha: string) => {
     return new Date(fecha).toLocaleDateString();
@@ -188,7 +190,7 @@ export default function EditProject() {
         <div className=" w-[90%] mx-auto" >
           <CardHeader>
             <CardTitle className="text-xl font-semibold">
-            Proyecto: {projectDetails?.idString || "Sin ID"}
+              Proyecto: {projectDetails?.idString || "Sin ID"}
             </CardTitle>
             <Progress value={64} className="h-2 mt-2" />
             <span className="text-sm text-muted-foreground mt-1">64%</span>
@@ -199,7 +201,7 @@ export default function EditProject() {
                 <div className="text-sm">
                   <div className="font-medium">Fecha Inicio</div>
                   <div className="text-muted-foreground py-2 px-4 rounded-lg border-2 border-gray-500 border-opacity-30 ">
-                  {formatearFecha(projectDetails?.fInit || "")}
+                    {formatearFecha(projectDetails?.fInit || "")}
                   </div>
                 </div>
               </div>
@@ -207,7 +209,7 @@ export default function EditProject() {
                 <div className="text-sm">
                   <div className="font-medium">Fecha final</div>
                   <div className="text-muted-foreground py-2 px-4 rounded-lg border-2 border-gray-500 border-opacity-30">
-                  {formatearFecha(projectDetails?.fFin || "")}
+                    {formatearFecha(projectDetails?.fFin || "")}
                   </div>
                 </div>
               </div>
@@ -224,7 +226,7 @@ export default function EditProject() {
               <h3 className="font-medium mb-2">Estado</h3>
               <div className="flex flex-wrap gap-2">
                 <Badge variant="outline" className="bg-yellow-200">
-                {projectDetails?.estado || "Sin estado"}
+                  {projectDetails?.estado || "Sin estado"}
                 </Badge>
               </div>
             </div>
@@ -259,11 +261,10 @@ export default function EditProject() {
                               key={escuela.idpe}
                               value={escuela.idpe.toString()}
                               onSelect={() => {
-                                setEscuelaP(
-                                  escuela.idpe.toString()
-                                );
+                                setEscuelaP(escuela.idpe.toString());
                                 setComboboxOpen(false);
                               }}
+                              
                             >
                               {escuela.nmPE}
                               <Check
@@ -281,24 +282,25 @@ export default function EditProject() {
                     </Command>
                   </PopoverContent>
                 </Popover>
+
                 <div>
-                    <div className="w-auto justify-between h-16 border-2 dark:border-gray-300 my-2 px-3 py-2 rounded-md">
+                  <div className="w-auto justify-between h-16 border-2 dark:border-gray-300 my-2 px-3 py-2 rounded-md">
                     <h3 className="font-medium mb-1">Plan de Proyecto</h3>
-                      <a
-                        href={`${API_URL}/${existingPlan}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mb-1"
-                      >
-                        Ver plan existente
-                      </a>
-                    </div>
-                    <div className="w-auto justify-between h-16 border-2 p-3 dark:border-gray-300 rounded-md px-3 py-2 my-2">
-                       <input type="file" name="" id="" onChange={(e) => setPlan(e.target.files?.[0] || null)} />
-                    </div>
+                    <a
+                      href={`${API_URL}/${existingPlan}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mb-1"
+                    >
+                      Ver plan existente
+                    </a>
+                  </div>
+                  <div className="w-auto justify-between h-16 border-2 p-3 dark:border-gray-300 rounded-md px-3 py-2 my-2">
+                    <input type="file" name="" id="" onChange={(e) => setPlan(e.target.files?.[0] || null)} />
+                  </div>
                 </div>
-                
-                
+
+
               </div>
               <Button className="bg-blue-500 hover:bg-blue-600 h-12 w-32 self-end mr-3" onClick={saveChanges}  >
                 guardar cambios

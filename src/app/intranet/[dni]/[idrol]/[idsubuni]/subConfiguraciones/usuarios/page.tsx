@@ -2,12 +2,12 @@
 import { Button } from "@/components/ui/button"
 import { Edit, X, Trash2, CirclePlus } from "lucide-react"
 import { useState, useEffect } from "react"
-import { API_USERS } from "@/config/apiconfig";
+import { API_USERS, API_CREATE_USERS } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
 import DynamicTable from "@/components/DynamicTable";
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
 import { User } from "@/tipos/typos"
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import Swal from 'sweetalert2';
 import { routeModule } from "next/dist/build/templates/pages";
 // Modal para agregar un nuevo Usuario
@@ -17,7 +17,7 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [idRol, setIdRol] = useState('');
-  const [idSubUni, setIdSubUni] = useState('');
+  const {idsubuni} = useParams();
   useEffect(() => {
     if (editingUser) {
       setDni(editingUser.dni);
@@ -25,7 +25,6 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
       setEmail(editingUser.email);
       setPassword(editingUser.password)
       setIdRol(editingUser.rol_id);
-      setIdSubUni(editingUser.id_sub)
     }
   }, [editingUser]);
 
@@ -52,11 +51,11 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
         email: email,  // email del usuario
         password: password,
         rol_id: idRol,  // rol_id, lo debes pasar como está en el objeto de usuario
-        id_sub: idSubUni,  // subunidad_id_subuni
+        id_sub: idsubuni,  // subunidad_id_subuni
       };
   
       try {
-        const response = await fetch(editingUser ? `${API_USERS}/${editingUser.dni}` : API_USERS, {
+        const response = await fetch(editingUser ? `${API_CREATE_USERS}/${editingUser.dni}` : API_CREATE_USERS, {
           method: editingUser ? 'PUT' : 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -159,19 +158,6 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
               id="name"
               value={idRol}
               onChange={(e) => setIdRol(e.target.value)}
-              placeholder="Permiso"
-              className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
-              Id Sub Unidad
-            </label>
-            <input
-              type="text"
-              id="name"
-              value={idSubUni}
-              onChange={(e) => setIdSubUni(e.target.value)}
               placeholder="Permiso"
               className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
             />
