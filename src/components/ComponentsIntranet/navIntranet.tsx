@@ -181,7 +181,7 @@ export function Perfil({ name }: { name: string }) {
       {/* Botón de perfil */}
       <Avatar onClick={toggleProfileMenu} className="cursor-pointer">
         <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-        <AvatarFallback>{(Us?.n_usu?.[0])?.toUpperCase() || "N"}</AvatarFallback>
+        <AvatarFallback>{(Us?.n_usu?.[0])?.toUpperCase() || "A"}</AvatarFallback>
       </Avatar>
 
       <div>
@@ -192,7 +192,7 @@ export function Perfil({ name }: { name: string }) {
               {(Us?.n_usu?.[0])?.toUpperCase() || "N"}
               </div>
               <div>
-                <h2 className="font-semibold">{(Us?.n_usu) || "N"}</h2>
+                <h2 className="font-semibold">{(Us?.n_usu) || "Admin"}</h2>
               </div>
             </div>
             <nav>
