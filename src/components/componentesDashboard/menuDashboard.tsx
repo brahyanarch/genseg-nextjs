@@ -105,7 +105,7 @@ const Menu = ({admi}) => {
               },
               {
                 label: "Usuarios",
-                url: `/intranet/${dni}/${idrol}/${idsubuni}/configuracion/usuarios`,
+                url: `/intranet/${dni}/${idrol}/${idsubuni}/subConfiguraciones/usuarios`,
               },
             ],
             onClick: toggleSubConfig,
