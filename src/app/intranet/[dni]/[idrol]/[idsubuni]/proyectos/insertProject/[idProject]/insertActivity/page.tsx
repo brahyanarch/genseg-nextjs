@@ -8,7 +8,7 @@ import { useParams, usePathname, useRouter } from "next/navigation"
 import { API_FORM, API_ACTIVITIES } from "@/config/apiconfig"
 import Swal from 'sweetalert2';
 export default function ActivityForm() {
-  const [questions, setQuestions] = useState([]);
+  const [questions, setQuestions] = useState<[]>([]);
   ///entradas obligatorios
   const [nombreActividad, setNombreActividad] = useState();
   const [fechaInicio, setFechaInicio] = useState();

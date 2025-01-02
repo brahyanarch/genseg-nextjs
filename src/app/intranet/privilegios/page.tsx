@@ -1,344 +1,74 @@
 "use client";
-import { useState, useEffect } from "react";
-import Image from 'next/image'
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {ChevronLeft, ChevronRight, Bell, Settings, Users, FileText, LayoutDashboard, ChevronDown, Moon,Sun} from "lucide-react";
-import { API_ROLES, API_SUBUNIDADES} from "@/config/apiconfig";
-import { Roles, Perfil, Notificacion } from "@/components/ComponentsIntranet/navIntranet";
 import Principal from "@/components/ComponentsIntranet/principal";
-//import ConfiRoles from "@/components/ComponentsIntranet/confiRoles";
-//import ConfiPermisos from "@/components/ComponentsIntranet/confiPermisos";
-//import ConfiUsers from "@/components/ComponentsIntranet/confiUsers";
-//import ConfiSunidad from "@/components/ComponentsIntranet/confiSunidad";
-//import Proyectos from "@/components/ComponentsIntranet/confiProyectos";
-import Formulario from "@/components/ComponentsIntranet/formularios";
-import NoteForm from '@/components/componentesFormulario/noteForm'
-interface Role {
-  id_rol: number;
-  n_rol: string;
-  abrev: string;
-}
-interface Subunidad {
-  id_subuni: number;
-  n_subuni: string;
-  abreviatura: string;
-}
+const Dashboard = () => {
 
-// Define los posibles valores para `activeContent`
-type ContentType =
-  | "Principal"
-  | "Roles"
-  | "Configuracion"
-  | "Permisos"
-  | "Usuarios"
-  | "Sub unidad"
-  | "Proyectos"
-  | "Monitoreo"
-  | "Estadísticas"
-  | "Sub configuracion"
-  | "Formularios"
-  | "Editar Formulario"
-  | "Logs";
-
-
-// Define el tipo del mapeo de contenido
-const contentMap: Record<ContentType, JSX.Element> = {
-  Principal: <>Componente de Monitoreo</>,
-  Configuracion: <>Componente de Monitoreo</>,
-  Roles: <>Componente de Monitoreo</>,
-  Permisos: <>Componente de Monitoreo</>,
-  Usuarios: <>Componente de Monitoreo</>,
-  "Sub unidad": <>Componente de Monitoreo</>,
-  Proyectos: <>Componente de Monitoreo</>,
-  Monitoreo: <>Componente de Monitoreo</>,
-  Estadísticas: <>Componente de Estadísticas</>,
-  Logs: <>Componente de Logs</>,
-  "Sub configuracion": <>Sub configuracion</>,
-  Formularios: <>Formularios</>,
-  "Editar Formulario": <>Editar Formulario</>
-};
-
-const Component = ({
-  idrol,
-  idsubuni,
-  dni,
-  name,
-}: {
-  idrol: number;
-  idsubuni: number;
-  dni: string;
-  name: string;
-}) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isConfigOpen, setIsConfigOpen] = useState(false);
-  const [isMonitorOpen, setIsMonitorOpen] = useState(false); // Para el segundo submenú
-  const [isSubConfigOpen, setisSubConfigOpen] = useState(false); // Para el tercer submenú
-  const [activeContent, setActiveContent] = useState<ContentType>("Principal");
-  const [selectedForm, setSelectedForm] = useState<number | null>(null);
-  const [nomroles, setnomroles] = useState<Role[]>([]);
-  const [subunidades, setSubunidades] = useState<Subunidad[]>([]);
-  const [darkMode, setDarkMode] = useState(false);
-
-  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
-  const toggleConfig = () => setIsConfigOpen(!isConfigOpen);
-  const toggleMonitor = () => setIsMonitorOpen(!isMonitorOpen);
-  //const toggleSubConfig = () => setisSubConfigOpen(!isSubConfigOpen);
-
-  const menuItems = [
-    { icon: LayoutDashboard, label: "Principal" },
-    { icon: Bell, label: "Notificación" },
-    {
-      icon: Settings,
-      label: "Configuracion",
-      subItems: ["Roles", "Permisos", "Usuarios", "Sub unidad"],
-      onClick: toggleConfig,
-    },
-    {
-      icon: FileText,
-      label: "Monitoreo",
-      subItems: ["Estadísticas", "Logs"],
-      onClick: toggleMonitor,
-    },
-    { icon: Users, label: "Pagina" },
-    
-  ];
-  /// función para cambiar formulario
-  /*
-  const handleEditForm = (formId: number) => {
-    setSelectedForm(formId);
-    setActiveContent("Editar Formulario");
-  };*/
+/*
+  // Obtener el nombre del rol por su ID
   const getRoleName = (rol_id: number) => {
-    const role = nomroles.find((r) => r.id_rol === rol_id);
-    //return role ? role.n_rol : `Rol ${rol_id}`; // poner esqueleton
-    console.log(role);
-    return role ? role.n_rol + " de " : null;
+    const role = roles.find((r) => r.id_rol === rol_id);
+    return role ? role.n_rol : `Rol ${rol_id}`;
   };
+
+  // Obtener el nombre de la subunidad por su ID
   const getSubunidadName = (subunidad_id: number) => {
     const subunidad = subunidades.find((s) => s.id_subuni === subunidad_id);
-    //return subunidad ? subunidad.n_subuni : `Subunidad ${subunidad_id}`;
-    return subunidad ? subunidad.n_subuni : null;
+    return subunidad ? subunidad.n_subuni : `Subunidad ${subunidad_id}`;
   };
-
-  const handleMenuClick = (label: ContentType) => {
-    setActiveContent(label);
-    if (label !== "Configuracion") {
-      setIsConfigOpen(false);
-    }
-    if (label !== "Monitoreo") {
-      setIsMonitorOpen(false);
-    }
-    if (label !== "Sub configuracion") {
-      setisSubConfigOpen(false);
-    }
-  };
-
-  const fetchRoles = async () => {
+  const fetchUs = async () => {
     try {
-      const response = await fetch(API_ROLES);
-      const data: Role[] = await response.json();
-      setnomroles(data);
-    } catch (error) {
-      console.error("Error fetching roles:", error);
+      const response = await fetch(`${API_USERS}/${dni}`);
+      if (!response.ok) {
+        throw new Error('Error al obtener los usuarios');
+      }
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setUser(data);
+      } else {
+        console.error('Respuesta de API no válida:', data);
+      }
+    } catch (err: any) {
+      console.error(err.message);
     }
-  };
-  const fetchSubunidades = async () => {
-    try {
-      const response = await fetch(API_SUBUNIDADES);
-      const data: Subunidad[] = await response.json();
-      setSubunidades(data);
-    } catch (error) {
-      console.error("Error fetching subunidades:", error);
-    }
-  };
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    if (!darkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  };
-  const handleSubItemClick = (subItem: ContentType) => {
-    setActiveContent(subItem);
   };
 
+  // Fetch de roles y subunidades
   useEffect(() => {
-    fetchRoles();
-    fetchSubunidades();
-  }, []);
+    fetchUs();
+    const fetchData = async () => {
+      try {
+        // Fetch roles
+        const [rolesResponse, subunidadesResponse] = await Promise.all([
+          fetch(API_ROLES),
+          fetch(API_SUBUNIDADES),
+        ]);
+
+        if (!rolesResponse.ok || !subunidadesResponse.ok) {
+          throw new Error("Error fetching data");
+        }
+
+        const rolesData: Role[] = await rolesResponse.json();
+        const subunidadesData: Subunidad[] = await subunidadesResponse.json();
+
+        setRoles(rolesData);
+        setSubunidades(subunidadesData);
+      } catch (error) {
+        setError("Ocurrió un error al cargar los datos. Por favor, intenta de nuevo.");
+        console.error("Error fetching data:", error);
+      }
+    };
+console.log(User);
+
+    //fetchData();
+    setIsClient(true);
+  }, []);*/
+
+  
+
   return (
-    <div className="flex flex-col h-screen w-full bg-gray-100 dark:bg-gray-900 ">
-      <nav className="bg-white dark:text-white w-full dark:bg-gray-800 shadow-md">
-        <div className=" mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <Image
-                src={"/resources/images/DPSEClogo.png"}
-                alt="Logo"
-                className="h-9 w-9 rounded-full bg-white"
-                width={50}
-                height={50}
-              />
-              <div className="flex flex-col pl-3">
-                <span className="text-sm font-semibold text-gray-800 dark:text-white ">
-                  Proyección Social y Extensión Cultural
-                </span>
-
-                {/*<p className="text-xs text-gray-400 flex-row">{getRoleName(idrol)} de {getSubunidadName(idsubuni)}</p>*/}
-                {getRoleName(idrol) && getSubunidadName(idsubuni) ? (
-                  <p className="text-xs text-gray-400 flex-row">
-                    {" "}
-                    {getRoleName(idrol)}
-                    {getSubunidadName(idsubuni)}{" "}
-                  </p>
-                ) : (
-                  <p className="text-xs text-gray-400 flex-row">
-                    Administrador General
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Input
-                className="mr-4 w-64"
-                placeholder="Buscar..."
-                type="search"
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleDarkMode}
-                aria-label="Toggle theme"
-              >
-                {darkMode ? (
-                  <Sun className="h-5 w-5 text-black dark:text-white" />
-                ) : (
-                  <Moon className="h-5 w-5 text-black dark:text-white" />
-                )}
-              </Button>
-              <Notificacion />
-
-              <Roles idRol={idrol} idSubUnidad={idsubuni} dni={dni} />
-              <Perfil name={name} />
-            </div>
-          </div>
-        </div>
-      </nav>
-      <div className="flex flex-1 overflow-hidden ">
-        <aside
-          className={`bg-white text-black dark:bg-gray-800 dark:text-white ${
-            isCollapsed ? "w-16" : "w-64"
-          }`}
-        >
-          <div className="flex items-center justify-between p-4">
-            {!isCollapsed && (
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-                Menu
-              </h2>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleSidebar}
-              aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            >
-              {isCollapsed ? (
-                <ChevronRight className="h-4 w-4" />
-              ) : (
-                <ChevronLeft className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
-          <ScrollArea className="h-full">
-            <ul className="space-y-1 p-4">
-              {menuItems.map(({ icon: Icon, label, subItems, onClick }) => (
-                <li key={label}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full flex justify-between items-center"
-                    onClick={() => {
-                      handleMenuClick(label as ContentType);
-                      if (subItems) {
-                        onClick && onClick();
-                      }
-                    }}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Icon className="h-5 w-5" />
-                      {!isCollapsed && label}
-                    </div>
-                    {!isCollapsed && subItems && (
-                      <ChevronDown
-                        className={`h-4 w-4 transition-transform ${
-                          (label === "Configuracion" && isConfigOpen) ||
-                          (label === "Monitoreo" && isMonitorOpen) || 
-                          (label === "Sub configuracion" && isSubConfigOpen)
-                            ? "rotate-180"
-                            : ""
-                        }`}
-                      />
-                    )}
-                  </Button>
-                  {!isCollapsed && subItems && ((label === "Configuracion" && isConfigOpen) || (label === "Monitoreo" && isMonitorOpen) || (label === "Sub configuracion" && isSubConfigOpen)) && (
-                    <ul className="pl-6 space-y-1 flex flex-col justify-between items-start">
-                      {subItems.map((subItem) => (
-                        <li key={subItem}>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="w-full text-left"
-                            onClick={() => handleSubItemClick(subItem as ContentType)}
-                          >
-                            {subItem}
-                          </Button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </ScrollArea>
-        </aside>
-        <main className="flex-1 p-6 overflow-auto">
-          <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-            <h1 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-white">
-              {/*activeContent*/}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300">
-              {/*Este es el contenido de la sección {activeContent}. Aquí se
-              mostraría la información relevante para esta área.*/}
-                  {activeContent === "Formularios" && (
-                    <Formulario
-                      onEdit={(formId) => {
-                        setSelectedForm(formId); // Almacena el formulario seleccionado
-                        setActiveContent("Editar Formulario"); // Cambia al contenido de edición
-                      }}
-                    />
-                  )}
-
-                  {/* Renderizar el formulario de edición dinámico */}
-                  {activeContent === "Editar Formulario" && selectedForm && (
-                    <NoteForm
-                      formId={selectedForm} // Pasa el ID del formulario
-                      onBack={() => setActiveContent("Formularios")} // Regresa a la vista de formularios
-                    />
-                  )}
-
-                  {/* Renderizar los demás contenidos del mapa */}
-                  {activeContent !== "Formularios" && activeContent !== "Editar Formulario" && (
-                    contentMap[activeContent] || <>Componente por defecto</>
-                  )}
-            </p>
-          </div>
-        </main>
-      </div>
+    <div className="w-full flex flex-col justify-between gap-2 text-black items-center overflow-auto mx-auto  bg-white dark:bg-gray-900 dark:text-white" >
+      <Principal />
     </div>
   );
 };
 
-export default Component;
+export default Dashboard;

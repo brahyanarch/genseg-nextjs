@@ -7,7 +7,7 @@ import { useParams, usePathname } from "next/navigation";
 import Link from 'next/link'
 import clsx from 'clsx'
 
-const Menu = () => {
+const Menu = ({admi}) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isSubConfigOpen, setIsSubConfigOpen] = useState(false);
@@ -24,71 +24,97 @@ const Menu = () => {
     {
       icon: LayoutDashboard,
       label: "Principal",
-      url: `/intranet/${dni}/${idrol}/${idsubuni}`
+      url: admi
+        ? `/intranet/privilegios`
+        : `/intranet/${dni}/${idrol}/${idsubuni}`,
     },
-    { icon: Bell, label: "notificacion", url: `/intranet/${dni}/${idrol}/${idsubuni}/notificacion` },
-
     {
-      icon: Settings,
-      label: "Configuracion",
-      url: "#",
-      subItems: [
-        {
-          label: "Roles",
-          url: `/intranet/${dni}/${idrol}/${idsubuni}/configuracion/roles`
-        }, {
-          label: "Permisos",
-          url: `/intranet/${dni}/${idrol}/${idsubuni}/configuracion/permisos`
-        },
-        {
-          label: "Usuarios",
-          url: `/intranet/${dni}/${idrol}/${idsubuni}/configuracion/usuarios`
-        },
-        {
-          label: "Sub unidad",
-          url: `/intranet/${dni}/${idrol}/${idsubuni}/configuracion/subUnidades`
-        }],
-      onClick: toggleConfig,
-      isOpen: isConfigOpen
+      icon: Bell,
+      label: "Notificación",
+      url: admi
+        ? `/intranet/privilegios/notificacion`
+        : `/intranet/${dni}/${idrol}/${idsubuni}/notificacion`,
     },
+    // Condicionalmente incluir "Configuración" solo si es administrador
+    ...(admi
+      ? [
+          {
+            icon: Settings,
+            label: "Configuración",
+            url: "#",
+            subItems: [
+              {
+                label: "Roles",
+                url: `/intranet/privilegios/configuracion/roles`,
+              },
+              {
+                label: "Permisos",
+                url: `/intranet/privilegios/configuracion/permisos`,
+              },
+              {
+                label: "Usuarios",
+                url: `/intranet/privilegios/configuracion/usuarios`,
+              },
+              {
+                label: "Sub unidad",
+                url: `/intranet/privilegios/configuracion/subUnidades`,
+              },
+            ],
+            onClick: toggleConfig,
+            isOpen: isConfigOpen,
+          },
+        ]
+      : []),
     {
       icon: LayoutDashboard,
-      label: "Pagina",
+      label: "Página",
       url: `#`,
       subItems: [
         {
           label: "Carrusel",
-          url: `/intranet/${dni}/${idrol}/${idsubuni}/pagina/carrusel`
-        }, {
+          url: admi
+            ? `/intranet/privilegios/pagina/carrusel`
+            : `/intranet/${dni}/${idrol}/${idsubuni}/pagina/carrusel`,
+        },
+        {
           label: "Avisos",
-          url: `/intranet/${dni}/${idrol}/${idsubuni}/pagina/avisos`
+          url: admi
+            ? `/intranet/privilegios/pagina/avisos`
+            : `/intranet/${dni}/${idrol}/${idsubuni}/pagina/avisos`,
         },
       ],
       onClick: togglePagina,
       isOpen: isPaginaOpen,
     },
-    {
-      icon: FolderKanban,
-      label: "Proyectos",
-      url: `/intranet/${dni}/${idrol}/${idsubuni}/proyectos`
-    },
-    {
-      icon: Settings2,
-      label: "Sub Configuraciones",
-      url: `#`,
-      subItems: [
-        {
-          label: "Formularios",
-          url: `/intranet/${dni}/${idrol}/${idsubuni}/subConfiguraciones/Formularios`
-        }, {
-          label: "Usuarios",
-          url: `/intranet/${dni}/${idrol}/${idsubuni}/configuracion/usuarios`
-        },
-      ],
-      onClick: toggleSubConfig,
-      isOpen: isSubConfigOpen,
-    },
+    // Condicionalmente incluir "Proyectos" y "Sub Configuraciones"
+    ...(!admi
+      ? [
+          {
+            icon: FolderKanban,
+            label: "Proyectos",
+            url: `/intranet/${dni}/${idrol}/${idsubuni}/proyectos`,
+          },
+          {
+            icon: Settings2,
+            label: "Sub Configuraciones",
+            url: `#`,
+            subItems: [
+              {
+                label: "Formularios",
+                url: `/intranet/${dni}/${idrol}/${idsubuni}/subConfiguraciones/Formularios`,
+              },
+              {
+                label: "Usuarios",
+                url: `/intranet/${dni}/${idrol}/${idsubuni}/configuracion/usuarios`,
+              },
+            ],
+            onClick: toggleSubConfig,
+            isOpen: isSubConfigOpen,
+          },
+        ]
+      : []),
   ];
+  
 
   return (
     <aside
