@@ -15,7 +15,7 @@ export default function ActivityForm() {
   const [fechaInicio, setFechaInicio] = useState();
   const [fechaFinal, setFechaFinal] = useState();
   const [answers, setAnswers] = useState({}); // Estado para almacenar respuestas
-  const { projectId, idActivity } = useParams();
+  const { idProject, idActivity } = useParams();
   const pathname = usePathname();
   const router = useRouter();
   const handleChange = (questionId, field, value) => {
@@ -29,7 +29,7 @@ export default function ActivityForm() {
       ],
     }));
   };
-  
+
   /// casos de single choice
   const handleSingleChange = (questionId, optionId) => {
     setAnswers((prev) => ({
@@ -43,7 +43,7 @@ export default function ActivityForm() {
       [questionId]: [{ file, idp: questionId }], // Agrega el archivo
     }));
   };
-    
+
 
 
   // Manejar cambios para opciones múltiples
@@ -53,19 +53,19 @@ export default function ActivityForm() {
       const isSelected = currentAnswers.some(
         (response) => response.idomul === optionId
       );
-  
+
       return {
         ...prev,
         [questionId]: isSelected
           ? currentAnswers.filter((response) => response.idomul !== optionId) // Quita si ya está seleccionado
           : [
-              ...currentAnswers,
-              { idomul: optionId, idp: questionId }, // Agrega la opción seleccionada
-            ],
+            ...currentAnswers,
+            { idomul: optionId, idp: questionId }, // Agrega la opción seleccionada
+          ],
       };
     });
   };
-  
+
   //
   const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
     const partes = ruta.split('/'); // Divide la ruta en partes
@@ -77,7 +77,7 @@ export default function ActivityForm() {
   const handleCancelActivity = async () => {
     const result = await Swal.fire({
       title: '¿Estás seguro?',
-      text: "No se Editará la Actividad.",
+      text: "No se editará la actividad.",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, no editar actividad',
@@ -89,16 +89,8 @@ export default function ActivityForm() {
       // Mostrar un SweetAlert de éxito
       Swal.fire({
         icon: 'success',
-        title: '¡Éxito!',
-        text: 'Actividad no editada.',
-        confirmButtonText: 'OK'
-      });
-    } else {
-      // Si el usuario cancela la operación
-      Swal.fire({
-        icon: 'info',
-        title: 'Operación cancelada',
-        text: 'Puedes editar la Actividad.',
+        title: 'Actividad no editada',
+        text: 'los datos de la actividad no fueron editados.',
         confirmButtonText: 'OK'
       });
     }
@@ -114,7 +106,7 @@ export default function ActivityForm() {
     formData.append("name", String(nombreActividad)); // Nombre de la actividad
     formData.append("fInit", String(fechaInicio));    // Fecha de inicio
     formData.append("fFin", String(fechaFinal));      // Fecha final
-    formData.append("idproj", String(projectId));     // ID del proyecto
+    formData.append("idproj", String(idProject));     // ID del proyecto
 
     // Crear un objeto para almacenar las respuestas
     const responses = {};
@@ -147,8 +139,8 @@ export default function ActivityForm() {
         // Mostrar un SweetAlert de éxito
         Swal.fire({
           icon: 'success',
-          title: '¡Éxito!',
-          text: 'La Actividad fue editado correctamente.',
+          title: 'Actividad editada',
+          text: 'La actividad fue editada correctamente.',
           confirmButtonText: 'OK'
         });
         router.back(); // Volver a la ruta anterior
@@ -159,8 +151,8 @@ export default function ActivityForm() {
         // Si el servidor no responde correctamente
         Swal.fire({
           icon: 'error',
-          title: 'Error',
-          text: 'Hubo un problema al editar la Actividad.',
+          title: 'No se pudo editar la actividad',
+          text: 'Hubo un problema al editar la actividad.',
           confirmButtonText: 'OK'
         });
         formData.forEach((value, key) => {
@@ -223,39 +215,39 @@ export default function ActivityForm() {
       </div>
 
       <div className="max-w-2xl mx-auto space-y-6">
-        <h1 className="text-2xl font-semibold mb-8">Insertar Actividad</h1>
+        <h1 className="text-3xl font-semibold text-center text-gray-800 dark:text-white mb-10">Editar Actividad</h1>
 
-        <form className="space-y-4" >
-          <div className="space-y-2">
-            <Label htmlFor="activity-name">Nombre de la actividad</Label>
+        <form className="space-y-6" >
+          <div className="space-y-4">
+            <Label htmlFor="activity-name" className="text-lg font-medium text-gray-700 dark:text-gray-300">Nombre de la actividad</Label>
             <Input
               id="activity-name"
               placeholder="Nombre de la actividad"
-              className="bg-background"
+              className="w-full bg-gray-100 dark:bg-gray-800 h-12 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
               value={nombreActividad}
               onChange={(e) => setNombreActividad(e.target.value)}
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="start-date">Fecha inicial</Label>
-            <Input
+          <div className="space-y-4">
+            <Label htmlFor="start-date" className="text-lg font-medium text-gray-700 dark:text-gray-300">Fecha inicial</Label>
+            <input
               id="start-date"
               type="date"
               placeholder="Fecha inicial"
               value={fechaInicio}
               onChange={(e) => setFechaInicio(e.target.value)}
-              className="bg-background"
+              className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="end-date">Fecha final</Label>
-            <Input
+            <Label htmlFor="end-date" className="text-lg font-medium text-gray-700 dark:text-gray-300">Fecha final</Label>
+            <input
               id="end-date"
               type="date"
               placeholder="Fecha final"
-              className="bg-background"
+              className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
               value={fechaFinal}
               onChange={(e) => setFechaFinal(e.target.value)}
             />
@@ -264,11 +256,11 @@ export default function ActivityForm() {
             switch (question.type) {
               case "text":
                 return (
-                  <div key={question.id}>
-                    <label className="block font-medium">{question.questionText}</label>
+                  <div key={question.id} className="space-y-4">
+                    <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
                     <input
                       type="text"
-                      className="border rounded p-2 w-full bg-background"
+                      className="w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500"
                       placeholder="Escribe tu respuesta"
                       value={answers[question.id]?.[0]?.resTxt || ""}
                       onChange={(e) => handleChange(question.id, "resTxt", e.target.value)}
@@ -278,11 +270,11 @@ export default function ActivityForm() {
 
               case "date":
                 return (
-                  <div key={question.id}>
-                    <label className="block font-medium">{question.questionText}</label>
+                  <div key={question.id} className="space-y-4">
+                    <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
                     <input
                       type="date"
-                      className="border rounded p-2 w-full bg-background"
+                      className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
                       value={answers[question.id]?.[0]?.resTxt || ""}
                       onChange={(e) => handleChange(question.id, "resTxt", e.target.value)}
                     />
@@ -291,14 +283,14 @@ export default function ActivityForm() {
 
               case "multipleChoice":
                 return (
-                  <div key={question.id}>
-                    <label className="block font-medium">{question.questionText}</label>
+                  <div key={question.id} className="space-y-4">
+                    <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
                     {question.options?.map((option) => (
                       <div key={option.idop}>
-                        <label className="flex items-center gap-2">
+                        <label className="flex items-center gap-2 text-gray-700 dark:text-white">
                           <input
                             type="checkbox"
-                            className="border rounded"
+                            className="border rounded-lg text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
                             checked={
                               answers[question.id]?.some(
                                 (response) => response.idomul === option.idop
@@ -316,10 +308,10 @@ export default function ActivityForm() {
               case "singleChoice":
                 return (
                   <div key={question.id}>
-                    <label className="block font-medium">{question.questionText}</label>
+                    <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
                     {question.options?.map((option) => (
                       <div key={option.idop}>
-                        <label className="flex items-center gap-2">
+                        <label className="flex items-center gap-2 text-gray-700 dark:text-white">
                           <input
                             type="radio"
                             name={`singleChoice-${question.id}`}
@@ -340,10 +332,10 @@ export default function ActivityForm() {
 
               case "dropdown":
                 return (
-                  <div key={question.id}>
-                    <label className="block font-medium">{question.questionText}</label>
+                  <div key={question.id} className="space-y-4">
+                    <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
                     <select
-                      className="border rounded p-2 w-full bg-background"
+                      className="w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500"
                       value={answers[question.id]?.[0]?.idomul || ""}
                       onChange={(e) =>
                         handleSingleChange(question.id, Number(e.target.value))
@@ -361,15 +353,18 @@ export default function ActivityForm() {
 
               case "archive":
                 return (
-                  <div key={question.id}>
-                    <label className="block font-medium">{question.questionText}</label>
+                  <div key={question.id} className="space-y-4">
+                    <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
                     <input
-                      type="file"
-                      className="border rounded p-2 w-full"
+                      type="file" accept=".pdf,.xls,.xlsx,.doc,.docx"
+                      className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 px-4 py-3 file:bg-blue-600 file:text-white file:rounded-md file:px-6 file:py-3"
                       onChange={(e) =>
                         handleChangeFile(question.id, e.target.files?.[0] || null)
                       }
                     />
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
+                      Solo se permiten formatos: <strong>PDF, Excel, Word</strong>. Tamaño máximo: <strong>20MB</strong>.
+                    </p>
                   </div>
                 );
 
@@ -379,16 +374,18 @@ export default function ActivityForm() {
           })}
 
         </form>
-        <div className="w-[90%] mx-auto flex justify-end space-x-4 pt-4">
+
+        {/* Botones */}
+        <div className="w-full mx-auto flex justify-end space-x-6 pt-8">
           <Button
             variant="destructive"
-            className="bg-[#F08080] hover:bg-[#E07070] text-white"
+            className="bg-red-600 hover:bg-red-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-red-500 transition-all duration-300"
             onClick={handleCancelActivity}
           >
             Cancelar
           </Button>
           <Button
-            className="bg-blue-500 hover:bg-blue-600"
+            className="bg-blue-600 hover:bg-blue-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-blue-500 transition-all duration-300"
             onClick={handleSubmitAnswers}
           >
             Insertar Actividad

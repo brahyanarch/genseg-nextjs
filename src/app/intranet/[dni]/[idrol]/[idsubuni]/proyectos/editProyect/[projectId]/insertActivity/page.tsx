@@ -8,7 +8,7 @@ import { useParams, usePathname, useRouter } from "next/navigation"
 import { API_FORM, API_ACTIVITIES } from "@/config/apiconfig"
 import Swal from 'sweetalert2';
 export default function ActivityForm() {
-  const [questions, setQuestions] = useState([]);
+  const [questions, setQuestions] = useState<[]>([]);
   ///entradas obligatorios
   const [nombreActividad, setNombreActividad] = useState();
   const [fechaInicio, setFechaInicio] = useState();
@@ -55,12 +55,13 @@ export default function ActivityForm() {
     return partes.slice(0, indice + 2).join('/'); // Toma hasta el segmento + un nivel
   };
   const handleCancelActivity = async () => {
+    // Confirmación de SweetAlert antes de eliminar
     const result = await Swal.fire({
-      title: '¿Estás seguro?',
+      title: '¿Estás seguro de no crear la actividad?',
       text: "No se creará la actividad.",
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Sí, no crear Actividad',
+      confirmButtonText: 'Sí, no crear actividad',
       cancelButtonText: 'No, regresar.',
     });
     if (result.isConfirmed) {
@@ -69,19 +70,11 @@ export default function ActivityForm() {
       // Mostrar un SweetAlert de éxito
       Swal.fire({
         icon: 'success',
-        title: '¡Éxito!',
-        text: 'Actividad no creada.',
+        title: 'Actividad no creada',
+        text: 'La actividad no ha sido creada.',
         confirmButtonText: 'OK'
       });
-    } else {
-      // Si el usuario cancela la operación
-      Swal.fire({
-        icon: 'info',
-        title: 'Operación cancelada',
-        text: 'Puedes crear una Actividad.',
-        confirmButtonText: 'OK'
-      });
-    }
+    } 
   }
 
   const handleSubmitAnswers = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -127,8 +120,8 @@ export default function ActivityForm() {
         // Mostrar un SweetAlert de éxito
         Swal.fire({
           icon: 'success',
-          title: '¡Éxito!',
-          text: 'La Actividad fue creado correctamente.',
+          title: 'Actividad Creada',
+          text: 'La actividad fue creada correctamente.',
           confirmButtonText: 'OK'
         });
         router.back(); // Volver a la ruta anterior
@@ -139,8 +132,8 @@ export default function ActivityForm() {
         // Si el servidor no responde correctamente
         Swal.fire({
           icon: 'error',
-          title: 'Error',
-          text: 'Hubo un problema al crear la Actividad.',
+          title: 'Error al crear la actividad',
+          text: 'Rellene todos los campos del formulario correctamente',
           confirmButtonText: 'OK'
         });
         formData.forEach((value, key) => {
@@ -192,7 +185,7 @@ export default function ActivityForm() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background text-black dark:text-white p-6">
       <div className="text-sm breadcrumbs mb-6 text-muted-foreground">
         <span>Inicio</span> {' > '}
         <span>Proyectos</span> {' > '}
@@ -200,175 +193,225 @@ export default function ActivityForm() {
         <span>actividad</span>
       </div>
 
-      <div className="max-w-2xl mx-auto space-y-6">
-        <h1 className="text-2xl font-semibold mb-8">Insertar Actividad</h1>
+      <div className="max-w-2xl mx-auto bg-white dark:bg-gray-900 p-10 rounded-lg shadow-xl space-y-8">
+  <h1 className="text-3xl font-semibold text-center text-gray-800 dark:text-white mb-10">
+    Insertar Actividad
+  </h1>
 
-        <form className="space-y-4" >
-          <div className="space-y-2">
-            <Label htmlFor="activity-name">Nombre de la actividad</Label>
-            <Input
-              id="activity-name"
-              placeholder="Nombre de la actividad"
-              className="bg-background"
-              value={nombreActividad}
-              onChange={(e) => setNombreActividad(e.target.value)}
-            />
-          </div>
+  <form className="space-y-6">
+    {/* Nombre de la actividad */}
+    <div className="space-y-4">
+      <Label htmlFor="activity-name" className="text-lg font-medium text-gray-700 dark:text-gray-300">
+        Nombre de la actividad
+      </Label>
+      <Input
+        id="activity-name"
+        placeholder="Nombre de la actividad"
+        className="w-full bg-gray-100 dark:bg-gray-800 h-12 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
+        value={nombreActividad}
+        onChange={(e) => setNombreActividad(e.target.value)}
+      />
+    </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="start-date">Fecha inicial</Label>
-            <Input
-              id="start-date"
-              type="date"
-              placeholder="Fecha inicial"
-              value={fechaInicio}
-              onChange={(e) => setFechaInicio(e.target.value)}
-              className="bg-background"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="end-date">Fecha final</Label>
-            <Input
-              id="end-date"
-              type="date"
-              placeholder="Fecha final"
-              className="bg-background"
-              value={fechaFinal}
-              onChange={(e) => setFechaFinal(e.target.value)}
-            />
-          </div>
-          {questions.map((question) => {
-            switch (question.type) {
-              case "text":
-                return (
-                  <div key={question.id}>
-                    <label className="block font-medium">{question.questionText}</label>
-                    <input
-                      type="text"
-                      className="border rounded p-2 w-full bg-background"
-                      placeholder="Escribe tu respuesta"
-                      value={answers[question.id] || ""}
-                      required
-                      onChange={(e) => handleChange(question.id, e.target.value)}
-                    />
-                  </div>
-                );
-
-              case "date":
-                return (
-                  <div key={question.id}>
-                    <label className="block font-medium bg-background">{question.questionText}</label>
-                    <input
-                      type="date"
-                      className="border rounded p-2 w-full bg-background"
-                      value={answers[question.id] || ""}
-                      required
-                      onChange={(e) => handleChange(question.id, e.target.value)}
-                    />
-                  </div>
-                );
-
-              case "multipleChoice":
-                return (
-                  <div key={question.id}>
-                    <label className="block font-medium">{question.questionText}</label>
-                    {question.options?.map((option) => (
-                      <div key={option.idop}>
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            className="border rounded"
-                            id={`${question.id}-${option.idop}`} // Vincula correctamente con el ID
-                            value={option.idop}
-                            checked={answers[question.id]?.includes(option.idop) || false} // Comprueba contra option.id
-                            onChange={() => handleMultipleChoiceChange(question.id, option.idop)} // Envía option.id correctamente
-                            required
-                          />
-                          {option.optionTxt} {/* Usa la propiedad correcta para el texto */}
-                        </label>
-                      </div>
-                    ))}
-
-                  </div>
-                );
-              case "singleChoice":
-                return (
-                  <div key={question.id}>
-                    <label className="block font-medium">{question.questionText}</label>
-                    {question.options?.map((option) => (
-                      <div key={option.idop}>
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="radio"
-                            name={`singleChoice-${question.id}`}
-                            value={option.idop}
-                            checked={answers[question.id]?.includes(option.idop)} // Verifica si está incluido en el array
-                            onChange={(e) => handleSingleChange(question.id, option.idop)} // Llama a la función con el ID
-                            required
-                          />
-                          {option.optionTxt}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                );
-
-
-              case "archive":
-                return (
-                  <div key={question.id}>
-                    <label className="block font-medium bg-background">{question.questionText}</label>
-                    <input
-                      type="file"
-                      className="border rounded p-2 w-full"
-                      onChange={(e) => handleChangeFile(question.id, e.target.files?.[0] || null)}
-                      required
-                    />
-                  </div>
-                );
-
-              case "dropdown":
-                return (
-                  <div key={question.id}>
-                    <label className="block font-medium bg-background">{question.questionText}</label>
-                    <select
-                      className="border rounded p-2 w-full bg-background"
-                      value={answers[question.id]?.[0] || ""} // Accede al primer valor del array
-                      onChange={(e) => handleSingleChange(question.id, e.target.value)} // Llama a la función con el valor seleccionado
-                      required
-                    >
-                      <option value="">Seleccione una opción</option>
-                      {question.options?.map((option) => (
-                        <option key={option.idop} value={option.idop}>
-                          {option.optionTxt}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                );
-
-              default:
-                return null;
-            }
-          })}
-        </form>
-        <div className="w-[90%] mx-auto flex justify-end space-x-4 pt-4">
-          <Button
-            variant="destructive"
-            className="bg-[#F08080] hover:bg-[#E07070] text-white"
-            onClick={handleCancelActivity}
-          >
-            Cancelar
-          </Button>
-          <Button
-            className="bg-blue-500 hover:bg-blue-600"
-            onClick={handleSubmitAnswers}
-          >
-            Insertar Actividad
-          </Button>
-        </div>
+    {/* Fecha inicial */}
+    <div className="space-y-4">
+      <Label htmlFor="start-date" className="text-lg font-medium text-gray-700 dark:text-gray-300">
+        Fecha inicial
+      </Label>
+      <div className="relative">
+        <input
+          id="start-date"
+          type="date"
+          value={fechaInicio}
+          onChange={(e) => setFechaInicio(e.target.value)}
+          className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
+        />
       </div>
+    </div>
+
+    {/* Fecha final */}
+    <div className="space-y-4">
+      <Label htmlFor="end-date" className="text-lg font-medium text-gray-700 dark:text-gray-300">
+        Fecha final
+      </Label>
+      <div className="relative">
+        <input
+          id="end-date"
+          type="date"
+          value={fechaFinal}
+          onChange={(e) => setFechaFinal(e.target.value)}
+          className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
+        />
+      </div>
+    </div>
+
+    {/* Preguntas dinámicas */}
+    {questions.map((question) => {
+      switch (question.type) {
+        case "text":
+          return (
+            <div key={question.id} className="space-y-4">
+              <Label
+                htmlFor={`text-${question.id}`}
+                className="text-lg font-medium text-gray-700 dark:text-gray-300"
+              >
+                {question.questionText}
+              </Label>
+              <input
+                type="text"
+                id={`text-${question.id}`}
+                className="w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500"
+                placeholder="Escribe tu respuesta"
+                value={answers[question.id] || ""}
+                onChange={(e) => handleChange(question.id, e.target.value)}
+              />
+            </div>
+          );
+
+        case "date":
+          return (
+            <div key={question.id} className="space-y-4">
+              <Label
+                htmlFor={`date-${question.id}`}
+                className="text-lg font-medium text-gray-700 dark:text-gray-300"
+              >
+                {question.questionText}
+              </Label>
+              <div className="relative">
+                <input
+                  type="date"
+                  id={`date-${question.id}`}
+                  value={answers[question.id] || ""}
+                  onChange={(e) => handleChange(question.id, e.target.value)}
+                  className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
+                />
+              </div>
+            </div>
+          );
+
+        case "multipleChoice":
+          return (
+            <div key={question.id} className="space-y-4">
+              <Label
+                htmlFor={`multipleChoice-${question.id}`}
+                className="text-lg font-medium text-gray-700 dark:text-gray-300"
+              >
+                {question.questionText}
+              </Label>
+              {question.options?.map((option) => (
+                <div key={option.idop} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    className="border rounded-lg text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
+                    id={`${question.id}-${option.idop}`}
+                    value={option.idop}
+                    checked={answers[question.id]?.includes(option.idop) || false}
+                    onChange={() => handleMultipleChoiceChange(question.id, option.idop)}
+                  />
+                  <Label htmlFor={`${question.id}-${option.idop}`} className="text-gray-700 dark:text-white">
+                    {option.optionTxt}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          );
+
+        case "singleChoice":
+          return (
+            <div key={question.id} className="space-y-4">
+              <Label
+                htmlFor={`singleChoice-${question.id}`}
+                className="text-lg font-medium text-gray-700 dark:text-gray-300"
+              >
+                {question.questionText}
+              </Label>
+              {question.options?.map((option) => (
+                <div key={option.idop} className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name={`singleChoice-${question.id}`}
+                    value={option.idop}
+                    checked={answers[question.id]?.includes(option.idop)}
+                    onChange={(e) => handleSingleChange(question.id, option.idop)}
+                  />
+                  <Label htmlFor={`${question.id}-${option.idop}`} className="text-gray-700 dark:text-white">
+                    {option.optionTxt}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          );
+
+        case "archive":
+          return (
+            <div key={question.id} className="space-y-4">
+              <Label
+                htmlFor={`file-upload-${question.id}`}
+                className="text-lg font-medium text-gray-700 dark:text-gray-300"
+              >
+                {question.questionText}
+              </Label>
+              <input
+                id={`file-upload-${question.id}`}
+                type="file"
+                accept=".pdf,.xls,.xlsx,.doc,.docx"
+                className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 px-4 py-3 file:bg-blue-600 file:text-white file:rounded-md file:px-6 file:py-3"
+                onChange={(e) => handleChangeFile(question.id, e.target.files?.[0] || null)}
+              />
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
+                Solo se permiten formatos: <strong>PDF, Excel, Word</strong>. Tamaño máximo: <strong>20MB</strong>.
+              </p>
+            </div>
+          );
+
+        case "dropdown":
+          return (
+            <div key={question.id} className="space-y-4">
+              <Label
+                htmlFor={`dropdown-${question.id}`}
+                className="text-lg font-medium text-gray-700 dark:text-gray-300"
+              >
+                {question.questionText}
+              </Label>
+              <select
+                className="w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500"
+                value={answers[question.id]?.[0] || ""}
+                onChange={(e) => handleSingleChange(question.id, e.target.value)}
+              >
+                <option value="">Seleccione una opción</option>
+                {question.options?.map((option) => (
+                  <option key={option.idop} value={option.idop}>
+                    {option.optionTxt}
+                  </option>
+                ))}
+              </select>
+            </div>
+          );
+
+        default:
+          return null;
+      }
+    })}
+  </form>
+
+  {/* Botones */}
+  <div className="w-full mx-auto flex justify-end space-x-6 pt-8">
+    <Button
+      variant="destructive"
+      className="bg-red-600 hover:bg-red-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-red-500 transition-all duration-300"
+      onClick={handleCancelActivity}
+    >
+      Cancelar
+    </Button>
+    <Button
+      className="bg-blue-600 hover:bg-blue-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-blue-500 transition-all duration-300"
+      onClick={handleSubmitAnswers}
+    >
+      Insertar Actividad
+    </Button>
+  </div>
+</div>
+
     </div>
   )
 }

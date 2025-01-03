@@ -134,15 +134,7 @@ export default function ProjectForm() {
           text: 'Los cambios fueron guardados correctamente.',
           confirmButtonText: 'OK'
         });
-    } else {
-      // Si el usuario cancela la operación
-      Swal.fire({
-        icon: 'info',
-        title: 'Operación cancelada',
-        text: 'Los cambios no fueron guardados.',
-        confirmButtonText: 'OK'
-      });
-    }
+    } 
   }
   const handleCancelChange = async () => {
     // Confirmación de SweetAlert antes de eliminar
@@ -164,15 +156,7 @@ export default function ProjectForm() {
         text: 'Los cambios fueron Eliminados correctamente.',
         confirmButtonText: 'OK'
       });
-    } else {
-      // Si el usuario cancela la operación
-      Swal.fire({
-        icon: 'info',
-        title: 'Operación cancelada',
-        text: 'Los cambios no fueron guardados.',
-        confirmButtonText: 'OK'
-      });
-    }
+    } 
   }
   ///recortar rutas
   const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
@@ -418,7 +402,7 @@ export default function ProjectForm() {
       <div className="w-full space-y-6">
         <div className="flex-1 w-[90%]  mx-auto flex flex-col justify-between ">
           <div className="  w-[100%] flex flex-1 justify-around items-center">
-            <h2>
+            <h2 className="text-2xl font-extrabold">
               Insertando Actividades del Proyecto {idProject}.
             </h2>
           </div>
@@ -436,7 +420,11 @@ export default function ProjectForm() {
               Nueva Actividad
             </Button>
           </div>
+          <h2 className="text-lg font-bold my-3 ">
+            Lista de actividades registradas:
+          </h2>
           <div className="bg-[#E3E6ED] rounded-lg ">
+
             <DynamicTable
               configuration={configurationUser}
               data={currentItems}
@@ -448,10 +436,10 @@ export default function ProjectForm() {
           </div>
         </div>
         <div className="w-[90%] flex justify-end gap-8 items-center mx-auto">
-          <Button className="bg-red-500 hover:bg-red-600  w-32 h-14 " onClick={handleCancelChange} >
+          <Button className="bg-red-500 hover:bg-red-600  w-32 h-12 " onClick={handleCancelChange} >
             Cancelar Cambios
           </Button>
-          <Button className="bg-green-500 hover:bg-green-600  w-32 h-14 " onClick={handleSaveChange} >
+          <Button className="bg-blue-500 hover:bg-blue-600 h-12 w-32 " onClick={handleSaveChange} >
             Guardar Cambios
           </Button>
         </div>

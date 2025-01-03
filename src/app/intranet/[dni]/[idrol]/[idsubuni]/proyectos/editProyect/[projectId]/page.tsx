@@ -167,7 +167,7 @@ export default function EditProject() {
   useEffect(() => {
     fetchProjectsDetails();
     getAllEscuelas();
-  }, []);
+  }, [fetchProjectsDetails]);
 
   const formatearFecha = (fecha: string) => {
     return new Date(fecha).toLocaleDateString();
@@ -184,133 +184,124 @@ export default function EditProject() {
   return (
     <>
       <Card className=" w-full rounded-none bg-white dark:bg-gray-900 mx-auto overflow-y-auto p-2 relative">
-        <CardContent className="">
-          <Image src={"/resources/images/imgActividad.jpg"} alt="imagen header" className="w-[100%] h-44" width={500} height={300} ></Image>
-        </CardContent>
-        <div className=" w-[90%] mx-auto" >
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold">
+        <div className="w-[80%] mx-auto space-y-8">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-semibold">
               Proyecto: {projectDetails?.idString || "Sin ID"}
             </CardTitle>
-            <Progress value={64} className="h-2 mt-2" />
-            <span className="text-sm text-muted-foreground mt-1">64%</span>
+            <Progress value={64} className="h-2 mt-4 mx-auto w-3/4" />
+            <span className="text-sm text-muted-foreground mt-2 block">64%</span>
           </CardHeader>
-          <CardContent className="space-y-6 ">
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
-              <div className="flex items-center gap-2">
-                <div className="text-sm">
-                  <div className="font-medium">Fecha Inicio</div>
-                  <div className="text-muted-foreground py-2 px-4 rounded-lg border-2 border-gray-500 border-opacity-30 ">
-                    {formatearFecha(projectDetails?.fInit || "")}
-                  </div>
+          <CardContent className="space-y-8 text-center">
+            <div>
+              <div className="mb-4">
+                <div className="font-medium text-lg">Fecha Inicio</div>
+                <div className="text-muted-foreground py-2 px-4 rounded-lg border border-gray-300 w-64 mx-auto">
+                  {formatearFecha(projectDetails?.fInit || "")}
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="text-sm">
-                  <div className="font-medium">Fecha final</div>
-                  <div className="text-muted-foreground py-2 px-4 rounded-lg border-2 border-gray-500 border-opacity-30">
-                    {formatearFecha(projectDetails?.fFin || "")}
-                  </div>
+              <div>
+                <div className="font-medium text-lg">Fecha Final</div>
+                <div className="text-muted-foreground py-2 px-4 rounded-lg border border-gray-300 w-64 mx-auto">
+                  {formatearFecha(projectDetails?.fFin || "")}
                 </div>
               </div>
             </div>
-
             <div>
-              <h3 className="font-medium mb-2">Asignados</h3>
-              <div className="w-10 h-10 flex items-center justify-center bg-gray-400 rounded-full">
-                <span className=" text-black font-bold text-lg ">L</span>
+              <h3 className="font-medium text-lg">Asignados</h3>
+              <div className="w-16 h-16 flex items-center justify-center bg-gray-400 rounded-full mx-auto">
+                <span className="text-black font-bold text-2xl">L</span>
               </div>
             </div>
-
             <div>
-              <h3 className="font-medium mb-2">Estado</h3>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="bg-yellow-200">
+              <h3 className="font-medium text-lg">Estado</h3>
+              <div className="flex justify-center">
+                <Badge variant="outline" className="bg-yellow-200 px-4 py-2 text-lg">
                   {projectDetails?.estado || "Sin estado"}
                 </Badge>
               </div>
             </div>
-            <div className="flex w-full justify-between items-center">
-              <div className="dark:texto-white texto md">
-                <h3 className="font-medium mb-2">Escuela Profesional</h3>
-                <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={comboboxOpen}
-                      className="w-96 justify-between h-10 border-2 dark:border-gray-300"
-                    >
-                      {escuelaP
-                        ? escuelas.find((esc) => esc.idpe === parseInt(escuelaP))?.nmPE
-                        : "Seleccione una opción"}
-                      <ChevronsUpDown className="opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-96 p-0">
-                    <Command>
-                      <CommandInput
-                        placeholder="Buscar escuela profesional..."
-                        className="h-9"
-                      />
-                      <CommandList>
-                        <CommandEmpty>No se encontraron resultados.</CommandEmpty>
-                        <CommandGroup>
-                          {escuelas.map((escuela) => (
-                            <CommandItem
-                              key={escuela.idpe}
-                              value={escuela.idpe.toString()}
-                              onSelect={() => {
-                                setEscuelaP(escuela.idpe.toString());
-                                setComboboxOpen(false);
-                              }}
-                              
-                            >
-                              {escuela.nmPE}
-                              <Check
-                                className={cn(
-                                  "ml-auto",
-                                  escuelaP === escuela.idpe.toString()
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-
-                <div>
-                  <div className="w-auto justify-between h-16 border-2 dark:border-gray-300 my-2 px-3 py-2 rounded-md">
-                    <h3 className="font-medium mb-1">Plan de Proyecto</h3>
-                    <a
-                      href={`${API_URL}/${existingPlan}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mb-1"
-                    >
-                      Ver plan existente
-                    </a>
-                  </div>
-                  <div className="w-auto justify-between h-16 border-2 p-3 dark:border-gray-300 rounded-md px-3 py-2 my-2">
-                    <input type="file" name="" id="" onChange={(e) => setPlan(e.target.files?.[0] || null)} />
-                  </div>
-                </div>
-
-
-              </div>
-              <Button className="bg-blue-500 hover:bg-blue-600 h-12 w-32 self-end mr-3" onClick={saveChanges}  >
-                guardar cambios
-              </Button>
+            <div>
+              <h3 className="font-medium text-lg">Escuela Profesional</h3>
+              <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={comboboxOpen}
+                    className="w-96 mx-auto justify-between h-12 border border-gray-300 text-lg"
+                  >
+                    {escuelaP
+                      ? escuelas.find((esc) => esc.idpe === parseInt(escuelaP))?.nmPE
+                      : "Seleccione una opción"}
+                    <ChevronsUpDown className="opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64 p-0 mx-auto">
+                  <Command>
+                    <CommandInput placeholder="Buscar escuela profesional..." className="h-10" />
+                    <CommandList>
+                      <CommandEmpty>No se encontraron resultados.</CommandEmpty>
+                      <CommandGroup>
+                        {escuelas.map((escuela) => (
+                          <CommandItem
+                            key={escuela.idpe}
+                            value={escuela.idpe.toString()}
+                            onSelect={() => {
+                              setEscuelaP(escuela.idpe.toString());
+                              setComboboxOpen(false);
+                            }}
+                          >
+                            {escuela.nmPE}
+                            <Check
+                              className={cn(
+                                "ml-auto",
+                                escuelaP === escuela.idpe.toString()
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
-
-
-            <TaskList toggleOpenDetsAct={(id: number) => toggleOpenDetailsActivities(id)} typeEdit={true} />
+            <div className="space-y-4">
+              <div className="border border-gray-300 p-4 rounded-lg text-center">
+                <h3 className="font-medium text-lg mb-2">Plan de Proyecto</h3>
+                <a
+                  href={`${API_URL}/${existingPlan}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block text-blue-600 underline text-lg"
+                >
+                  Ver plan existente
+                </a>
+              </div>
+              <div className="border border-gray-300 p-4 rounded-lg text-center">
+                <input
+                  type="file"
+                  onChange={(e) => setPlan(e.target.files?.[0] || null)}
+                  className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 px-4 py-3 file:bg-blue-600 file:text-white file:rounded-md file:px-6 file:py-3"
+                />
+              </div>
+            </div>
+            <Button
+              className="bg-blue-500 hover:bg-blue-600 h-12 w-40 mx-auto text-lg"
+              onClick={saveChanges}
+            >
+              Guardar Cambios
+            </Button>
           </CardContent>
+
         </div>
+        <TaskList
+              toggleOpenDetsAct={(id: number) => toggleOpenDetailsActivities(id)}
+              typeEdit={true}
+            />
       </Card>
     </>
 
