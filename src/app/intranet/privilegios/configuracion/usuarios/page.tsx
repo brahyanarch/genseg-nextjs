@@ -32,54 +32,60 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
   
-    // Abre el SweetAlert para confirmar la acción
-    const result = await Swal.fire({
-      title: '¿Estás seguro?',
-      text: '¡Este cambio no se puede deshacer!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, guardar',
-      cancelButtonText: 'Cancelar',
-    });
+    // Si estamos editando un usuario, no mostramos la confirmación
+    if (!editingUser) {
+      // Si no estamos editando, entonces mostramos la confirmación
+      const result = await Swal.fire({
+        title: '¿Estás seguro de agregar un nuevo usuario?',
+        text: 'Agregarás un nuevo usuario en el sistema',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, agregar usuario',
+        cancelButtonText: 'Cancelar',
+        customClass: {
+          cancelButton: 'bg-red-500 text-white hover:bg-red-600', // Personalizando el botón de cancelar
+          confirmButton: 'bg-blue-500 text-white hover:bg-blue-600', // Estilo del botón de confirmar
+        },
+      });
   
-    if (result.isConfirmed) {
-      // Aquí construimos el objeto con los datos a guardar
-      const updatedUser = {
-        dni: dni,  // dni del usuario
-        usuario: name,  // nombre del usuario
-        email: email,  // email del usuario
-        password: password,
-        rol_id: idRol,  // rol_id, lo debes pasar como está en el objeto de usuario
-        id_sub: idSubUni,  // subunidad_id_subuni
-      };
-  
-      try {
-        const response = await fetch(editingUser ? `${API_CREATE_USERS}/${editingUser.dni}` : API_CREATE_USERS, {
-          method: editingUser ? 'PUT' : 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updatedUser),
-        });
-  
-        if (response.ok) {
-          const savedUser = await response.json();
-          onSaveUser(savedUser);
-          Swal.fire('Guardado!', 'El usuario se ha guardado correctamente.', 'success');
-          closeModal();
-        } else {
-          Swal.fire('Error', 'Hubo un problema al guardar el usuario.', 'error');
-        }
-      } catch (error) {
-        Swal.fire('Error', 'Error al conectar con la API: ' + error, 'error');
+      if (!result.isConfirmed) {
+        Swal.fire('Cancelado', 'El usuario no fue agregado.', 'info');
+        return; // Si el usuario cancela, salimos de la función
       }
-    } else {
-      // Si el usuario cancela la operación
-      Swal.fire('Cancelado', 'El usuario no fue guardado.', 'info');
+    }
+  
+    // Aquí construimos el objeto con los datos a guardar
+    const updatedUser = {
+      dni: dni,  // dni del usuario
+      usuario: name,  // nombre del usuario
+      email: email,  // email del usuario
+      password: password,
+      rol_id: idRol,  // rol_id, lo debes pasar como está en el objeto de usuario
+      id_sub: idSubUni,  // subunidad_id_subuni
+    };
+  
+    try {
+      const response = await fetch(editingUser ? `${API_CREATE_USERS}/${editingUser.dni}` : API_CREATE_USERS, {
+        method: editingUser ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedUser),
+      });
+  
+      if (response.ok) {
+        const savedUser = await response.json();
+        onSaveUser(savedUser);
+        Swal.fire('Guardado!', 'El usuario se ha guardado correctamente.', 'success');
+        closeModal();
+      } else {
+        Swal.fire('Error', 'Hubo un problema al guardar el usuario.', 'error');
+      }
+    } catch (error) {
+      Swal.fire('Error', 'Error al conectar con la API: ' + error, 'error');
     }
   };
+  
 
 
   if (!isOpen) return null;

@@ -14,7 +14,6 @@ import { usePathname } from "next/navigation";
 
 // Notificaciones
 import Swal from 'sweetalert2';
-import { toast } from 'react-toastify';
 // Modal para agregar un nuevo Rol
 
 export const EditModal = ({
@@ -96,15 +95,7 @@ export const EditModal = ({
           confirmButtonText: 'OK'
         });
       }
-    } else {
-      // Si el usuario cancela
-      Swal.fire({
-        icon: 'info',
-        title: 'Operación cancelada',
-        text: 'El rol no fue guardado.',
-        confirmButtonText: 'OK'
-      });
-    }
+    } 
   };
 
   if (!isOpen) return null;

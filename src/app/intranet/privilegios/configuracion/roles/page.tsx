@@ -35,56 +35,46 @@ export const EditModal = ({
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-
-    // Confirmación de SweetAlert antes de guardar
-    const result = await Swal.fire({
-      title: '¿Estás seguro?',
-      text: "Este cambio será guardado.",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, guardar',
-      cancelButtonText: 'No, cancelar',
-    });
-
-    // Si el usuario acepta, se procede a guardar
-    if (result.isConfirmed) {
+  
+    // Si estamos editando un rol (actualizando), no pedimos confirmación
+    if (editingRole) {
       const updatedRole = {
         n_rol: name,
         abrev: abbreviation,
       };
-
+  
       try {
         const response = await fetch(
-          editingRole ? `${API_ROLES}/${editingRole.id_rol}` : API_ROLES,
+          `${API_ROLES}/${editingRole.id_rol}`, // Asegúrate de que el ID esté correctamente asignado
           {
-            method: editingRole ? 'PUT' : 'POST',
+            method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify(updatedRole),
           }
         );
-
+  
         if (response.ok) {
           const savedRole = await response.json();
-          onSaveRole(savedRole);
-
-          // Mostrar un SweetAlert de éxito
+          onSaveRole(savedRole); // Guardar el rol actualizado en el estado
+  
+          // Mostrar un SweetAlert de éxito con el check
           Swal.fire({
             icon: 'success',
             title: '¡Éxito!',
-            text: 'Rol guardado correctamente.',
-            confirmButtonText: 'OK'
+            text: 'Rol actualizado correctamente.',
+            confirmButtonText: 'OK',
           });
-
+  
           closeModal();  // Cerrar modal
         } else {
           // Si el servidor no responde bien, mostrar un SweetAlert de error
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'Hubo un problema al guardar el rol.',
-            confirmButtonText: 'OK'
+            text: 'Hubo un problema al actualizar el rol.',
+            confirmButtonText: 'OK',
           });
         }
       } catch (error) {
@@ -93,19 +83,77 @@ export const EditModal = ({
           icon: 'error',
           title: 'Error',
           text: 'Error al conectar con la API.',
-          confirmButtonText: 'OK'
+          confirmButtonText: 'OK',
         });
       }
     } else {
-      // Si el usuario cancela
-      Swal.fire({
-        icon: 'info',
-        title: 'Operación cancelada',
-        text: 'El rol no fue guardado.',
-        confirmButtonText: 'OK'
+      // Si estamos creando un nuevo rol, mostramos la confirmación de SweetAlert
+      const result = await Swal.fire({
+        title: '¿Estás seguro de crear un nuevo rol?',
+        text: "Se ingresará un nuevo rol en el sistema.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, crear',
+        cancelButtonText: 'Cancelar',
+        customClass: {
+          cancelButton: 'bg-red-500 text-white hover:bg-red-600',
+          confirmButton: 'bg-blue-500 text-white hover:bg-blue-600',
+        },
       });
+  
+      if (result.isConfirmed) {
+        const newRole = {
+          n_rol: name,
+          abrev: abbreviation,
+        };
+  
+        try {
+          const response = await fetch(API_ROLES, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newRole),
+          });
+  
+          if (response.ok) {
+            const savedRole = await response.json();
+            onSaveRole(savedRole); // Guardar el rol recién creado
+  
+            // Mostrar un SweetAlert de éxito
+            Swal.fire({
+              icon: 'success',
+              title: '¡Éxito!',
+              text: 'Rol creado correctamente.',
+              confirmButtonText: 'OK',
+            });
+  
+            closeModal();  // Cerrar modal
+          } else {
+            // Si hay un error al guardar el rol
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Hubo un problema al guardar el rol.',
+              confirmButtonText: 'OK',
+            });
+          }
+        } catch (error) {
+          // Si hay un error de conexión, mostrar un SweetAlert de error
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error al conectar con la API.',
+            confirmButtonText: 'OK',
+          });
+        }
+      } else {
+        // Si el usuario cancela
+        closeModal();
+      }
     }
   };
+  
 
   if (!isOpen) return null;
 
@@ -426,12 +474,16 @@ const ConfiRoles = () => {
   const deleteRoles = async (id: number) => {
     // Confirmación de SweetAlert antes de eliminar
     const result = await Swal.fire({
-      title: '¿Estás seguro?',
+      title: '¿Estás seguro de eliminar el rol?',
       text: "Este rol será eliminado permanentemente.",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'No, cancelar',
+      customClass: {
+        cancelButton: 'bg-red-500 text-white hover:bg-red-600', // Personalizando el botón de cancelar
+        confirmButton: 'bg-blue-500 text-white hover:bg-blue-600', // Estilo del botón de confirmar
+      },
     });
 
     if (result.isConfirmed) {

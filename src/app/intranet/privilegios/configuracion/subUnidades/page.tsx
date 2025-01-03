@@ -26,56 +26,64 @@ export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnida
   const handleSubmit = async (e: any) => {
     e.preventDefault();
   
-    // Confirmación antes de guardar con SweetAlert2
-    const result = await Swal.fire({
-      title: '¿Estás seguro?',
-      text: '¿Deseas guardar esta subunidad?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, guardar',
-      cancelButtonText: 'Cancelar',
-    });
+    // Si estamos en modo de edición, no necesitamos mostrar la alerta de confirmación, solo actualizar
+    const isEdit = editingSubUnidad ? true : false;
   
-    if (result.isConfirmed) {
-      const updatedSubUnidad = {
-        nombre: name,
-        abreviatura: abbreviation,
-      };
+    // Si estamos agregando (no editando), preguntamos primero
+    if (!isEdit) {
+      const result = await Swal.fire({
+        title: '¿Estás seguro de agregar una subunidad?',
+        text: 'Se creará una nueva subunidad en el sistema.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, guardar',
+        cancelButtonText: 'Cancelar',
+      });
   
-      try {
-        const response = await fetch(
-          editingSubUnidad ? `${API_SUBUNIDADES}/${editingSubUnidad.id_subuni}` : API_SUBUNIDADES,
-          {
-            method: editingSubUnidad ? 'PUT' : 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updatedSubUnidad),
-          }
-        );
+      // Si el usuario confirma la acción, proceder con la creación
+      if (!result.isConfirmed) return;
+    }
   
-        if (response.ok) {
-          const savedSubUnidad = await response.json();
-          onSaveSubUnidad(savedSubUnidad);
-          
-          // Muestra un mensaje de éxito usando SweetAlert2
-          await Swal.fire('Guardado!', 'La subunidad ha sido guardada correctamente.', 'success');
-          closeModal();
-        } else {
-          // Muestra un mensaje de error usando SweetAlert2 si la operación falla
-          await Swal.fire('Error', 'Hubo un problema al guardar la subunidad.', 'error');
+    const updatedSubUnidad = {
+      nombre: name,
+      abreviatura: abbreviation,
+    };
+  
+    try {
+      const response = await fetch(
+        isEdit ? `${API_SUBUNIDADES}/${editingSubUnidad.id_subuni}` : API_SUBUNIDADES,
+        {
+          method: isEdit ? 'PUT' : 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedSubUnidad),
         }
-      } catch (error) {
-        // Muestra un mensaje de error si ocurre un problema de conexión
-        await Swal.fire('Error', 'Error al conectar con la API: ' + error, 'error');
+      );
+  
+      if (response.ok) {
+        const savedSubUnidad = await response.json();
+        onSaveSubUnidad(savedSubUnidad);
+  
+        // Muestra un mensaje de éxito usando SweetAlert2
+        await Swal.fire(
+          isEdit ? 'Actualizado!' : 'Guardado!',
+          `La subunidad ha sido ${isEdit ? 'actualizada' : 'guardada'} correctamente.`,
+          'success'
+        );
+        closeModal();
+      } else {
+        // Muestra un mensaje de error si la operación falla
+        await Swal.fire('Error', 'Hubo un problema al guardar la subunidad.', 'error');
       }
-    } else {
-      // Muestra un mensaje de cancelación usando SweetAlert2 si el usuario cancela
-      await Swal.fire('Cancelado', 'No se realizaron cambios.', 'info');
+    } catch (error) {
+      // Muestra un mensaje de error si ocurre un problema de conexión
+      await Swal.fire('Error', 'Error al conectar con la API: ' + error, 'error');
     }
   };
+  
   
   
 
@@ -366,7 +374,7 @@ export default function Component() {
   const deleteSubUnidad = async (id: number) => {
     // Confirmación antes de eliminar con SweetAlert2
     const result = await Swal.fire({
-      title: '¿Estás seguro?',
+      title: '¿Estás seguro de eliminar esta subunidad?',
       text: '¡Esta acción no se puede deshacer!',
       icon: 'warning',
       showCancelButton: true,
@@ -397,10 +405,7 @@ export default function Component() {
         // Muestra un mensaje de error si ocurre un problema en la conexión
         await Swal.fire('Error', 'Error al conectar con la API: ' + error, 'error');
       }
-    } else {
-      // Muestra un mensaje de cancelación usando SweetAlert2 si el usuario cancela
-      await Swal.fire('Cancelado', 'La subunidad no fue eliminada.', 'info');
-    }
+    } 
   };
   
   

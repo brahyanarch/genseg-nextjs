@@ -27,43 +27,106 @@ export const EditModal = ({ isOpen, closeModal, onSavePermission, editingPermiss
   const handleSubmit = async (e: any) => {
     e.preventDefault();
   
-    // Mostrar confirmación de SweetAlert antes de guardar
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: `¿Deseas ${editingPermission ? 'actualizar' : 'guardar'} el permiso?`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, guardar',
-      cancelButtonText: 'Cancelar',
-    }).then(async (result) => {
+    if (editingPermission) {
+      // Si estamos editando, no pedimos confirmación, solo actualizamos
+      const updatedPermission = {
+        n_per: name,
+        abrev: abbreviation,
+      };
+  
+      try {
+        const response = await fetch(`${API_PERMISOS}/${editingPermission.id_per}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updatedPermission)
+        });
+  
+        if (response.ok) {
+          const savedPermission = await response.json();
+          onSavePermission(savedPermission);
+          Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: 'Permiso actualizado correctamente.',
+            confirmButtonText: 'OK',
+          });
+          closeModal();
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error al actualizar el permiso.',
+            confirmButtonText: 'OK',
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: `Error al conectar con la API: ${error}`,
+          confirmButtonText: 'OK',
+        });
+      }
+    } else {
+      // Si estamos creando un nuevo permiso, pedimos confirmación
+      const result = await Swal.fire({
+        title: '¿Estás seguro de crear un nuevo permiso?',
+        text: "Este permiso se agregará al sistema.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, crear',
+        cancelButtonText: 'Cancelar',
+        customClass: {
+          cancelButton: 'bg-red-500 text-white hover:bg-red-600',
+          confirmButton: 'bg-blue-500 text-white hover:bg-blue-600',
+        },
+      });
+  
       if (result.isConfirmed) {
-        const updatedPermission = {
+        const newPermission = {
           n_per: name,
           abrev: abbreviation,
         };
   
         try {
-          const response = await fetch(editingPermission ? `${API_PERMISOS}/${editingPermission.id_per}` : API_PERMISOS, {
-            method: editingPermission ? 'PUT' : 'POST',
+          const response = await fetch(API_PERMISOS, {
+            method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify(updatedPermission)
+            body: JSON.stringify(newPermission)
           });
   
           if (response.ok) {
             const savedPermission = await response.json();
             onSavePermission(savedPermission);
-            Swal.fire('¡Éxito!', 'Permiso guardado correctamente.', 'success');
+            Swal.fire({
+              icon: 'success',
+              title: '¡Éxito!',
+              text: 'Permiso creado correctamente.',
+              confirmButtonText: 'OK',
+            });
             closeModal();
           } else {
-            Swal.fire('Error', 'Error al guardar el permiso.', 'error');
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Error al crear el permiso.',
+              confirmButtonText: 'OK',
+            });
           }
         } catch (error) {
-          Swal.fire('Error', `Error al conectar con la API: ${error}`, 'error');
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: `Error al conectar con la API: ${error}`,
+            confirmButtonText: 'OK',
+          });
         }
       }
-    });
+    }
   };
   
 
@@ -190,23 +253,25 @@ export default function Component() {
 
   const deletePermission = async (id: number) => {
     Swal.fire({
-      title: '¿Estás seguro?',
-      text: '¿Realmente deseas eliminar este permiso?',
+      title: '¿Estás seguro de eliminar este permiso?',
+      text: 'Una vez eliminado, no se podrá recuperar.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar',
+      customClass: {
+        cancelButton: 'bg-red-500 text-white hover:bg-red-600', // Personalizando el botón de cancelar
+        confirmButton: 'bg-blue-500 text-white hover:bg-blue-600', // Estilo del botón de confirmar
+      },
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`${API_PERMISOS}/${id}`, {
-            method: 'DELETE',
-          });
+          const response = await fetch(`${API_PERMISOS}/${id}`, { method: 'DELETE' });
   
           if (response.ok) {
             setUsers((prevPermisos) => prevPermisos.filter((permiso: any) => permiso.id_per !== id));
             Swal.fire('¡Eliminado!', 'Permiso eliminado correctamente.', 'success');
-            fetchPermisos();
+            fetchPermisos(); // Refrescar la lista de permisos
           } else {
             Swal.fire('Error', 'Error al eliminar el permiso.', 'error');
           }
@@ -216,6 +281,7 @@ export default function Component() {
       }
     });
   };
+  
   
 
   if (loading) {
