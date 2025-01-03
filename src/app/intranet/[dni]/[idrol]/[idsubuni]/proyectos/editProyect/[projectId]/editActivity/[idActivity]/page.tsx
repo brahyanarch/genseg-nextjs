@@ -7,6 +7,7 @@ import { useState, useEffect } from "react"
 import { useParams, usePathname, useRouter } from "next/navigation"
 import { API_ACTIVITIES } from "@/config/apiconfig"
 import Swal from 'sweetalert2';
+import { BreadcrumbWithDropdown } from "@/components/breadcrumb"
 
 export default function ActivityForm() {
   const [questions, setQuestions] = useState([]);
@@ -15,7 +16,7 @@ export default function ActivityForm() {
   const [fechaInicio, setFechaInicio] = useState();
   const [fechaFinal, setFechaFinal] = useState();
   const [answers, setAnswers] = useState({}); // Estado para almacenar respuestas
-  const { projectId, idActivity } = useParams();
+  const { projectId, idActivity, dni, idrol, idsubuni } = useParams();
   const pathname = usePathname();
   const router = useRouter();
   const handleChange = (questionId, field, value) => {
@@ -203,15 +204,20 @@ export default function ActivityForm() {
     fetchData();
   }, []);
 
+  const configuracion = recortarRutaHastaSegmento(pathname, 'editProyect');
+  const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
+  //definimos valores para el breadCrumb
+  const breadcrumbData = [
+    { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
+    { type: "link", label: "Editar proyecto", href: configuracion },
+    { type: "page", label: "Editar actividad" },
+  ];
 
 
   return (
     <div className="min-h-screen bg-background p-6">
-      <div className="text-sm breadcrumbs mb-6 text-muted-foreground">
-        <span>Inicio</span> {' > '}
-        <span>Proyectos</span> {' > '}
-        <span>Insertar</span> {' > '}
-        <span>actividad</span>
+      <div className=" flex gap-4 items-center mx-auto text-sm breadcrumbs mb-6 text-muted-foreground">
+        <BreadcrumbWithDropdown items={breadcrumbData} />
       </div>
 
       <div className="max-w-2xl mx-auto space-y-6">

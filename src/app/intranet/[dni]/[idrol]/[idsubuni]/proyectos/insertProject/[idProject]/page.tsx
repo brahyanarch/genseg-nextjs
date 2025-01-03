@@ -7,6 +7,7 @@ import DynamicTable from "@/components/DynamicTable";
 import { useState, useEffect } from "react"
 import { useParams, usePathname, useRouter } from "next/navigation"
 import { API_PROJECT_ACTIVITIES, API_ACTIVITIES } from "@/config/apiconfig"
+import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
 import Swal from 'sweetalert2';
 
 interface Activities {
@@ -45,6 +46,7 @@ export default function ProjectForm() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const router = useRouter();
   const pathname = usePathname();
+  const { idrol, idsubuni, dni } = useParams();
 
   //función para insertar una actividad
   const insertActivity = () => {
@@ -123,18 +125,25 @@ export default function ProjectForm() {
       showCancelButton: true,
       confirmButtonText: 'Sí, guardar cambios',
       cancelButtonText: 'No guardar cambios',
+      customClass: {
+        confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+        cancelButton: 'bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded',
+      },
     });
     if (result.isConfirmed) {
       const recortada = recortarRutaHastaSegmento(pathname, 'proyectos');
       router.push(recortada);
-        // Mostrar un SweetAlert de éxito
-        Swal.fire({
-          icon: 'success',
-          title: '¡Éxito!',
-          text: 'Los cambios fueron guardados correctamente.',
-          confirmButtonText: 'OK'
-        });
-    } 
+      // Mostrar un SweetAlert de éxito
+      Swal.fire({
+        icon: 'success',
+        title: '¡Éxito!',
+        text: 'Los cambios fueron guardados correctamente.',
+        confirmButtonText: 'OK',
+        customClass: {
+          confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+        },
+      });
+    }
   }
   const handleCancelChange = async () => {
     // Confirmación de SweetAlert antes de eliminar
@@ -145,6 +154,12 @@ export default function ProjectForm() {
       showCancelButton: true,
       confirmButtonText: 'Sí, Eliminar cambios',
       cancelButtonText: 'No Eliminar cambios',
+      background: 'bg-gray-800', // Fondo para modo oscuro
+      color: 'text-gray-200', // Texto claro
+      customClass: {
+        confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+        cancelButton: 'bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded',
+      },
     });
     if (result.isConfirmed) {
       const recortada = recortarRutaHastaSegmento(pathname, 'proyectos');
@@ -154,9 +169,14 @@ export default function ProjectForm() {
         icon: 'success',
         title: '¡Éxito!',
         text: 'Los cambios fueron Eliminados correctamente.',
-        confirmButtonText: 'OK'
+        confirmButtonText: 'OK',
+        background: 'bg-gray-800', // Fondo para modo oscuro
+        color: 'text-gray-200', // Texto claro
+        customClass: {
+          confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+        },
       });
-    } 
+    }
   }
   ///recortar rutas
   const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
@@ -391,20 +411,30 @@ export default function ProjectForm() {
     return pageButtons;
   };
 
-
+  //recortamos las rutas requeridas
+  const configuracion = recortarRutaHastaSegmento(pathname, 'proyectos');
+  const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
+  //definimos valores para el breadCrumb
+  const breadcrumbData = [
+    { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
+    { type: "link", label: "Proyectos", href: configuracion },
+    { type: "page", label: "Insertar actividades" },
+  ];
   return (
     <div className="flex-1 bg-background py-4 pl-4  text-black dark:text-white">
       <div className=" flex gap-4 items-center mx-auto text-sm breadcrumbs mb-6 text-muted-foreground">
-        <span>Inicio</span> {' > '}
-        <span>Proyectos</span> {' > '}
-        <span>Insertar</span>
+      <BreadcrumbWithDropdown items={breadcrumbData} />
       </div>
       <div className="w-full space-y-6">
         <div className="flex-1 w-[90%]  mx-auto flex flex-col justify-between ">
           <div className="  w-[100%] flex flex-1 justify-around items-center">
-            <h2 className="text-2xl font-extrabold">
-              Insertando Actividades del Proyecto {idProject}.
-            </h2>
+            <div className="text-center my-4">
+              <h1 className="text-3xl font-bold">Insertar Actividades en el Proyecto {idProject}</h1>
+              <p className="text-sm text-gray-400 text-muted-foreground">
+                Administra y registra las actividades necesarias para completar el proyecto.
+              </p>
+            </div>
+
           </div>
         </div>
         <div className="w-[90%] mx-auto my-4">
@@ -417,7 +447,7 @@ export default function ProjectForm() {
               />
             </div>
             <Button className="bg-blue-500 hover:bg-blue-600 h-12 w-32 " onClick={insertActivity} >
-              Nueva Actividad
+            Registrar Actividad
             </Button>
           </div>
           <h2 className="text-lg font-bold my-3 ">

@@ -62,7 +62,7 @@ export default function Principal (){
       }, []);
     return(
         <>
-        <div className="self-start px-4" >
+        <div className="self-start p-4" >
         <BreadcrumbWithDropdown items={breadcrumbData}  />
         </div>
         

@@ -76,7 +76,7 @@ const Navbar = ({
         fetchSubunidades();
       }, []);
   return (
-    <nav className="bg-white dark:text-white w-full dark:bg-gray-800 shadow-md">
+    <nav className="bg-white dark:text-white w-full dark:bg-gray-800 shadow-xl ">
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">

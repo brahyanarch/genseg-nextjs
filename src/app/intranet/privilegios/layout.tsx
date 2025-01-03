@@ -54,7 +54,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   console.log(User, " ");
   return (
     <div className="flex flex-col h-screen w-full bg-gray-200 dark:bg-gray-900">
-      <nav className="bg-white dark:text-white w-full dark:bg-gray-800 shadow-md">
+      <nav className="bg-white dark:text-white w-full dark:bg-gray-800 shadow-lg ">
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">

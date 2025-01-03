@@ -7,6 +7,7 @@ import { Edit, Trash2, Eye, CirclePlus } from "lucide-react";
 import DynamicTable from "@/components/DynamicTable";
 import { usePathname, useRouter, useParams } from "next/navigation";
 import Swal from 'sweetalert2';
+import { BreadcrumbWithDropdown } from '@/components/breadcrumb';
 interface Project {
   idproj: number;
   estado: string;
@@ -21,7 +22,7 @@ export default function Component() {
   const [error, setError] = useState(null);
   const pathname = usePathname();
   const router = useRouter();
-  const { dni, idsubuni } = useParams();
+  const { dni, idsubuni, idrol } = useParams();
   ///variables necesarios para la tabla dinámica
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(4);
@@ -369,12 +370,36 @@ export default function Component() {
 
     return pageButtons;
   };
-
+  ///recortar rutas
+  const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
+    const partes = ruta.split('/'); // Divide la ruta en partes
+    const indice = partes.indexOf(segmento); // Encuentra el índice del segmento clave
+    if (indice === -1) return ruta; // Si no encuentra el segmento, retorna la ruta completa
+    return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
+  };
+  //recortamos las rutas requeridas
+  const configuracion = recortarRutaHastaSegmento(pathname, 'proyectos');
+  const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
+  //definimos valores para el breadCrumb
+  const breadcrumbData = [
+    { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
+    { type: "page", label: "Proyectos" },
+  ];
   return (
     <div className=" w-[90%] mx-auto  py-4  space-y-4 text-black dark:text-white min-h-screen">
-      <div >
-        <h1 className="text-2xl font-bold text-black dark:text-white">Proyectos</h1>
+      <div className="flex gap-4 items-center mx-auto text-sm breadcrumbs mb-6 text-muted-foreground">
+        <BreadcrumbWithDropdown items={breadcrumbData} />
       </div>
+      <div className="flex flex-col items-center my-8 space-y-4">
+        <h1 className="text-5xl font-extrabold text-gray-800 tracking-tight">
+          Gestión de Proyectos
+        </h1>
+        <p className="text-lg text-gray-500 max-w-2xl text-center">
+          Accede a las opciones para editar, eliminar o visualizar más detalles de cada proyecto.
+        </p>
+        <div className="w-full border-t border-gray-300"></div>
+      </div>
+
       <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 " onClick={insertProject} >
         <CirclePlus className="h-8 w-8 " />
         <span className="mx-2"></span> {/* Añadir margen entre los elementos */}

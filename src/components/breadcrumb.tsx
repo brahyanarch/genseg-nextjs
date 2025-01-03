@@ -37,7 +37,7 @@ export function BreadcrumbWithDropdown({ items }:Data) {
             {/* Renderiza cada tipo de elemento dinámicamente */}
             <BreadcrumbItem>
               {item.type === "link" && (
-                <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
+                <Link href={item.href}>{item.label}</Link>
               )}
               {item.type === "dropdown" && (
                 <DropdownMenu>

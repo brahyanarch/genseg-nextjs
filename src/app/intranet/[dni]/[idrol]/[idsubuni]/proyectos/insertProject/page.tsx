@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { API_PROJECTS, API_ESCUELA_PROFESIONAL } from "@/config/apiconfig";
 import Swal from 'sweetalert2';
+import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
 
 /// Interface escuela profesional
 interface Escuelas {
@@ -95,7 +96,12 @@ export default function ProjectForm() {
           icon: 'success',
           title: '¡Éxito!',
           text: 'El Proyecto fue creado correctamente.',
-          confirmButtonText: 'OK'
+          confirmButtonText: 'OK',
+          background: 'bg-gray-800', // Fondo para modo oscuro
+          color: 'text-gray-200', // Texto claro
+          customClass: {
+            confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+          },
         });
         if (resIdProject.idproj !== undefined) {
           router.push(`${pathname}/${resIdProject.idproj}`);
@@ -106,7 +112,12 @@ export default function ProjectForm() {
           icon: 'error',
           title: 'Error',
           text: 'Hubo un problema al crear el Proyecto.',
-          confirmButtonText: 'OK'
+          confirmButtonText: 'OK',
+          background: 'bg-gray-800', // Fondo para modo oscuro
+          color: 'text-gray-200', // Texto claro
+          customClass: {
+            confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+          },
         });
         formData.forEach((value, key) => {
           console.log(`${key}:`, value);
@@ -126,13 +137,26 @@ export default function ProjectForm() {
   useEffect(() => {
     getAllEscuelas();
   }, []);
-
+  ///recortar rutas
+  const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
+    const partes = ruta.split('/'); // Divide la ruta en partes
+    const indice = partes.indexOf(segmento); // Encuentra el índice del segmento clave
+    if (indice === -1) return ruta; // Si no encuentra el segmento, retorna la ruta completa
+    return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
+  };
+  //recortamos las rutas requeridas
+  const configuracion = recortarRutaHastaSegmento(pathname, 'proyectos');
+  const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
+  //definimos valores para el breadCrumb
+  const breadcrumbData = [
+    { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}`},
+    { type: "link", label: "Proyectos", href: configuracion },
+    { type: "page", label: "Insertar proyecto" },
+  ];
   return (
     <div className="flex-1 bg-background py-4 pl-4 text-black dark:text-white">
-      <div className="flex gap-4 items-center mx-auto text-sm breadcrumbs mb-6 text-muted-foreground">
-        <span>Inicio</span> {" > "}
-        <span>Proyectos</span> {" > "}
-        <span>Insertar</span>
+      <div className="flex gap-4 px-4 items-center mx-auto text-sm breadcrumbs mb-6 text-muted-foreground">
+        <BreadcrumbWithDropdown items={breadcrumbData} />
       </div>
       <div className="w-full flex flex-col items-center space-y-8">
         <div className="w-[80%] max-w-2xl bg-white dark:bg-gray-900 shadow-md rounded-lg p-6">
