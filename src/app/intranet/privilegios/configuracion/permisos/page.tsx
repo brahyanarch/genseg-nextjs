@@ -10,6 +10,8 @@ import DynamicTable from "@/components/DynamicTable";
 import { Permisos } from "@/tipos/typos"
 import { usePathname } from "next/navigation";
 import Swal from 'sweetalert2';
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 
 // Modal para agregar o editar un Permiso
@@ -205,6 +207,7 @@ export default function Component() {
   const totalPages = Math.ceil(Users.length / itemsPerPage);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [searchTerm, setSearchTerm] = useState("");
   //manejo de rutas
   const pathname = usePathname();
   /// función para obtener datos desde la API
@@ -333,10 +336,23 @@ export default function Component() {
 
   const sortedUsers = getSortedData();
 
+  // Función para filtrar los datos basados en el término de búsqueda
+  const getFilteredData = () => {
+    if (!searchTerm) return sortedUsers;
+  
+    return sortedUsers.filter((user) =>
+      Object.values(user).some((value) =>
+        value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  };
+
+  const filteredUsers = getFilteredData();
+
   // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = sortedUsers.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -345,19 +361,19 @@ export default function Component() {
   // Configuración de la tabla
   const configurationUser = [
     {
-      key: "index",
+      key: "id_per",
       label: "ID",
       render: (item: Permisos) => <>{Users.indexOf(item) + 1}</>,
       sortable: true,
     },
     {
-      key: "n_usu",
+      key: "n_per",
       label: "Nombre",
       render: (item: Permisos) => item.n_per,
       sortable: true,
     },
     {
-      key: "abrev.abrev",
+      key: "abreviatura",
       label: "Abreviatura",
       render: (item: Permisos) => item.abreviatura,
       sortable: true,
@@ -502,6 +518,17 @@ export default function Component() {
         <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
             <p  className="font-bold" >Nuevo</p>
       </Button>
+      <div className="relative ">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar..."
+                type="text"
+                className="pl-8 w-[250px] bg-background text-gray-900"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                
+              />
+            </div>
       <DynamicTable
         configuration={configurationUser}
         data={currentItems}

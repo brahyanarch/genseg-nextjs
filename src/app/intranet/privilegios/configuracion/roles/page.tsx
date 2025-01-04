@@ -237,6 +237,7 @@ const ConfiRoles = () => {
   const totalPages = Math.ceil(Data.length / itemsPerPage);
   const { mostrarAviso } = useContext<any>(AvisoContext);
   const [showPermissions, setShowPermissions] = useState(false) //para la interfaz de permisos asociados con los roles
+  const [searchTerm, setSearchTerm] = useState("");
   //navegacion rutas
   const pathname = usePathname();
   const handleTogglePermissions = () => {
@@ -274,7 +275,18 @@ const ConfiRoles = () => {
     });
   };
   const sortedUsers = getSortedData();
-
+  // Función para filtrar los datos basados en el término de búsqueda
+  const getFilteredData = () => {
+    if (!searchTerm) return sortedUsers;
+  
+    return sortedUsers.filter((user) =>
+      Object.values(user).some((value) =>
+        value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  };
+  const filteredUsers = getFilteredData();
+  
   const handleSort = (column: string) => {
     setSortColumn(column);
     setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -367,19 +379,19 @@ const ConfiRoles = () => {
 
   const configurationUser = [
     {
-      key: "index",
+      key: "id_rol",
       label: "ID",
       render: (item: Rol) => <>{Data.indexOf(item) + 1}</>,
       sortable: true
     },
     {
-      key: "n_usu",
+      key: "n_rol",
       label: "Nombre",
       render: (item: Rol) => item.n_rol,
       sortable: true,
     },
     {
-      key: "rol.abrev",
+      key: "abrev",
       label: "Abreviatura",
       render: (item: Rol) => item.abrev,
       sortable: true,
@@ -427,7 +439,7 @@ const ConfiRoles = () => {
   // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = sortedUsers.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
   //función para obtener datos desde la API
   const fetchRoles = async () => {
     try {

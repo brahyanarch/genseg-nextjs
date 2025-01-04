@@ -162,6 +162,7 @@ export default function Component() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [itemsPerPage] = useState(4);
   const totalPages = Math.ceil(Data.length / itemsPerPage);
+  const [searchTerm, setSearchTerm] = useState("");
   ///navegacion de rutas
   const pathname = usePathname();
   // Funcion asíncrona para obtener los datos
@@ -197,10 +198,23 @@ export default function Component() {
     setSortDirection(sortDirection === "asc" ? "desc" : "asc");
   };
   const sortedData = getSortedData();
+
+  // Función para filtrar los datos basados en el término de búsqueda
+  const getFilteredData = () => {
+    if (!searchTerm) return sortedData;
+  
+    return sortedData.filter((user) =>
+      Object.values(user).some((value) =>
+        value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    
+      )
+    );
+  };
+  const filteredUsers = getFilteredData();
   // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = sortedData.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -208,19 +222,19 @@ export default function Component() {
 
   const configurationData = [
     {
-      key: "index",
+      key: "id_subuni",
       label: "ID",
       render: (item: Subunidad) => <>{Data.indexOf(item) + 1}</>,
       sortable: true
     },
     {
-      key: "n_usu",
+      key: "n_subuni",
       label: "Nombre",
       render: (item: Subunidad) => item.n_subuni,
       sortable: true,
     },
     {
-      key: "rol.abrev",
+      key: "abreviatura",
       label: "Abreviatura",
       render: (item: Subunidad) => item.abreviatura,
       sortable: true,

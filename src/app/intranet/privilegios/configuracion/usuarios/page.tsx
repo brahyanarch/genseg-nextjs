@@ -10,6 +10,8 @@ import { User } from "@/tipos/typos"
 import { usePathname } from "next/navigation";
 import Swal from 'sweetalert2';
 import { routeModule } from "next/dist/build/templates/pages";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 // Modal para agregar un nuevo Usuario
 export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) => {
   const [dni, setDni] = useState('');
@@ -211,9 +213,9 @@ export default function Component() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(4);
-  const totalPages = Math.ceil(Users.length / itemsPerPage);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [searchTerm, setSearchTerm] = useState('');
   /// navegacion rutas
   const pathname = usePathname();
   // Función para acceder a propiedades anidadas
@@ -251,15 +253,28 @@ export default function Component() {
   };
 
   const sortedUsers = getSortedData();
-
+  // Función para filtrar los datos basados en el término de búsqueda
+  const getFilteredData = () => {
+    if (!searchTerm) return sortedUsers;
+  
+    return sortedUsers.filter((user) =>
+      Object.values(user).some((value) =>
+        value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  };
+  const filteredUsers = getFilteredData();
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
   // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = sortedUsers.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
+
+  // Ensure currentPage is within the valid range after filtering
 
   // Configuración de la tabla
   const configurationUser = [
@@ -267,7 +282,7 @@ export default function Component() {
       key: "index",
       label: "ID",
       render: (item: User) => <>{Users.indexOf(item) + 1}</>,
-      sortable: true,
+      
     },
     {
       key: "n_usu",
@@ -421,7 +436,9 @@ export default function Component() {
     fetchUser();
     const interval = setInterval(fetchUser, 5000); // Cada 5 segundos
     return () => clearInterval(interval); // Limpia el intervalo al desmontar
+  
   }, []);
+
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -561,6 +578,18 @@ export default function Component() {
         <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
         <p className="font-bold" >Nuevo</p>
       </Button>
+      <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar..."
+                type="text"
+                className="pl-8 w-[250px] bg-background"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                
+              />
+            </div>
+
       <div className="bg-[#E3E6ED] rounded-lg ">
         <DynamicTable
           configuration={configurationUser}
