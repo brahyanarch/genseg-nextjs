@@ -168,7 +168,7 @@ export default function EditProject() {
   useEffect(() => {
     fetchProjectsDetails();
     getAllEscuelas();
-  }, [fetchProjectsDetails]);
+  }, []);
 
   const formatearFecha = (fecha: string) => {
     return new Date(fecha).toLocaleDateString();

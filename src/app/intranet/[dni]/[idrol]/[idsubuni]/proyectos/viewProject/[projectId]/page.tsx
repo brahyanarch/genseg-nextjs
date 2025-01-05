@@ -1,7 +1,7 @@
 'use client';
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from 'next/image';
 import { useState, useEffect } from "react";
 import { API_PROJECT_ACTIVITIES, API_URL } from "@/config/apiconfig";
@@ -49,7 +49,7 @@ export default function ProjectDetails() {
 
   useEffect(() => {
     fetchProjectsDetails();
-  }, [projectId]);
+  }, []);
 
   const formatearFecha = (fecha: string) => {
     return new Date(fecha).toLocaleDateString();
