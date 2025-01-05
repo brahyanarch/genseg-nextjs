@@ -81,7 +81,8 @@ export default function EditProject() {
       }
       const data = await response.json();
       setProjectDetails(data.datasProject);
-      setEscuelaP(data.datasProject.prgest.idpe.toString());
+      //setEscuelaP(data.datasProject.prgest.idpe.toString());
+      setEscuelaP(data.prgest.nmPE);
 
       setExistingPlan(data.datasProject.plan)
 
@@ -103,7 +104,7 @@ export default function EditProject() {
   const saveChanges = async () => {
 
     const formData = new FormData();
-    formData.append("idpe", String(escuelaP)); // Valor actualizado
+    //formData.append("idpe", String(escuelaP)); // Valor actualizado
 
     if (plan) {
       formData.append("file", plan); // Archivo nuevo si se seleccionó
@@ -167,7 +168,7 @@ export default function EditProject() {
   // useEffect para obtener los roles desde la API al montar el componente
   useEffect(() => {
     fetchProjectsDetails();
-    getAllEscuelas();
+    //getAllEscuelas();
   }, [fetchProjectsDetails]);
 
   const formatearFecha = (fecha: string) => {
@@ -258,55 +259,10 @@ export default function EditProject() {
             <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 text-center">
               Escuela Profesional
             </h3>
-            <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={comboboxOpen}
-                  className="w-full max-w-md h-12 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 mx-auto mt-2 flex justify-between items-center px-4 shadow"
-                >
-                  {escuelaP
-                    ? escuelas.find((esc) => esc.idpe === parseInt(escuelaP))?.nmPE
-                    : "Seleccione una opción"}
-                  <ChevronsUpDown className="opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full max-w-md p-0 rounded-lg shadow-md bg-white dark:bg-gray-800 mx-auto mt-2">
-                <Command>
-                  <CommandInput
-                    placeholder="Buscar escuela profesional..."
-                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none"
-                  />
-                  <CommandList>
-                    <CommandEmpty className="p-4 text-gray-500 dark:text-gray-400">
-                      No se encontraron resultados.
-                    </CommandEmpty>
-                    <CommandGroup>
-                      {escuelas.map((escuela) => (
-                        <CommandItem
-                          key={escuela.idpe}
-                          value={escuela.idpe.toString()}
-                          onSelect={() => {
-                            setEscuelaP(escuela.idpe.toString());
-                            setComboboxOpen(false);
-                          }}
-                          className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        >
-                          {escuela.nmPE}
-                          <Check
-                            className={cn(
-                              "ml-auto text-blue-500",
-                              escuelaP === escuela.idpe.toString() ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+            <div className="mt-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg shadow text-center">
+
+            { escuelaP ? escuelaP: "Cargando..."}
+            </div>
           </div>
 
           {/* Plan de Proyecto */}
