@@ -8,6 +8,7 @@ import { API_PROJECT_ACTIVITIES, API_URL } from "@/config/apiconfig";
 import { usePathname, useRouter, useParams } from "next/navigation";
 import { TaskList } from '@/components/componentesProyecto/porjectInfo';
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
+import { set } from "date-fns";
 
 interface ProjectDetails {
   plan: string;
@@ -27,6 +28,7 @@ export default function ProjectDetails() {
   const router = useRouter();
   const pathname = usePathname();
   const { projectId, dni, idrol, idsubuni } = useParams();
+  const [escuela, setEscuela] = useState<string>("");
 
   const toggleOpenDetailsActivities = (activityId: number) => {
     router.push(`${pathname}/viewActivity/${activityId}`);
@@ -40,6 +42,7 @@ export default function ProjectDetails() {
       }
       const data = await response.json();
       setProjectDetails(data.datasProject);
+      setEscuela(data.prgest.nmPE);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -128,14 +131,9 @@ export default function ProjectDetails() {
             Escuela Profesional
           </h3>
           <div className="flex items-center justify-center space-x-2">
-            <Image
-              src="/assets/images/escudo_unmsm.png"
-              alt="Escudo de la UNMSM"
-              width={50}
-              height={50}
-            />
+            
             <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">
-              {projectDetails?.prgest.nmPE || "Sin Escuela Profesional"}
+              {escuela ? escuela : "... cargando escuela"}
             </span>
           </div>
 

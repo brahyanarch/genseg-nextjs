@@ -171,6 +171,14 @@ export default function ActivityForm() {
     }
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -190,6 +198,10 @@ export default function ActivityForm() {
 
         setQuestions(data.preguntas); // Ajusta según la estructura de datos
         setAnswers(data.respuestas);     // Ajusta según la estructura de datos
+        setNombreActividad(data.actividad.name); // Ajusta según la estructura de datos
+        
+        setFechaInicio(formatDate(data.actividad.fInit));    // Ajusta según la estructura de datos
+        setFechaFinal(formatDate(data.actividad.fFin));      // Ajusta según la estructura de datos
       } catch (err: any) {
         // Si ocurre un error de conexión
         Swal.fire({
@@ -203,6 +215,8 @@ export default function ActivityForm() {
 
     fetchData();
   }, []);
+
+  
 
   const configuracion = recortarRutaHastaSegmento(pathname, 'editProyect');
   const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
@@ -221,7 +235,7 @@ export default function ActivityForm() {
       </div>
 
       <div className="max-w-2xl mx-auto space-y-6">
-        <h1 className="text-3xl font-semibold text-center text-gray-800 dark:text-white mb-10">Editar Actividad</h1>
+        <h1 className="text-3xl font-semibold text-center text-gray-800 dark:text-white mb-10 ">Editar Actividad</h1>
 
         <form className="space-y-6" >
           <div className="space-y-4">
@@ -229,7 +243,7 @@ export default function ActivityForm() {
             <Input
               id="activity-name"
               placeholder="Nombre de la actividad"
-              className="w-full bg-gray-100 dark:bg-gray-800 h-12 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
+              className="w-full bg-gray-100 text-gray-950 dark:bg-gray-800 h-12 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
               value={nombreActividad}
               onChange={(e) => setNombreActividad(e.target.value)}
             />
@@ -243,7 +257,7 @@ export default function ActivityForm() {
               placeholder="Fecha inicial"
               value={fechaInicio}
               onChange={(e) => setFechaInicio(e.target.value)}
-              className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
+              className="w-full bg-gray-100 text-gray-950 dark:bg-gray-800 dark:text-gray-950 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
             />
           </div>
 
@@ -253,7 +267,7 @@ export default function ActivityForm() {
               id="end-date"
               type="date"
               placeholder="Fecha final"
-              className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
+              className="w-full bg-gray-100 text-gray-950 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
               value={fechaFinal}
               onChange={(e) => setFechaFinal(e.target.value)}
             />
@@ -266,7 +280,7 @@ export default function ActivityForm() {
                     <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
                     <input
                       type="text"
-                      className="w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500"
+                      className="w-full border rounded-lg text-gray-950 bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500"
                       placeholder="Escribe tu respuesta"
                       value={answers[question.id]?.[0]?.resTxt || ""}
                       onChange={(e) => handleChange(question.id, "resTxt", e.target.value)}
@@ -280,7 +294,7 @@ export default function ActivityForm() {
                     <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
                     <input
                       type="date"
-                      className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
+                      className="w-full bg-gray-100 text-gray-950 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
                       value={answers[question.id]?.[0]?.resTxt || ""}
                       onChange={(e) => handleChange(question.id, "resTxt", e.target.value)}
                     />

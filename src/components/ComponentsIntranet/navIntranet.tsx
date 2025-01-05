@@ -212,10 +212,12 @@ export function Perfil({ name }: { name: string }) {
               </ul>
             </nav>
             <div className="mt-6">
+                <Link href="/intranet/">
               <Button variant="secondary" className="w-full bg-gray-800 hover:bg-gray-700 text-white">
                 <LogOut className="mr-2 h-4 w-4" />
-                <Link href="/">Cerrar Sesión</Link>
+                {/*<a href="/">Cerrar Sesión</a>*/}Cerrar Sesión
               </Button>
+                </Link>
             </div>
           </div>
         )}
