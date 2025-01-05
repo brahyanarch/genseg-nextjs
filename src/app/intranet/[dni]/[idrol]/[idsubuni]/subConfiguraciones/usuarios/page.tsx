@@ -9,7 +9,6 @@ import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
 import { User } from "@/tipos/typos"
 import { usePathname, useParams } from "next/navigation";
 import Swal from 'sweetalert2';
-import { routeModule } from "next/dist/build/templates/pages";
 // Modal para agregar un nuevo Usuario
 export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) => {
   const [dni, setDni] = useState('');
@@ -41,6 +40,7 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
       cancelButtonColor: '#d33',
       confirmButtonText: 'Sí, guardar',
       cancelButtonText: 'Cancelar',
+      
     });
   
     if (result.isConfirmed) {
@@ -196,6 +196,7 @@ export default function Component() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [searchTerm, setSearchTerm] = useState("");
   /// navegacion rutas
+  const {dni, idrol,idsubuni} = useParams();
   const pathname = usePathname();
   // Función para acceder a propiedades anidadas
   const getNestedProperty = (obj: any, key: string) => {
@@ -520,18 +521,16 @@ export default function Component() {
     return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
   };
   //recortamos las rutas requeridas
-  const configuracion = recortarRutaHastaSegmento(pathname, 'configuracion');
-  const inicio = recortarRutaHastaSegmento(pathname, 'usuarios');
+  const configuracion = recortarRutaHastaSegmento(pathname, 'subConfiguraciones');
+  const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
   //definimos valores para el breadCrumb
   const breadcrumbData = [
-    { type: "link", label: "Inicio", href: inicio },
+    { type: "link", label: "Inicio", href:`${inicio}/${dni}/${idrol}/${idsubuni}` },
     {
       type: "dropdown",
-      label: "Configuración",
+      label: "Sub configuraciones",
       items: [
-        { label: "Permisos", href: `${configuracion}/permisos` },
-        { label: "Roles", href: `${configuracion}/roles` },
-        { label: "SubUnidades", href: `${configuracion}/subUnidades` },
+        { label: "Formularios", href: `${configuracion}/Formularios` },
       ],
     },
     { type: "page", label: "Usuarios" },
