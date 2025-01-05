@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Command,
   CommandEmpty,
@@ -22,6 +22,8 @@ import { useParams, usePathname, useRouter } from "next/navigation";
 import { API_PROJECTS, API_ESCUELA_PROFESIONAL } from "@/config/apiconfig";
 import Swal from 'sweetalert2';
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Progress } from "@/components/ui/progress";
 
 /// Interface escuela profesional
 interface Escuelas {
@@ -29,6 +31,21 @@ interface Escuelas {
   nmPE: string;
   idesc: number;
 }
+
+const ALLOWED_FILE_TYPES = [
+  'application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/msword',
+  'application/vnd.ms-excel'
+];
+const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB en bytes
+
+const formatFileSize = (bytes: number): string => {
+  if (bytes < 1024) return bytes + ' bytes';
+  else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  else return (bytes / 1048576).toFixed(1) + ' MB';
+};
 
 export default function ProjectForm() {
   /// Variables importantes
@@ -39,16 +56,30 @@ export default function ProjectForm() {
   const router = useRouter();
   const pathname = usePathname();
   const [comboboxOpen, setComboboxOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   //// Funciones importantes
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setPlanProyecto(event.target.files[0]);
+    const selectedFile = event.target.files?.[0];
+    setError(null);
+
+    if (selectedFile) {
+      if (!ALLOWED_FILE_TYPES.includes(selectedFile.type)) {
+        setError("El archivo debe ser PDF, Word o Excel.");
+        return;
+      }
+
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        setError("El archivo no debe superar los 20 MB.");
+        return;
+      }
+
+      setPlanProyecto(selectedFile);
     }
   };
 
   const getAllEscuelas = async () => {
-
     try {
       const response = await fetch(API_ESCUELA_PROFESIONAL);
       if (response.ok) {
@@ -137,6 +168,7 @@ export default function ProjectForm() {
   useEffect(() => {
     getAllEscuelas();
   }, []);
+
   ///recortar rutas
   const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
     const partes = ruta.split('/'); // Divide la ruta en partes
@@ -144,15 +176,18 @@ export default function ProjectForm() {
     if (indice === -1) return ruta; // Si no encuentra el segmento, retorna la ruta completa
     return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
   };
+
   //recortamos las rutas requeridas
   const configuracion = recortarRutaHastaSegmento(pathname, 'proyectos');
   const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
+
   //definimos valores para el breadCrumb
   const breadcrumbData = [
     { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}`},
     { type: "link", label: "Proyectos", href: configuracion },
     { type: "page", label: "Insertar proyecto" },
   ];
+
   return (
     <div className="flex-1 bg-background py-4 pl-4 text-black dark:text-white">
       <div className="flex gap-4 px-4 items-center mx-auto text-sm breadcrumbs mb-6 text-muted-foreground">
@@ -164,61 +199,6 @@ export default function ProjectForm() {
             Insertar Proyecto
           </h1>
           <div className="space-y-4">
-            {/* Escuela Profesional */}
-            <div className="w-full">
-              <label className="text-lg font-medium mb-2 block text-gray-700 dark:text-gray-300">
-                Escuela Profesional
-              </label>
-              <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={comboboxOpen}
-                    className="w-full justify-between h-12 border-2 rounded-lg px-4 dark:border-gray-600"
-                  >
-                    {escuelaProfesional
-                      ? escuelas.find((esc) => esc.idpe === parseInt(escuelaProfesional))?.nmPE
-                      : "Seleccione una opción"}
-                    <ChevronsUpDown className="opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Command>
-                    <CommandInput
-                      placeholder="Buscar escuela profesional..."
-                      className="h-10"
-                    />
-                    <CommandList>
-                      <CommandEmpty>No se encontraron resultados.</CommandEmpty>
-                      <CommandGroup>
-                        {escuelas.map((escuela) => (
-                          <CommandItem
-                            key={escuela.idpe}
-                            value={escuela.idpe.toString()}
-                            onSelect={() => {
-                              setEscuelaProfesional(escuela.idpe.toString());
-                              setComboboxOpen(false);
-                            }}
-                          >
-                            {escuela.nmPE}
-                            <Check
-                              className={cn(
-                                "ml-auto",
-                                escuelaProfesional === escuela.idpe.toString()
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
-
             {/* Insertar Plan */}
             <div>
               <label className="text-lg font-medium mb-2 block text-gray-700 dark:text-gray-300">
@@ -227,8 +207,31 @@ export default function ProjectForm() {
               <Input
                 type="file"
                 onChange={handleFileChange}
-                className="w-full h-18 bg-gray-100 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 px-4 py-3 file:bg-blue-600 file:text-white file:rounded-md file:px-6 file:py-3"
+                accept=".pdf,.doc,.docx,.xls,.xlsx"
+                ref={fileInputRef}
+                className="hidden"
               />
+              <Button onClick={() => fileInputRef.current?.click()}>
+                Seleccionar archivo
+              </Button>
+              {planProyecto && (
+                <div className="space-y-2">
+                  <p>Archivo seleccionado: {planProyecto.name}</p>
+                  <p>Tamaño: {formatFileSize(planProyecto.size)}</p>
+                  <div className="space-y-1">
+                    <Progress value={(planProyecto.size / MAX_FILE_SIZE) * 100} />
+                    <p className="text-sm text-gray-500">
+                      {formatFileSize(planProyecto.size)} / {formatFileSize(MAX_FILE_SIZE)}
+                    </p>
+                  </div>
+                </div>
+              )}
+              {error && (
+                <Alert variant="destructive">
+                  <AlertTitle>Error</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
                 Solo se permiten formatos: <strong>PDF, Excel, Word</strong>. Tamaño máximo: <strong>20MB</strong>.
               </p>

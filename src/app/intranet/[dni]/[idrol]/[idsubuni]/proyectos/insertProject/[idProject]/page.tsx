@@ -47,6 +47,7 @@ export default function ProjectForm() {
   const router = useRouter();
   const pathname = usePathname();
   const { idrol, idsubuni, dni } = useParams();
+  const [searchTerm, setSearchTerm] = useState("");
 
   //función para insertar una actividad
   const insertActivity = () => {
@@ -83,7 +84,7 @@ export default function ProjectForm() {
           Swal.fire({
             icon: 'success',
             title: '¡Eliminado!',
-            text: 'La Actividad fue eliminado correctamente.',
+            text: 'La Actividad fue eliminada correctamente.',
             confirmButtonText: 'OK'
           });
           fetchActivitiesProject();
@@ -256,10 +257,23 @@ export default function ProjectForm() {
 
   const sortedUsers = getSortedData();
 
+  // Función para filtrar los datos basados en el término de búsqueda
+  const getFilteredData = () => {
+    if (!searchTerm) return sortedUsers;
+  
+    return sortedUsers.filter((user) =>
+      Object.values(user).some((value) =>
+        value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  };
+
+  const filteredUsers = getFilteredData();
+
   // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = sortedUsers.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -271,31 +285,25 @@ export default function ProjectForm() {
   // Configuración de la tabla
   const configurationUser = [
     {
-      key: "index",
+      key: "idActivi",
       label: "ID",
       render: (item: Activities) => <>{activitiesProject.indexOf(item) + 1}</>,
       sortable: true,
     },
     {
-      key: "n_usu",
+      key: "name",
       label: "Nombre",
       render: (item: Activities) => item.name,
       sortable: true,
     },
     {
-      key: "abrev.abrev",
-      label: "Escuela Profesional",
-      render: () => projectDetails?.prgest?.nmPE || "Sin escuela profesional",
-      sortable: true,
-    },
-    {
-      key: "dateNow",
+      key: "fInit",
       label: "Fecha Inicio",
       render: (item: Activities) => formatearFecha(item.fInit),
       sortable: true,
     },
     {
-      key: "dateNow",
+      key: "fFin",
       label: "Fecha Final",
       render: (item: Activities) => formatearFecha(item.fFin),
       sortable: true,
@@ -443,7 +451,11 @@ export default function ProjectForm() {
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar..."
+                type="text"
                 className="pl-8 w-[250px] bg-background"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                
               />
             </div>
             <Button className="bg-blue-500 hover:bg-blue-600 h-12 w-32 " onClick={insertActivity} >

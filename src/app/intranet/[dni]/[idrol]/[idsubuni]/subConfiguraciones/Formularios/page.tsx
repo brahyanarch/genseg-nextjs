@@ -174,7 +174,7 @@ export default function Component() {
   const totalPages = Math.ceil(form.length / itemsPerPage);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-
+  const [searchTerm, setSearchTerm] = useState("");
   if (loading) {
     return (
       <>
@@ -270,11 +270,21 @@ export default function Component() {
   };
 
   const sortedProjects = getSortedData();
-
+  // Función para filtrar los datos basados en el término de búsqueda
+  const getFilteredData = () => {
+    if (!searchTerm) return sortedProjects;
+  
+    return sortedProjects.filter((user) =>
+      Object.values(user).some((value) =>
+        value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  };
+  const filteredUsers = getFilteredData();
   // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = sortedProjects.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -283,25 +293,25 @@ export default function Component() {
   // Configuración de la tabla
   const configurationUser = [
     {
-      key: "index",
+      key: "idf",
       label: "ID",
       render: (item: FormEntry) => <>{form.indexOf(item) + 1}</>,
       sortable: true,
     },
     {
-      key: "n_usu",
+      key: "nmForm",
       label: "Nombre",
       render: (item: FormEntry) => item.nmForm,
       sortable: true,
     },
     {
-      key: "fechaCreacion",
+      key: "Fcreate",
       label: "Fecha Creación",
       render: (item: FormEntry) => item.Fcreate,
       sortable: true,
     },
     {
-      key: "Abreviatura",
+      key: "abre",
       label: "Abreviatura",
       render: (item: FormEntry) => item.abre,
       sortable: true,
@@ -572,11 +582,19 @@ export default function Component() {
           <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
           <p className="font-bold" >Nuevo</p>
         </Button>
-        <div className="relative">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Buscar..." className="pl-8 w-[300px]" />
-        </div>
+        
       </div>
+        <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar..."
+                type="text"
+                className="pl-8 w-[250px] bg-background"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                
+              />
+            </div>
       <div className="bg-[#E3E6ED] rounded-lg  ">
         <DynamicTable
           configuration={configurationUser}

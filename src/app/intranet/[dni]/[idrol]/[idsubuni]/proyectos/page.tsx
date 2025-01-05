@@ -1,6 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { API_GET_PROJECTS } from "@/config/apiconfig";
 import { Edit, Trash2, Eye, CirclePlus } from "lucide-react";
@@ -29,6 +31,7 @@ export default function Component() {
   const totalPages = Math.ceil(projects.length / itemsPerPage);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [searchTerm, setSearchTerm] = useState("");
 
   // función para ver detalles del proyecto
   const viewProject = (projectId: number) => {
@@ -217,10 +220,22 @@ export default function Component() {
 
   const sortedProjects = getSortedData();
 
+  // Función para filtrar los datos basados en el término de búsqueda
+  const getFilteredData = () => {
+    if (!searchTerm) return sortedProjects;
+  
+    return sortedProjects.filter((user) =>
+      Object.values(user).some((value) =>
+        value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  };
+
+  const filteredUsers = getFilteredData();  
   // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = sortedProjects.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -234,31 +249,31 @@ export default function Component() {
   // Configuración de la tabla
   const configurationUser = [
     {
-      key: "index",
+      key: "idproj",
       label: "ID",
       render: (item: Project) => <>{projects.indexOf(item) + 1}</>,
       sortable: true,
     },
     {
-      key: "n_usu",
+      key: "idString",
       label: "Nombre",
       render: (item: Project) => item.idString,
       sortable: true,
     },
     {
-      key: "fechaIncio",
+      key: "fInit",
       label: "Fecha Inicio",
       render: (item: Project) => formatearFecha(item.fInit),
-      sortable: true,
+      sortable: false,
     },
     {
-      key: "fechaFinal",
+      key: "fFin",
       label: "Fecha Final",
       render: (item: Project) => formatearFecha(item.fFin),
-      sortable: true,
+      sortable: false,
     },
     {
-      key: "Estado",
+      key: "estado",
       label: "Estado",
       render: (item: Project) => item.estado,
       sortable: true,
@@ -390,6 +405,8 @@ export default function Component() {
       <div className="flex gap-4 items-center mx-auto text-sm breadcrumbs mb-6 text-muted-foreground">
         <BreadcrumbWithDropdown items={breadcrumbData} />
       </div>
+      
+
       <div className="flex flex-col items-center my-8 space-y-4">
         <h1 className="text-5xl font-extrabold text-gray-800 tracking-tight dark:text-white">
           Gestión de Proyectos
@@ -405,6 +422,17 @@ export default function Component() {
         <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
         <p className="font-bold" >Nuevo</p>
       </Button>
+      <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar..."
+                type="text"
+                className="pl-8 w-[250px] bg-background"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                
+              />
+            </div>
       <div className="bg-[#E3E6ED] rounded-lg ">
         <DynamicTable
           configuration={configurationUser}

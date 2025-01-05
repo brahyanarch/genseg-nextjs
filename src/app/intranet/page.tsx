@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {API_LOGIN, API_LOGIN_UNIQUE} from "@/config/apiconfig";
+import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import Image from 'next/image'
 interface Subunidad {
   id_subuni: number;
@@ -19,6 +22,7 @@ interface User {
   dni: string;
   rol_id: number;
   subunidad_id_subuni: number;
+  email: string;
   rol: Role;
   sub_uni: Subunidad;
 }
@@ -37,7 +41,7 @@ interface RoleProps {
 function RoleCard({ title, subtitle, onClick }: RoleProps) {
   return (
     <Card
-      className="w-48 h-48 bg-gray-900 text-white flex flex-col items-center justify-between cursor-pointer hover:bg-slate-700"
+      className="w-48 h-48 bg-gray-50 text-black border border-gray-600 flex flex-col items-center justify-between cursor-pointer hover:bg-gray-200"
       onClick={onClick}
     >
       <CardContent className="text-center p-4">
@@ -105,7 +109,7 @@ const RoleSelectionPage: React.FC = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          n_usu: user.n_usu,
+          email: user.email,
           dni: user.dni,
           rol_id: user.rol_id,
           subunidad_id_subuni: user.subunidad_id_subuni,
@@ -132,11 +136,11 @@ const RoleSelectionPage: React.FC = () => {
   }, [admin, router]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-gray-300">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-gray-300">
       {userRoles.length > 0 ? (
         // Mostrar tarjetas de roles normales
         <div className="w-[50%] space-y-8">
-          <h2 className="text-2xl font-bold">Selecciona un Rol y Subunidad</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Selecciona un Rol y Subunidad</h2>
           <div className="grid grid-cols-3 gap-4">
             {userRoles.map((user, index) => (
               <RoleCard
@@ -150,39 +154,72 @@ const RoleSelectionPage: React.FC = () => {
         </div>
       ) : (
         // Formulario de inicio de sesión
-        <div className="w-full max-w-md space-y-8">
-          <div className="flex flex-col items-center">
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <Card className="w-full max-w-4xl grid md:grid-cols-2 overflow-hidden">
+        {/* Left Panel */}
+        <div className="bg-[#1a2942] p-8 text-white flex flex-col items-center justify-center text-center">
+          <div className="relative w-32 h-32 mb-6">
             <Image
-              alt="Logo"
-              className="h-24 w-24 rounded-full bg-white"
-              src={"/resources/images/DPSEClogo.png"}
-              width={80}
-              height={80}
+              src="/resources/images/sinFondoLogo.png"
+              alt="Universidad Nacional del Altiplano"
+              fill
+              className="object-contain"
             />
-            <h2 className="mt-6 text-3xl font-bold">INICIAR SESIÓN</h2>
           </div>
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-4">
-              <input
+          <h1 className="text-2xl font-medium mb-2">
+            Gestor de <span className="text-emerald-400">Proyectos</span>
+          </h1>
+          <p className="text-sm opacity-90 mb-6">
+            Oficina de Dirección de Proyección Social y Extension Cultural
+          </p>
+          <div className="mt-auto text-emerald-400 text-sm">
+            Oficina de Tecnologías de Información
+          </div>
+          <div className="text-xs opacity-70 mt-2">
+            © Universidad Nacional del Altiplano, Puno - Perú, 2025.
+          </div>
+        </div>
+
+        {/* Right Panel */}
+        <div className="p-8 flex flex-col justify-center">
+          <h2 className="text-2xl font-medium text-gray-900 mb-8">
+            Iniciar Sesión
+          </h2>
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-2">
+              <Label htmlFor="email">Correo Electrónico</Label>
+              <Input
+                id="email"
                 type="text"
                 required
                 onChange={(e) => setUsuario(e.target.value)}
-                className="w-full px-3 py-2 rounded-md bg-gray-800 text-white border border-gray-700"
-                placeholder="Nombre de usuario"
-              />
-              <input
-                type="password"
-                required
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 rounded-md bg-gray-800 text-white border border-gray-700"
-                placeholder="••••••••"
+                placeholder="Ingrese su correo electrónico"
               />
             </div>
-            <Button type="submit" className="w-full py-2 bg-blue-600">
-              Iniciar Sesión
+            <div className="space-y-2">
+              <Label htmlFor="password">Contraseña</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Ingrese su contraseña"
+                onChange={(e) => setPassword(e.target.value)}
+                aria-placeholder="••••••••"
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox id="remember" />
+              <Label htmlFor="remember" className="text-sm font-normal">
+                Recordar contraseña
+              </Label>
+            </div>
+            <Button className="w-full bg-emerald-500 hover:bg-emerald-600">
+              Ingresar Ahora
             </Button>
           </form>
-          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+          </div>
+          {error && <p className="text-red-500 text-sm mt-2 text-center">{error}</p>}
+      </Card>
+    
         </div>
       )}
     </div>
