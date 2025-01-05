@@ -264,6 +264,7 @@ export default function Component() {
     );
   };
   const filteredUsers = getFilteredData();
+
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
   // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -291,13 +292,13 @@ export default function Component() {
       sortable: true,
     },
     {
-      key: "rol.n_rol",
+      key: "rol?.n_rol",
       label: "Rol",
       render: (item: User) => item.rol?.n_rol,
       sortable: true,
     },
     {
-      key: "sub_uni.n_subuni",
+      key: "sub_uni?.n_subuni",
       label: "Sub Unidad",
       render: (item: User) => item.sub_uni?.n_subuni,
       sortable: true,
@@ -434,10 +435,13 @@ export default function Component() {
   // useEffect para obtener los permisos desde la API al montar el componente
   useEffect(() => {
     fetchUser();
-    const interval = setInterval(fetchUser, 5000); // Cada 5 segundos
-    return () => clearInterval(interval); // Limpia el intervalo al desmontar
-  
   }, []);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [filteredUsers, totalPages]);
 
 
   const toggleModal = () => {

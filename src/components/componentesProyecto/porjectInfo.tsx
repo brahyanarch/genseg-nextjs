@@ -184,37 +184,31 @@ export function TaskList({ toggleOpenDetsAct, typeEdit }: any) {
   // Configuración de la tabla
   const configurationUser = [
     {
-      key: "index",
+      key: "idActivi",
       label: "ID",
       render: (item: Activities) => <>{activitiesProject.indexOf(item) + 1}</>,
       sortable: true,
     },
     {
-      key: "n_usu",
+      key: "name",
       label: "Nombre",
       render: (item: Activities) => item.name,
       sortable: true,
     },
     {
-      key: "abrev.abrev",
-      label: "Escuela Profesional",
-      render: () => projectDetails?.prgest?.nmPE || "Sin escuela profesional",
-      sortable: true,
-    },
-    {
-      key: "dateNow",
+      key: "fInit",
       label: "Fecha Inicio",
       render: (item: Activities) => formatearFecha(item.fInit),
       sortable: true,
     },
     {
-      key: "dateNow",
+      key: "fFin",
       label: "Fecha Final",
       render: (item: Activities) => formatearFecha(item.fFin),
       sortable: true,
     },
     {
-      key: "status",
+      key: "estado",
       label: "Estado",
       render: (item: Activities) => item.estado,
       sortable: true,

@@ -173,7 +173,7 @@ const RoleSelectionPage: React.FC = () => {
             Oficina de Dirección de Proyección Social y Extension Cultural
           </p>
           <div className="mt-auto text-emerald-400 text-sm">
-            Oficina de Tecnologías de Información
+            GENSEG
           </div>
           <div className="text-xs opacity-70 mt-2">
             © Universidad Nacional del Altiplano, Puno - Perú, 2025.

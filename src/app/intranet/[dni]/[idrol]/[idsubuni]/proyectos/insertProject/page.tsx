@@ -24,6 +24,7 @@ import Swal from 'sweetalert2';
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
+import Spinner from "@/components/ui/spinner"; // Import the spinner component
 
 /// Interface escuela profesional
 interface Escuelas {
@@ -58,6 +59,7 @@ export default function ProjectForm() {
   const [comboboxOpen, setComboboxOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false); // State to manage uploading status
 
   //// Funciones importantes
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,6 +107,7 @@ export default function ProjectForm() {
 
   const handleNewProyect = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsUploading(true); // Set uploading status to true
     const formData = new FormData();
     if (planProyecto) {
       formData.append("file", planProyecto);
@@ -162,6 +165,8 @@ export default function ProjectForm() {
         text: `Error al conectar con la API. ${error}`,
         confirmButtonText: 'OK'
       });
+    } finally {
+      setIsUploading(false); // Set uploading status to false
     }
   };
 
@@ -190,6 +195,11 @@ export default function ProjectForm() {
 
   return (
     <div className="flex-1 bg-background py-4 pl-4 text-black dark:text-white">
+      {isUploading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <Spinner className="w-16 h-16 text-white" />
+        </div>
+      )}
       <div className="flex gap-4 px-4 items-center mx-auto text-sm breadcrumbs mb-6 text-muted-foreground">
         <BreadcrumbWithDropdown items={breadcrumbData} />
       </div>

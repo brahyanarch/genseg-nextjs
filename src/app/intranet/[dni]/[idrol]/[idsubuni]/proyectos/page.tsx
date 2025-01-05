@@ -18,6 +18,20 @@ interface Project {
   fFin: string;
   idString: string;
 }
+interface BreadcrumbItem {
+  type: "link" | "dropdown" | "page";
+  label: string;
+  href?: string;
+  items?: Array<{
+    label: string;
+    href: string;
+    external?: boolean;
+  }>;
+}
+
+interface BreadcrumbWithDropdownProps {
+  items: BreadcrumbItem[];
+}
 export default function Component() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
