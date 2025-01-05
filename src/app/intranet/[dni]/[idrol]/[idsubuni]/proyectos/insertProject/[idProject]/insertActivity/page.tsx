@@ -8,6 +8,7 @@ import { useParams, usePathname, useRouter } from "next/navigation"
 import { API_FORM, API_ACTIVITIES } from "@/config/apiconfig"
 import Swal from 'sweetalert2';
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb"
+import clsx from "clsx"
 export default function ActivityForm() {
   const [questions, setQuestions] = useState<[]>([]);
   ///entradas obligatorios
@@ -15,6 +16,8 @@ export default function ActivityForm() {
   const [fechaInicio, setFechaInicio] = useState();
   const [fechaFinal, setFechaFinal] = useState();
   const [answers, setAnswers] = useState<{ [key: number]: string | File | number[] }>({}); // Estado para almacenar respuestas
+  const [errorForm, setErrorForm] = useState(false);
+
   const { idProject, dni, idrol, idsubuni } = useParams();
   const pathname = usePathname();
   const router = useRouter();
@@ -81,6 +84,25 @@ export default function ActivityForm() {
   const handleSubmitAnswers = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    // Verificación de campos vacíos
+    const requiredFields = [
+      nombreActividad,
+      fechaInicio,
+      fechaFinal,
+      ...questions.map((question) => answers[question.id] || "") // Respuestas dinámicas
+    ];
+
+    // Si alguno de los campos requeridos está vacío, establece errorForm como true
+    const isValid = requiredFields.every((field) => field !== "" && field !== undefined && field !== null);
+
+    if (!isValid) {
+      setErrorForm(true); // Si hay algún campo vacío, activa el error
+      return; // No continuar con el envío al backend
+    }
+
+    // Si todos los campos están completos, desactivar errorForm
+    setErrorForm(false);
+
     // Crear el objeto FormData
     const formData = new FormData();
 
@@ -138,7 +160,7 @@ export default function ActivityForm() {
           icon: 'error',
           title: 'Error al crear la actividad',
           text: 'Rellene todos los campos del formulario correctamente',
-          confirmButtonText: 'OK', 
+          confirmButtonText: 'OK',
           customClass: {
             confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
           },
@@ -186,7 +208,7 @@ export default function ActivityForm() {
         icon: 'error',
         title: 'Error',
         text: `Error al conectar con la API. ${err.message}`,
-        confirmButtonText: 'OK', 
+        confirmButtonText: 'OK',
         customClass: {
           confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
         },
@@ -225,18 +247,23 @@ export default function ActivityForm() {
           Insertar Actividad
         </h1>
 
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmitAnswers}>
           {/* Nombre de la actividad */}
           <div className="space-y-4">
             <Label htmlFor="activity-name" className="text-lg font-medium text-gray-700 dark:text-gray-300">
               Nombre de la actividad
             </Label>
-            <Input
+            <input
               id="activity-name"
               placeholder="Nombre de la actividad"
-              className="w-full bg-gray-100 dark:bg-gray-800 h-12 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
+              className={clsx(
+                "w-full bg-gray-100 dark:bg-gray-800  dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3",
+                { "border-red-400 ring-1 ring-red-400": errorForm && nombreActividad}, // Estilo condicional si el campo está vacío
+                { "border-green-400 ring-1 ring-green-400": !errorForm && nombreActividad } // Estilo si el campo está lleno
+              )}
               value={nombreActividad}
               onChange={(e) => setNombreActividad(e.target.value)}
+              required
             />
           </div>
 
@@ -251,8 +278,15 @@ export default function ActivityForm() {
                 type="date"
                 value={fechaInicio}
                 onChange={(e) => setFechaInicio(e.target.value)}
-                className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
+                className={clsx('w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-4 focus:ring-red-500 px-4 py-3',
+                  { "border-red-400 ring-1 ring-red-400": errorForm && !fechaFinal }, // Estilo condicional si el campo está vacío
+                  { "border-green-400 ring-1 ring-green-400": !errorForm && fechaInicio } // Estilo si el campo está lleno
+                )}
+                required
               />
+              <p className="text-sm text-red-500 mt-1 invisible peer-invalid:visible">
+                Por favor selecciona una fecha.
+              </p>
             </div>
           </div>
 
@@ -267,11 +301,14 @@ export default function ActivityForm() {
                 type="date"
                 value={fechaFinal}
                 onChange={(e) => setFechaFinal(e.target.value)}
-                className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
+                className={clsx('w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-4 focus:ring-red-500 px-4 py-3',
+                  { "border-red-400 ring-1 ring-red-400": errorForm && !fechaFinal }, // Estilo condicional si el campo está vacío
+                  { "border-green-400 ring-1 ring-green-400": !errorForm && fechaFinal } // Estilo si el campo está lleno
+                )}
+                required
               />
             </div>
           </div>
-
           {/* Preguntas dinámicas */}
           {questions.map((question) => {
             switch (question.type) {
@@ -287,10 +324,17 @@ export default function ActivityForm() {
                     <input
                       type="text"
                       id={`text-${question.id}`}
-                      className="w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500"
+                      className={clsx(
+                        "w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-4 focus:ring-red-500",
+                        {
+                          "border-red-400 ring-1 ring-red-400": !errorForm, // Error
+                          "border-green-400 ring-1 ring-green-400": errorForm, // Validez
+                        }
+                      )}
                       placeholder="Escribe tu respuesta"
                       value={answers[question.id] || ""}
                       onChange={(e) => handleChange(question.id, e.target.value)}
+                      required
                     />
                   </div>
                 );
@@ -304,15 +348,20 @@ export default function ActivityForm() {
                     >
                       {question.questionText}
                     </Label>
-                    <div className="relative">
-                      <input
-                        type="date"
-                        id={`date-${question.id}`}
-                        value={answers[question.id] || ""}
-                        onChange={(e) => handleChange(question.id, e.target.value)}
-                        className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
-                      />
-                    </div>
+                    <input
+                      type="date"
+                      id={`date-${question.id}`}
+                      value={answers[question.id] || ""}
+                      onChange={(e) => handleChange(question.id, e.target.value)}
+                      className={clsx(
+                        "w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3",
+                        {
+                          "border-red-400 ring-1 ring-red-400": !errorForm, // Error
+                          "border-green-400 ring-1 ring-green-400": errorForm, // Validez
+                        }
+                      )}
+                      required
+                    />
                   </div>
                 );
 
@@ -334,6 +383,7 @@ export default function ActivityForm() {
                           value={option.idop}
                           checked={answers[question.id]?.includes(option.idop) || false}
                           onChange={() => handleMultipleChoiceChange(question.id, option.idop)}
+                          required
                         />
                         <Label htmlFor={`${question.id}-${option.idop}`} className="text-gray-700 dark:text-white">
                           {option.optionTxt}
@@ -353,13 +403,14 @@ export default function ActivityForm() {
                       {question.questionText}
                     </Label>
                     {question.options?.map((option) => (
-                      <div key={option.idop} className="flex items-center gap-2">
+                      <div key={option.idop} className="flex items-center gap-2 ">
                         <input
                           type="radio"
                           name={`singleChoice-${question.id}`}
                           value={option.idop}
                           checked={answers[question.id]?.includes(option.idop)}
                           onChange={(e) => handleSingleChange(question.id, option.idop)}
+                          required
                         />
                         <Label htmlFor={`${question.id}-${option.idop}`} className="text-gray-700 dark:text-white">
                           {option.optionTxt}
@@ -382,8 +433,17 @@ export default function ActivityForm() {
                       id={`file-upload-${question.id}`}
                       type="file"
                       accept=".pdf,.xls,.xlsx,.doc,.docx"
-                      className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 px-4 py-3 file:bg-blue-600 file:text-white file:rounded-md file:px-6 file:py-3"
+                      className={clsx(
+                        "w-full bg-gray-100 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 px-4 py-3 file:bg-blue-600 file:text-white file:rounded-md file:px-6 file:py-3",
+                        {
+
+                          "border-red-400 ring-1 ring-red-400": !errorForm, // Error
+                          "border-green-400 ring-1 ring-green-400": errorForm, // Validez
+
+                        }
+                      )}
                       onChange={(e) => handleChangeFile(question.id, e.target.files?.[0] || null)}
+                      required
                     />
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
                       Solo se permiten formatos: <strong>PDF, Excel, Word</strong>. Tamaño máximo: <strong>20MB</strong>.
@@ -401,9 +461,16 @@ export default function ActivityForm() {
                       {question.questionText}
                     </Label>
                     <select
-                      className="w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500"
+                      className={clsx(
+                        "w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500",
+                        {
+                          "border-red-400 ring-1 ring-red-400": !errorForm, // Error
+                          "border-green-400 ring-1 ring-green-400": errorForm, // Validez
+                        }
+                      )}
                       value={answers[question.id]?.[0] || ""}
                       onChange={(e) => handleSingleChange(question.id, e.target.value)}
+                      required
                     >
                       <option value="">Seleccione una opción</option>
                       {question.options?.map((option) => (
@@ -419,24 +486,23 @@ export default function ActivityForm() {
                 return null;
             }
           })}
+          {/* Botones */}
+          <div className="w-full mx-auto flex justify-end space-x-6 pt-8">
+            <Button
+              variant="destructive"
+              className="bg-red-600 hover:bg-red-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-red-500 transition-all duration-300"
+              onClick={handleCancelActivity}
+            >
+              Cancelar
+            </Button>
+            <Button
+              className="bg-blue-600 hover:bg-blue-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-blue-500 transition-all duration-300"
+              type="submit"
+            >
+              Insertar Actividad
+            </Button>
+          </div>
         </form>
-
-        {/* Botones */}
-        <div className="w-full mx-auto flex justify-end space-x-6 pt-8">
-          <Button
-            variant="destructive"
-            className="bg-red-600 hover:bg-red-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-red-500 transition-all duration-300"
-            onClick={handleCancelActivity}
-          >
-            Cancelar
-          </Button>
-          <Button
-            className="bg-blue-600 hover:bg-blue-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-blue-500 transition-all duration-300"
-            onClick={handleSubmitAnswers}
-          >
-            Insertar Actividad
-          </Button>
-        </div>
       </div>
 
     </div>
