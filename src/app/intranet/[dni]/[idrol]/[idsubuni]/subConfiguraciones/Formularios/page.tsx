@@ -8,6 +8,7 @@ import DynamicTable from "@/components/DynamicTable";
 import { API_FORM , API_GET_FORM_BY_SUBUNI} from "@/config/apiconfig";
 import { AvisoContext } from '@/context/avisoContext'
 import { useParams, usePathname, useRouter } from "next/navigation";
+import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
 type FormEntry = {
   idf: number;
   nmForm: string;
@@ -166,7 +167,7 @@ export default function Component() {
   const { mostrarAviso } = useContext<any>(AvisoContext);
   const pathname = usePathname();
   const router = useRouter();
-  const { dni, idsubuni } = useParams();
+  const { dni, idsubuni, idrol } = useParams();
   ///variables necesarios para la tabla dinámica
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(4);
@@ -538,9 +539,32 @@ export default function Component() {
   if (error) {
     return <p>Error: {error}</p>;
   }
+   ///recortar rutas
+   const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
+    const partes = ruta.split('/'); // Divide la ruta en partes
+    const indice = partes.indexOf(segmento); // Encuentra el índice del segmento clave
+    if (indice === -1) return ruta; // Si no encuentra el segmento, retorna la ruta completa
+    return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
+  };
+  //recortamos las rutas requeridas
+  const configuracion = recortarRutaHastaSegmento(pathname, 'subConfiguraciones');
+  const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
+  //definimos valores para el breadCrumb
+  const breadcrumbData = [
+    { type: "link", label: "Inicio", href:`${inicio}/${dni}/${idrol}/${idsubuni}` },
+    {
+      type: "dropdown",
+      label: "Sub configuraciones",
+      items: [
+        { label: "Usuarios", href: `${configuracion}/usuarios` },
+      ],
+    },
+    { type: "page", label: "Formularios" },
+  ];
 
   return (
     <div className="w-[90%] max-w-6xl mx-auto p-4 text-black dark:text-white space-y-4">
+      <BreadcrumbWithDropdown items={breadcrumbData} />
       <h1 className="text-2xl font-bold  ">Formularios</h1>
       <div className="flex justify-between items-center gap-4 flex-wrap">
         <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 "   >

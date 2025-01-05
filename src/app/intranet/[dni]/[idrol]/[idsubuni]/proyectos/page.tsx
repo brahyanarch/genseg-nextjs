@@ -391,7 +391,7 @@ export default function Component() {
         <BreadcrumbWithDropdown items={breadcrumbData} />
       </div>
       <div className="flex flex-col items-center my-8 space-y-4">
-        <h1 className="text-5xl font-extrabold text-gray-800 tracking-tight">
+        <h1 className="text-5xl font-extrabold text-gray-800 tracking-tight dark:text-white">
           Gestión de Proyectos
         </h1>
         <p className="text-lg text-gray-500 max-w-2xl text-center">
