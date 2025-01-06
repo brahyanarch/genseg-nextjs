@@ -409,13 +409,6 @@ export default function ActivityForm() {
         {/* Botones */}
         <div className="w-full mx-auto flex justify-end space-x-6 pt-8">
           <Button
-            variant="destructive"
-            className="bg-red-600 hover:bg-red-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-red-500 transition-all duration-300"
-            onClick={handleCancelActivity}
-          >
-            Cancelar
-          </Button>
-          <Button
             className="bg-blue-600 hover:bg-blue-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-blue-500 transition-all duration-300"
             type="submit"
           >
@@ -423,6 +416,13 @@ export default function ActivityForm() {
           </Button>
         </div>
         </form>
+          <Button
+            variant="destructive"
+            className="bg-red-600 hover:bg-red-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-red-500 transition-all duration-300"
+            onClick={handleCancelActivity}
+          >
+            Cancelar
+          </Button>
 
       </div>
     </div>
