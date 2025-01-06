@@ -406,8 +406,6 @@ export default function ActivityForm() {
             }
           })}
 
-        </form>
-
         {/* Botones */}
         <div className="w-full mx-auto flex justify-end space-x-6 pt-8">
           <Button
@@ -424,6 +422,8 @@ export default function ActivityForm() {
             Insertar Actividad
           </Button>
         </div>
+        </form>
+
       </div>
     </div>
   )
