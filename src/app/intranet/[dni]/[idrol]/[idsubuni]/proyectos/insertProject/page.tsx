@@ -2,22 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect, useRef } from "react";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState, useRef, useEffect } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { API_PROJECTS, API_ESCUELA_PROFESIONAL } from "@/config/apiconfig";
 import Swal from 'sweetalert2';
@@ -60,6 +45,7 @@ export default function ProjectForm() {
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false); // State to manage uploading status
+  const [progress, setProgress] = useState(0); // State to manage upload progress
 
   //// Funciones importantes
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,58 +67,40 @@ export default function ProjectForm() {
     }
   };
 
-  const getAllEscuelas = async () => {
-    try {
-      const response = await fetch(API_ESCUELA_PROFESIONAL);
-      if (response.ok) {
-        const data = await response.json();
-        setEscuelas(data);
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Error al cargar las escuelas profesionales.',
-          confirmButtonText: 'OK'
-        });
-      }
-    } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: `Error al conectar con la API: ${error}`,
-        confirmButtonText: 'OK'
-      });
-    }
-  };
-
   const handleNewProyect = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setIsUploading(true); // Set uploading status to true
+    if (!planProyecto) return;
+
+    setIsUploading(true);
+    setProgress(0);
+
     const formData = new FormData();
-    if (planProyecto) {
-      formData.append("file", planProyecto);
-    }
+    formData.append("file", planProyecto);
     formData.append("dni", String(dni));
     formData.append("id_rol", String(idrol));
     formData.append("subunidad", String(idsubuni));
     formData.append("idpe", String(escuelaProfesional));
 
-    try {
-      const response = await fetch(API_PROJECTS, {
-        method: "POST",
-        body: formData,
-      });
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', API_PROJECTS, true);
 
-      if (response.ok) {
-        const resIdProject = await response.json();
-        // Mostrar un SweetAlert de éxito
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percentCompleted = Math.round((event.loaded * 100) / event.total);
+        setProgress(percentCompleted);
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status === 201) {
+        const resIdProject = JSON.parse(xhr.responseText);
         Swal.fire({
           icon: 'success',
           title: '¡Éxito!',
           text: 'El Proyecto fue creado correctamente.',
           confirmButtonText: 'OK',
-          background: 'bg-gray-800', // Fondo para modo oscuro
-          color: 'text-gray-200', // Texto claro
+          background: 'bg-gray-800',
+          color: 'text-gray-200',
           customClass: {
             confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
           },
@@ -141,38 +109,35 @@ export default function ProjectForm() {
           router.push(`${pathname}/${resIdProject.idproj}`);
         }
       } else {
-        // Si el servidor no responde correctamente
         Swal.fire({
           icon: 'error',
           title: 'Error',
           text: 'Hubo un problema al crear el Proyecto.',
           confirmButtonText: 'OK',
-          background: 'bg-gray-800', // Fondo para modo oscuro
-          color: 'text-gray-200', // Texto claro
+          background: 'bg-gray-800',
+          color: 'text-gray-200',
           customClass: {
             confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
           },
         });
-        formData.forEach((value, key) => {
-          console.log(`${key}:`, value);
-        });
       }
-    } catch (error) {
-      // Si ocurre un error de conexión
+      setIsUploading(false);
+    };
+
+    xhr.onerror = () => {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: `Error al conectar con la API. ${error}`,
+        text: 'Error al conectar con la API.',
         confirmButtonText: 'OK'
       });
-    } finally {
-      setIsUploading(false); // Set uploading status to false
-    }
+      setIsUploading(false);
+    };
+
+    xhr.send(formData);
   };
 
-  useEffect(() => {
-    getAllEscuelas();
-  }, []);
+
 
   ///recortar rutas
   const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
@@ -195,11 +160,7 @@ export default function ProjectForm() {
 
   return (
     <div className="flex-1 bg-background py-4 pl-4 text-black dark:text-white">
-      {isUploading && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <Spinner className="w-16 h-16 text-white" />
-        </div>
-      )}
+      
       <div className="flex gap-4 px-4 items-center mx-auto text-sm breadcrumbs mb-6 text-muted-foreground">
         <BreadcrumbWithDropdown items={breadcrumbData} />
       </div>
@@ -256,10 +217,17 @@ export default function ProjectForm() {
             <Button
               className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg w-full max-w-sm py-3 h-12 font-semibold"
               type="submit"
+              disabled={isUploading}
             >
-              Crear Proyecto
+              {isUploading ? "Subiendo..." : "Crear Proyecto"}
             </Button>
           </form>
+          {isUploading && (
+            <div className="space-y-2 mt-4">
+              <Progress value={progress} className="w-full" />
+              <p className="text-sm text-gray-500 text-center">{progress}% completado</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

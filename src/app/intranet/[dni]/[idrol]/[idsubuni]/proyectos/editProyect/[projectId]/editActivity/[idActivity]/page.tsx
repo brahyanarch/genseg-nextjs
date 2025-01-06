@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState, useEffect } from "react"
+import { useState, useEffect, ChangeEvent } from "react"
 import { useParams, usePathname, useRouter } from "next/navigation"
 import { API_ACTIVITIES } from "@/config/apiconfig"
 import Swal from 'sweetalert2';
@@ -15,11 +15,11 @@ export default function ActivityForm() {
   const [nombreActividad, setNombreActividad] = useState();
   const [fechaInicio, setFechaInicio] = useState();
   const [fechaFinal, setFechaFinal] = useState();
-  const [answers, setAnswers] = useState({}); // Estado para almacenar respuestas
+  const [answers, setAnswers] = useState<{ [key: string]: { [field: string]: any }[] }>({}); // Estado para almacenar respuestas
   const { projectId, idActivity, dni, idrol, idsubuni } = useParams();
   const pathname = usePathname();
   const router = useRouter();
-  const handleChange = (questionId, field, value) => {
+  const handleChange = (questionId: string, field: string, value: string) => {
     setAnswers((prev) => ({
       ...prev,
       [questionId]: [
@@ -32,13 +32,13 @@ export default function ActivityForm() {
   };
 
   /// casos de single choice
-  const handleSingleChange = (questionId, optionId) => {
+  const handleSingleChange = (questionId: string, optionId: number) => {
     setAnswers((prev) => ({
       ...prev,
       [questionId]: [{ idomul: optionId, idp: questionId }], // Reemplaza con la nueva selección
     }));
   };
-  const handleChangeFile = (questionId, file) => {
+  const handleChangeFile = (questionId: string, file: File | null) => {
     setAnswers((prev) => ({
       ...prev,
       [questionId]: [{ file, idp: questionId }], // Agrega el archivo
@@ -48,7 +48,7 @@ export default function ActivityForm() {
 
 
   // Manejar cambios para opciones múltiples
-  const handleMultipleChoiceChange = (questionId, optionId) => {
+  const handleMultipleChoiceChange = (questionId: string, optionId: number) => {
     setAnswers((prev) => {
       const currentAnswers = prev[questionId] || [];
       const isSelected = currentAnswers.some(

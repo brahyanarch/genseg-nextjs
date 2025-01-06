@@ -21,6 +21,7 @@ interface items {
   href: string;
   external?: boolean;
 }
+
 interface Data {   
   type: string;
   label: string;
@@ -28,7 +29,32 @@ interface Data {
   items?: items[];
 }
 
-export function BreadcrumbWithDropdown({ items }:Data) {
+interface BaseItem {
+  type: string;
+  label: string;
+}
+
+interface LinkItem extends BaseItem {
+  type: "link";
+  href: string;
+}
+
+interface DropdownItem extends BaseItem {
+  type: "dropdown";
+  items: { label: string; href: string; external?: boolean }[];
+}
+
+interface PageItem extends BaseItem {
+  type: "page";
+}
+
+type BreadcrumbItemType = LinkItem | DropdownItem | PageItem;
+
+interface BreadcrumbProps {
+  items: BreadcrumbItemType[];
+}
+
+export function BreadcrumbWithDropdown({ items }:BreadcrumbProps) {
   return (
     <Breadcrumb className="text-base font-semibold " >
       <BreadcrumbList>

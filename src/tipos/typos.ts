@@ -31,3 +31,25 @@ export type Activities = {
   n_act: string;
   
 }
+
+interface BaseItem {
+  type: string;
+  label: string;
+}
+
+interface LinkItem extends BaseItem {
+  type: "link";
+  href: string;
+}
+interface DropdownItem extends BaseItem {
+  type: "dropdown";
+  items: { label: string; href: string; external?: boolean }[];
+}
+
+interface PageItem extends BaseItem {
+  type: "page";
+}
+export type BreadcrumbItemType = LinkItem | DropdownItem | PageItem;
+interface BreadcrumbProps {
+  items: BreadcrumbItemType[];
+}

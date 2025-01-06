@@ -9,6 +9,7 @@ import { usePathname, useRouter, useParams } from "next/navigation";
 import { TaskList } from '@/components/componentesProyecto/porjectInfo';
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
 import { set } from "date-fns";
+import { BreadcrumbItemType } from "@/tipos/typos";
 
 interface ProjectDetails {
   plan: string;
@@ -20,6 +21,7 @@ interface ProjectDetails {
     nmPE: string;
   };
 }
+
 
 export default function ProjectDetails() {
   const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>(null);
@@ -76,7 +78,7 @@ export default function ProjectDetails() {
   const configuracion = recortarRutaHastaSegmento(pathname, 'proyectos');
   const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
   //definimos valores para el breadCrumb
-  const breadcrumbData = [
+  const breadcrumbData: BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
     { type: "link", label: "Proyectos", href: configuracion },
     { type: "page", label: "Ver proyecto" },

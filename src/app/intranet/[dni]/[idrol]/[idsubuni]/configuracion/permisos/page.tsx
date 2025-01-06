@@ -10,6 +10,7 @@ import DynamicTable from "@/components/DynamicTable";
 import { Permisos } from "@/tipos/typos"
 import { usePathname } from "next/navigation";
 import Swal from 'sweetalert2';
+import { BreadcrumbItemType } from "@/tipos/typos";
 
 
 // Modal para agregar o editar un Permiso
@@ -411,7 +412,7 @@ export default function Component() {
   const configuracion = recortarRutaHastaSegmento(pathname, 'configuracion');
   const inicio = recortarRutaHastaSegmento(pathname, 'usuarios');
   //definimos valores para el breadCrumb
-  const breadcrumbData = [
+  const breadcrumbData:BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: inicio },
     {
       type: "dropdown",

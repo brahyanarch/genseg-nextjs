@@ -11,7 +11,7 @@ import { Rol } from "@/tipos/typos"
 import { AvisoContext } from '@/context/avisoContext'
 import PermissionsManager from '@/components/ComponentsIntranet/permisosmanages'
 import { usePathname } from "next/navigation";
-
+import {BreadcrumbItemType} from "@/tipos/typos";
 // Notificaciones
 import Swal from 'sweetalert2';
 // Modal para agregar un nuevo Rol
@@ -170,9 +170,9 @@ export const EditModal = ({
 const ConfiRoles = () => {
   const [Data, setData] = useState<Rol[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingRole, setEditingRole] = useState(null);
+  const [editingRole, setEditingRole] = useState<Rol | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
@@ -381,7 +381,11 @@ const ConfiRoles = () => {
       const data = await response.json();
       setData(data);
     } catch (err) {
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError(String(err));
+      }
     } finally {
       setLoading(false);
     }
@@ -395,16 +399,16 @@ const ConfiRoles = () => {
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
-  const openEditModal = (role: boolean) => {
+  const openEditModal = (role: Rol) => {
     setEditingRole(role);
     setIsModalOpen(true);
   };
   //funcion para editar un Rol
-  const saveRole = (savedRole) => {
+  const saveRole = (savedRole: Rol) => {
     setData((prevRoles) => {
       if (editingRole) {
         return prevRoles.map((rol) =>
-          rol.id_rol === savedRole.id_per ? savedRole : rol
+          rol.id_rol === savedRole.id_rol ? savedRole : rol
         );
       } else {
         return [...prevRoles, savedRole];
@@ -544,7 +548,7 @@ const ConfiRoles = () => {
   const configuracion = recortarRutaHastaSegmento(pathname, 'configuracion');
   const inicio = recortarRutaHastaSegmento(pathname, 'usuarios');
   //definimos valores para el breadCrumb
-  const breadcrumbData = [
+  const breadcrumbData:BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: inicio },
     {
       type: "dropdown",
