@@ -3,15 +3,16 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState, useEffect, ChangeEvent } from "react"
+import { useState, useEffect } from "react"
 import { useParams, usePathname, useRouter } from "next/navigation"
 import { API_ACTIVITIES } from "@/config/apiconfig"
 import Swal from 'sweetalert2';
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb"
-import {BreadcrumbItemType} from "@/tipos/typos"
+import { BreadcrumbItemType } from "@/tipos/typos"
+
 export default function ActivityForm() {
   interface Question {
-    id: string;
+    id: number;
     type: string;
     questionText: string;
     options?: { idop: number; optionTxt: string }[];
@@ -19,60 +20,59 @@ export default function ActivityForm() {
 
   const [questions, setQuestions] = useState<Question[]>([]);
   ///entradas obligatorios
-  const [nombreActividad, setNombreActividad] = useState<string>("");
-  const [fechaInicio, setFechaInicio] = useState<string | undefined>();
-  const [fechaFinal, setFechaFinal] = useState<string | undefined>();
-  const [answers, setAnswers] = useState<{ [key: string]: { [field: string]: any }[] }>({}); // Estado para almacenar respuestas
+  const [nombreActividad, setNombreActividad] = useState("");
+  const [fechaInicio, setFechaInicio] = useState("");
+  const [fechaFinal, setFechaFinal] = useState("");
+  const [answers, setAnswers] = useState<{ [key: number]: any }>({}); // Estado para almacenar respuestas
   const { projectId, idActivity, dni, idrol, idsubuni } = useParams();
   const pathname = usePathname();
   const router = useRouter();
-  const handleChange = (questionId: string, field: string, value: string) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: [
-        {
-          ...prev[questionId]?.[0],
-          [field]: value, // Actualiza el campo correspondiente (resTxt, etc.)
-        },
-      ],
-    }));
+
+  // Manejar cambios en las respuestas
+  const handleChange = (id: number, value: string) => {
+    setAnswers((prev) => ({ ...prev, [id]: value }));
   };
 
   /// casos de single choice
-  const handleSingleChange = (questionId: string, optionId: number) => {
+  const handleSingleChange = (questionId: number, optionId: number) => {
     setAnswers((prev) => ({
       ...prev,
-      [questionId]: [{ idomul: optionId, idp: questionId }], // Reemplaza con la nueva selección
-    }));
-  };
-  const handleChangeFile = (questionId: string, file: File | null) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: [{ file, idp: questionId }], // Agrega el archivo
+      [questionId]: [optionId], // Guarda el ID seleccionado como un array
     }));
   };
 
+  const handleChangeFile = (id: number, file: File | null) => {
+
+    if (file) {
+      setAnswers((prev) => ({ ...prev, [id]: file }));
+    }
+  };
 
 
-  // Manejar cambios para opciones múltiples
-  const handleMultipleChoiceChange = (questionId: string, optionId: number) => {
+  const handleMultipleChoiceChange = (questionId: number, optionId: number) => {
     setAnswers((prev) => {
+      // Obtiene las respuestas actuales para esta pregunta o un array vacío
       const currentAnswers = prev[questionId] || [];
+  
+      // Verifica si la opción ya está seleccionada
       const isSelected = currentAnswers.some(
-        (response) => response.idomul === optionId
+        (response: { idomul: number }) => response.idomul === optionId
       );
-
+  
+      // Actualiza las respuestas de la pregunta
+      const updatedAnswers = isSelected
+        ? currentAnswers.filter((response: { idomul: number }) => response.idomul !== optionId) // Quita la opción si ya está seleccionada
+        : [...currentAnswers, optionId]; // Agrega la opción si no está seleccionada
+  
+      // Retorna el nuevo estado con las respuestas actualizadas
       return {
         ...prev,
-        [questionId]: isSelected
-          ? currentAnswers.filter((response) => response.idomul !== optionId) // Quita si ya está seleccionado
-          : [
-            ...currentAnswers,
-            { idomul: optionId, idp: questionId }, // Agrega la opción seleccionada
-          ],
+        [questionId]: updatedAnswers, // Actualiza solo esta pregunta
       };
     });
   };
+  
+
 
   //
   const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
@@ -177,7 +177,6 @@ export default function ActivityForm() {
       });
     }
   };
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -185,7 +184,6 @@ export default function ActivityForm() {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -208,7 +206,7 @@ export default function ActivityForm() {
         setNombreActividad(data.actividad.name); // Ajusta según la estructura de datos
         
         setFechaInicio(formatDate(data.actividad.fInit));    // Ajusta según la estructura de datos
-        setFechaFinal(formatDate(data.actividad.fFin));      // Ajusta según la estructura de datos
+        setFechaFinal(formatDate(data.actividad.fFin));   // Ajusta según la estructura de datos
       } catch (err: any) {
         // Si ocurre un error de conexión
         Swal.fire({
@@ -222,19 +220,21 @@ export default function ActivityForm() {
 
     fetchData();
   }, []);
-
-  
-
-  const configuracion = recortarRutaHastaSegmento(pathname, 'editProyect');
-  const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
+  //recortamos las rutas requeridas
+  const recortarRutaHastaSegmento1 = (ruta: string, segmento: string): string => {
+    const partes = ruta.split('/'); // Divide la ruta en partes
+    const indice = partes.indexOf(segmento); // Encuentra el índice del segmento clave
+    if (indice === -1) return ruta; // Si no encuentra el segmento, retorna la ruta completa
+    return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
+  };
+  const configuracion = recortarRutaHastaSegmento1(pathname, 'proyectos');
+  const inicio = recortarRutaHastaSegmento1(pathname, 'intranet');
   //definimos valores para el breadCrumb
   const breadcrumbData:BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
-    { type: "link", label: "Editar proyecto", href: configuracion },
+    { type: "link", label: "Proyectos", href: configuracion },
     { type: "page", label: "Editar actividad" },
   ];
-
-
   return (
     <div className="min-h-screen bg-background p-6">
       <div className=" flex gap-4 items-center mx-auto text-sm breadcrumbs mb-6 text-muted-foreground">
@@ -242,7 +242,7 @@ export default function ActivityForm() {
       </div>
 
       <div className="max-w-2xl mx-auto space-y-6">
-        <h1 className="text-3xl font-semibold text-center text-gray-800 dark:text-white mb-10 ">Editar Actividad</h1>
+        <h1 className="text-3xl font-semibold text-center text-gray-800 dark:text-white mb-10">Editar Actividad</h1>
 
         <form className="space-y-6" onSubmit={handleSubmitAnswers}>
           <div className="space-y-4">
@@ -250,7 +250,7 @@ export default function ActivityForm() {
             <Input
               id="activity-name"
               placeholder="Nombre de la actividad"
-              className="w-full bg-gray-100 text-gray-950 dark:bg-gray-800 h-12 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
+              className="w-full bg-gray-100 dark:bg-gray-800 h-12 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
               value={nombreActividad}
               onChange={(e) => setNombreActividad(e.target.value)}
             />
@@ -264,7 +264,7 @@ export default function ActivityForm() {
               placeholder="Fecha inicial"
               value={fechaInicio}
               onChange={(e) => setFechaInicio(e.target.value)}
-              className="w-full bg-gray-100 text-gray-950 dark:bg-gray-800 dark:text-gray-950 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
+              className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
             />
           </div>
 
@@ -274,7 +274,7 @@ export default function ActivityForm() {
               id="end-date"
               type="date"
               placeholder="Fecha final"
-              className="w-full bg-gray-100 text-gray-950 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
+              className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
               value={fechaFinal}
               onChange={(e) => setFechaFinal(e.target.value)}
             />
@@ -287,10 +287,11 @@ export default function ActivityForm() {
                     <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
                     <input
                       type="text"
-                      className="w-full border rounded-lg text-gray-950 bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500"
+                      className="w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500"
                       placeholder="Escribe tu respuesta"
-                      value={answers[question.id]?.[0]?.resTxt || ""}
-                      onChange={(e) => handleChange(question.id, "resTxt", e.target.value)}
+                      value={answers[question.id]?.[0]?.resTxt || answers[question.id]
+                      }
+                      onChange={(e) => handleChange(question.id, e.target.value)}
                     />
                   </div>
                 );
@@ -301,58 +302,32 @@ export default function ActivityForm() {
                     <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
                     <input
                       type="date"
-                      className="w-full bg-gray-100 text-gray-950 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
-                      value={answers[question.id]?.[0]?.resTxt || ""}
-                      onChange={(e) => handleChange(question.id, "resTxt", e.target.value)}
+                      className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
+                      value={formatDate(answers[question.id]?.[0]?.resdate || formatDate(answers[question.id]))}
+                      onChange={(e) => handleChange(question.id, e.target.value)}
                     />
                   </div>
                 );
 
-              case "multipleChoice":
-                return (
-                  <div key={question.id} className="space-y-4">
-                    <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
-                    {question.options?.map((option) => (
-                      <div key={option.idop}>
-                        <label className="flex items-center gap-2 text-gray-700 dark:text-white">
-                          <input
-                            type="checkbox"
-                            className="border rounded-lg text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
-                            checked={
-                              answers[question.id]?.some(
-                                (response) => response.idomul === option.idop
-                              ) || false
-                            }
-                            onChange={() => handleMultipleChoiceChange(question.id, option.idop)}
-                          />
-                          {option.optionTxt}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                );
-
-                case "singleChoice":
+                case "multipleChoice":
                   return (
                     <div key={question.id} className="space-y-4">
                       <label className="text-lg font-medium text-gray-700 dark:text-gray-300">
                         {question.questionText}
                       </label>
                       {question.options?.map((option) => (
-                        <div key={option.idop} className="flex items-center gap-2">
+                        <div key={option.idop}>
                           <label className="flex items-center gap-2 text-gray-700 dark:text-white">
                             <input
-                              type="radio"
-                              name={`singleChoice-${question.id}`}
+                              type="checkbox"
+                              className="border rounded-lg text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
                               value={option.idop}
                               checked={
-                                // Mantener seleccionada la opción inicial si coincide con la respuesta guardada
                                 answers[question.id]?.some(
-                                  (response) => response.idou === option.idop
-                                ) || answers[question.id]?.some((response) => response.idomul === option.idop)
+                                  (response: { idomul: number }) => response.idomul === option.idop
+                                ) || answers[question.id]?.includes(option.idop)
                               }
-                              onChange={() => handleSingleChange(question.id, option.idop)} // Actualizar la selección al editar
-                              
+                              onChange={() => handleMultipleChoiceChange(question.id, option.idop)}
                             />
                             {option.optionTxt}
                           </label>
@@ -361,7 +336,31 @@ export default function ActivityForm() {
                     </div>
                   );
                 
-                  
+
+              case "singleChoice":
+                return (
+                  <div key={question.id}>
+                    <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
+                    {question.options?.map((option) => (
+                      <div key={option.idop}>
+                        <label className="flex items-center gap-2 text-gray-700 dark:text-white">
+                          <input
+                            type="radio"
+                            name={`singleChoice-${question.id}`}
+                            value={option.idop}
+                            checked={
+                              answers[question.id]?.some(
+                                (response: { idou: number }) => response.idou === option.idop
+                              ) || answers[question.id]?.includes(option.idop)
+                            }
+                            onChange={() => handleSingleChange(question.id, option.idop)}
+                          />
+                          {option.optionTxt}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                );
 
               case "dropdown":
                 return (
@@ -369,7 +368,7 @@ export default function ActivityForm() {
                     <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
                     <select
                       className="w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500"
-                      value={answers[question.id]?.[0]?.idomul || ""}
+                      value={answers[question.id]?.[0]?.idodes || answers[question.id]?.[0] }
                       onChange={(e) =>
                         handleSingleChange(question.id, Number(e.target.value))
                       }
@@ -410,9 +409,8 @@ export default function ActivityForm() {
         <div className="w-full mx-auto flex justify-end space-x-6 pt-8">
           <Button
             className="bg-blue-600 hover:bg-blue-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-blue-500 transition-all duration-300"
-            type="submit"
           >
-            Insertar Actividad
+            Editar Actividad
           </Button>
         </div>
         </form>
