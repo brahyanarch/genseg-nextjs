@@ -325,30 +325,36 @@ export default function ActivityForm() {
                   </div>
                 );
 
-              case "singleChoice":
-                return (
-                  <div key={question.id}>
-                    <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
-                    {question.options?.map((option) => (
-                      <div key={option.idop}>
-                        <label className="flex items-center gap-2 text-gray-700 dark:text-white">
-                          <input
-                            type="radio"
-                            name={`singleChoice-${question.id}`}
-                            value={option.idop}
-                            checked={
-                              answers[question.id]?.some(
-                                (response) => response.idomul === option.idop
-                              ) || false
-                            }
-                            onChange={() => handleSingleChange(question.id, option.idop)}
-                          />
-                          {option.optionTxt}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                );
+                case "singleChoice":
+                  return (
+                    <div key={question.id} className="space-y-4">
+                      <label className="text-lg font-medium text-gray-700 dark:text-gray-300">
+                        {question.questionText}
+                      </label>
+                      {question.options?.map((option) => (
+                        <div key={option.idop} className="flex items-center gap-2">
+                          <label className="flex items-center gap-2 text-gray-700 dark:text-white">
+                            <input
+                              type="radio"
+                              name={`singleChoice-${question.id}`}
+                              value={option.idop}
+                              checked={
+                                // Mantener seleccionada la opción inicial si coincide con la respuesta guardada
+                                answers[question.id]?.some(
+                                  (response) => response.idou === option.idop
+                                ) || answers[question.id]?.includes(option.idop)
+                              }
+                              onChange={() => handleSingleChange(question.id, option.idop)} // Actualizar la selección al editar
+                              
+                            />
+                            {option.optionTxt}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                
+                  
 
               case "dropdown":
                 return (

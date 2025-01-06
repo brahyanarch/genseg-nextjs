@@ -19,30 +19,25 @@ export default function ActivityForm() {
   const { idProject, idActivity, dni, idrol, idsubuni } = useParams();
   const pathname = usePathname();
   const router = useRouter();
-  const handleChange = (questionId, field, value) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: [
-        {
-          ...prev[questionId]?.[0],
-          [field]: value, // Actualiza el campo correspondiente (resTxt, etc.)
-        },
-      ],
-    }));
+
+  // Manejar cambios en las respuestas
+  const handleChange = (id: number, value: string) => {
+    setAnswers((prev) => ({ ...prev, [id]: value }));
   };
 
   /// casos de single choice
   const handleSingleChange = (questionId, optionId) => {
     setAnswers((prev) => ({
       ...prev,
-      [questionId]: [{ idomul: optionId, idp: questionId }], // Reemplaza con la nueva selección
+      [questionId]: [optionId], // Guarda el ID seleccionado como un array
     }));
   };
-  const handleChangeFile = (questionId, file) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: [{ file, idp: questionId }], // Agrega el archivo
-    }));
+
+  const handleChangeFile = (id: number, file: File | null) => {
+
+    if (file) {
+      setAnswers((prev) => ({ ...prev, [id]: file }));
+    }
   };
 
 
@@ -170,7 +165,13 @@ export default function ActivityForm() {
       });
     }
   };
-
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -190,6 +191,10 @@ export default function ActivityForm() {
 
         setQuestions(data.preguntas); // Ajusta según la estructura de datos
         setAnswers(data.respuestas);     // Ajusta según la estructura de datos
+        setNombreActividad(data.actividad.name); // Ajusta según la estructura de datos
+        
+        setFechaInicio(formatDate(data.actividad.fInit));    // Ajusta según la estructura de datos
+        setFechaFinal(formatDate(data.actividad.fFin));   // Ajusta según la estructura de datos
       } catch (err: any) {
         // Si ocurre un error de conexión
         Swal.fire({
@@ -272,8 +277,9 @@ export default function ActivityForm() {
                       type="text"
                       className="w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500"
                       placeholder="Escribe tu respuesta"
-                      value={answers[question.id]?.[0]?.resTxt || ""}
-                      onChange={(e) => handleChange(question.id, "resTxt", e.target.value)}
+                      value={answers[question.id]?.[0]?.resTxt || answers[question.id]
+                      }
+                      onChange={(e) => handleChange(question.id, e.target.value)}
                     />
                   </div>
                 );
@@ -285,13 +291,13 @@ export default function ActivityForm() {
                     <input
                       type="date"
                       className="w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3"
-                      value={answers[question.id]?.[0]?.resTxt || ""}
-                      onChange={(e) => handleChange(question.id, "resTxt", e.target.value)}
+                      value={formatDate(answers[question.id]?.[0]?.resdate || formatDate(answers[question.id]))}
+                      onChange={(e) => handleChange(question.id, e.target.value)}
                     />
                   </div>
                 );
 
-              case "multipleChoice":
+              case "multipleChoice": 
                 return (
                   <div key={question.id} className="space-y-4">
                     <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
@@ -301,10 +307,11 @@ export default function ActivityForm() {
                           <input
                             type="checkbox"
                             className="border rounded-lg text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
+                            value={option.idop}
                             checked={
                               answers[question.id]?.some(
                                 (response) => response.idomul === option.idop
-                              ) || false
+                              ) || answers[question.id]?.includes(option.idop)
                             }
                             onChange={() => handleMultipleChoiceChange(question.id, option.idop)}
                           />
@@ -328,8 +335,8 @@ export default function ActivityForm() {
                             value={option.idop}
                             checked={
                               answers[question.id]?.some(
-                                (response) => response.idomul === option.idop
-                              ) || false
+                                (response) => response.idou === option.idop
+                              ) || answers[question.id]?.includes(option.idop)
                             }
                             onChange={() => handleSingleChange(question.id, option.idop)}
                           />
@@ -346,9 +353,9 @@ export default function ActivityForm() {
                     <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
                     <select
                       className="w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500"
-                      value={answers[question.id]?.[0]?.idomul || ""}
+                      value={answers[question.id]?.[0]?.idodes || answers[question.id]?.[0] }
                       onChange={(e) =>
-                        handleSingleChange(question.id, Number(e.target.value))
+                        handleSingleChange(question.id, e.target.value)
                       }
                     >
                       <option value="">Seleccione una opción</option>
