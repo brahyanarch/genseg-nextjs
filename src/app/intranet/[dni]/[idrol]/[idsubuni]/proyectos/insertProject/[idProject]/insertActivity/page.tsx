@@ -327,8 +327,8 @@ export default function ActivityForm() {
                       className={clsx(
                         "w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-4 focus:ring-red-500",
                         {
-                          "border-red-400 ring-1 ring-red-400": !errorForm, // Error
-                          "border-green-400 ring-1 ring-green-400": errorForm, // Validez
+                          "border-red-400 ring-1 ring-red-400": errorForm, // Error
+                          "border-green-400 ring-1 ring-green-400": !errorForm, // Validez
                         }
                       )}
                       placeholder="Escribe tu respuesta"
@@ -356,8 +356,8 @@ export default function ActivityForm() {
                       className={clsx(
                         "w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3",
                         {
-                          "border-red-400 ring-1 ring-red-400": !errorForm, // Error
-                          "border-green-400 ring-1 ring-green-400": errorForm, // Validez
+                          "border-red-400 ring-1 ring-red-400": errorForm, // Error
+                          "border-green-400 ring-1 ring-green-400": !errorForm, // Validez
                         }
                       )}
                       required
@@ -437,8 +437,8 @@ export default function ActivityForm() {
                         "w-full bg-gray-100 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 px-4 py-3 file:bg-blue-600 file:text-white file:rounded-md file:px-6 file:py-3",
                         {
 
-                          "border-red-400 ring-1 ring-red-400": !errorForm, // Error
-                          "border-green-400 ring-1 ring-green-400": errorForm, // Validez
+                          "border-red-400 ring-1 ring-red-400": errorForm, // Error
+                          "border-green-400 ring-1 ring-green-400": !errorForm, // Validez
 
                         }
                       )}
@@ -464,8 +464,8 @@ export default function ActivityForm() {
                       className={clsx(
                         "w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500",
                         {
-                          "border-red-400 ring-1 ring-red-400": !errorForm, // Error
-                          "border-green-400 ring-1 ring-green-400": errorForm, // Validez
+                          "border-red-400 ring-1 ring-red-400": errorForm, // Error
+                          "border-green-400 ring-1 ring-green-400": !errorForm, // Validez
                         }
                       )}
                       value={answers[question.id]?.[0] || ""}
