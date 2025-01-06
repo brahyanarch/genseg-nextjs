@@ -8,14 +8,22 @@ import { useParams, usePathname, useRouter } from "next/navigation"
 import { API_ACTIVITIES } from "@/config/apiconfig"
 import Swal from 'sweetalert2';
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb"
+import { BreadcrumbItemType } from "@/tipos/typos"
 
 export default function ActivityForm() {
-  const [questions, setQuestions] = useState([]);
+  interface Question {
+    id: number;
+    type: string;
+    questionText: string;
+    options?: { idop: number; optionTxt: string }[];
+  }
+
+  const [questions, setQuestions] = useState<Question[]>([]);
   ///entradas obligatorios
-  const [nombreActividad, setNombreActividad] = useState();
-  const [fechaInicio, setFechaInicio] = useState();
-  const [fechaFinal, setFechaFinal] = useState();
-  const [answers, setAnswers] = useState({}); // Estado para almacenar respuestas
+  const [nombreActividad, setNombreActividad] = useState("");
+  const [fechaInicio, setFechaInicio] = useState("");
+  const [fechaFinal, setFechaFinal] = useState("");
+  const [answers, setAnswers] = useState<{ [key: number]: any }>({}); // Estado para almacenar respuestas
   const { idProject, idActivity, dni, idrol, idsubuni } = useParams();
   const pathname = usePathname();
   const router = useRouter();
@@ -26,7 +34,7 @@ export default function ActivityForm() {
   };
 
   /// casos de single choice
-  const handleSingleChange = (questionId, optionId) => {
+  const handleSingleChange = (questionId: number, optionId: number) => {
     setAnswers((prev) => ({
       ...prev,
       [questionId]: [optionId], // Guarda el ID seleccionado como un array
@@ -43,17 +51,17 @@ export default function ActivityForm() {
 
 
   // Manejar cambios para opciones múltiples
-  const handleMultipleChoiceChange = (questionId, optionId) => {
-    setAnswers((prev) => {
-      const currentAnswers = prev[questionId] || [];
-      const isSelected = currentAnswers.some(
-        (response) => response.idomul === optionId
-      );
+  const handleMultipleChoiceChange = (questionId: number, optionId: number) => {
+      setAnswers((prev) => {
+        const currentAnswers = prev[questionId] || [];
+        const isSelected = currentAnswers.some(
+          (response: { idomul: number }) => response.idomul === optionId
+        );
 
       return {
         ...prev,
         [questionId]: isSelected
-          ? currentAnswers.filter((response) => response.idomul !== optionId) // Quita si ya está seleccionado
+          ? currentAnswers.filter((response: { idomul: number }) => response.idomul !== optionId) // Quita si ya está seleccionado
           : [
             ...currentAnswers,
             { idomul: optionId, idp: questionId }, // Agrega la opción seleccionada
@@ -105,7 +113,7 @@ export default function ActivityForm() {
     formData.append("idproj", String(idProject));     // ID del proyecto
 
     // Crear un objeto para almacenar las respuestas
-    const responses = {};
+    const responses: { [key: string]: any } = {};
 
     // Recorrer las respuestas y agregarlas al objeto responses
     Object.entries(answers).forEach(([key, value]) => {
@@ -218,7 +226,7 @@ export default function ActivityForm() {
   const configuracion = recortarRutaHastaSegmento1(pathname, 'proyectos');
   const inicio = recortarRutaHastaSegmento1(pathname, 'intranet');
   //definimos valores para el breadCrumb
-  const breadcrumbData = [
+  const breadcrumbData:BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
     { type: "link", label: "Proyectos", href: configuracion },
     { type: "page", label: "Insertar actividad" },
@@ -232,7 +240,7 @@ export default function ActivityForm() {
       <div className="max-w-2xl mx-auto space-y-6">
         <h1 className="text-3xl font-semibold text-center text-gray-800 dark:text-white mb-10">Editar Actividad</h1>
 
-        <form className="space-y-6" >
+        <form className="space-y-6" onSubmit={handleSubmitAnswers}>
           <div className="space-y-4">
             <Label htmlFor="activity-name" className="text-lg font-medium text-gray-700 dark:text-gray-300">Nombre de la actividad</Label>
             <Input
@@ -310,7 +318,7 @@ export default function ActivityForm() {
                             value={option.idop}
                             checked={
                               answers[question.id]?.some(
-                                (response) => response.idomul === option.idop
+                                (response: { idomul: number }) => response.idomul === option.idop
                               ) || answers[question.id]?.includes(option.idop)
                             }
                             onChange={() => handleMultipleChoiceChange(question.id, option.idop)}
@@ -335,7 +343,7 @@ export default function ActivityForm() {
                             value={option.idop}
                             checked={
                               answers[question.id]?.some(
-                                (response) => response.idou === option.idop
+                                (response: { idou: number }) => response.idou === option.idop
                               ) || answers[question.id]?.includes(option.idop)
                             }
                             onChange={() => handleSingleChange(question.id, option.idop)}
@@ -355,7 +363,7 @@ export default function ActivityForm() {
                       className="w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500"
                       value={answers[question.id]?.[0]?.idodes || answers[question.id]?.[0] }
                       onChange={(e) =>
-                        handleSingleChange(question.id, e.target.value)
+                        handleSingleChange(question.id, Number(e.target.value))
                       }
                     >
                       <option value="">Seleccione una opción</option>
@@ -390,8 +398,6 @@ export default function ActivityForm() {
             }
           })}
 
-        </form>
-
         {/* Botones */}
         <div className="w-full mx-auto flex justify-end space-x-6 pt-8">
           <Button
@@ -403,11 +409,12 @@ export default function ActivityForm() {
           </Button>
           <Button
             className="bg-blue-600 hover:bg-blue-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-blue-500 transition-all duration-300"
-            onClick={handleSubmitAnswers}
           >
             Insertar Actividad
           </Button>
         </div>
+        </form>
+
       </div>
     </div>
   )

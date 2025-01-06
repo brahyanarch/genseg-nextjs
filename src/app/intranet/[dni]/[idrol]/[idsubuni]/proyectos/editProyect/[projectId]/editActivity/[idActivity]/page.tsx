@@ -8,13 +8,20 @@ import { useParams, usePathname, useRouter } from "next/navigation"
 import { API_ACTIVITIES } from "@/config/apiconfig"
 import Swal from 'sweetalert2';
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb"
-
+import {BreadcrumbItemType} from "@/tipos/typos"
 export default function ActivityForm() {
-  const [questions, setQuestions] = useState([]);
+  interface Question {
+    id: string;
+    type: string;
+    questionText: string;
+    options?: { idop: number; optionTxt: string }[];
+  }
+
+  const [questions, setQuestions] = useState<Question[]>([]);
   ///entradas obligatorios
-  const [nombreActividad, setNombreActividad] = useState();
-  const [fechaInicio, setFechaInicio] = useState();
-  const [fechaFinal, setFechaFinal] = useState();
+  const [nombreActividad, setNombreActividad] = useState<string>("");
+  const [fechaInicio, setFechaInicio] = useState<string | undefined>();
+  const [fechaFinal, setFechaFinal] = useState<string | undefined>();
   const [answers, setAnswers] = useState<{ [key: string]: { [field: string]: any }[] }>({}); // Estado para almacenar respuestas
   const { projectId, idActivity, dni, idrol, idsubuni } = useParams();
   const pathname = usePathname();
@@ -110,7 +117,7 @@ export default function ActivityForm() {
     formData.append("idproj", String(projectId));     // ID del proyecto
 
     // Crear un objeto para almacenar las respuestas
-    const responses = {};
+    const responses: { [key: string]: any } = {};
 
     // Recorrer las respuestas y agregarlas al objeto responses
     Object.entries(answers).forEach(([key, value]) => {
@@ -221,7 +228,7 @@ export default function ActivityForm() {
   const configuracion = recortarRutaHastaSegmento(pathname, 'editProyect');
   const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
   //definimos valores para el breadCrumb
-  const breadcrumbData = [
+  const breadcrumbData:BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
     { type: "link", label: "Editar proyecto", href: configuracion },
     { type: "page", label: "Editar actividad" },
@@ -237,7 +244,7 @@ export default function ActivityForm() {
       <div className="max-w-2xl mx-auto space-y-6">
         <h1 className="text-3xl font-semibold text-center text-gray-800 dark:text-white mb-10 ">Editar Actividad</h1>
 
-        <form className="space-y-6" >
+        <form className="space-y-6" onSubmit={handleSubmitAnswers}>
           <div className="space-y-4">
             <Label htmlFor="activity-name" className="text-lg font-medium text-gray-700 dark:text-gray-300">Nombre de la actividad</Label>
             <Input
@@ -342,7 +349,7 @@ export default function ActivityForm() {
                                 // Mantener seleccionada la opción inicial si coincide con la respuesta guardada
                                 answers[question.id]?.some(
                                   (response) => response.idou === option.idop
-                                ) || answers[question.id]?.includes(option.idop)
+                                ) || answers[question.id]?.some((response) => response.idomul === option.idop)
                               }
                               onChange={() => handleSingleChange(question.id, option.idop)} // Actualizar la selección al editar
                               
@@ -412,7 +419,7 @@ export default function ActivityForm() {
           </Button>
           <Button
             className="bg-blue-600 hover:bg-blue-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-blue-500 transition-all duration-300"
-            onClick={handleSubmitAnswers}
+            type="submit"
           >
             Insertar Actividad
           </Button>

@@ -9,6 +9,7 @@ import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
 import { User } from "@/tipos/typos"
 import { usePathname, useParams } from "next/navigation";
 import Swal from 'sweetalert2';
+import {BreadcrumbItemType} from '@/tipos/typos';
 // Modal para agregar un nuevo Usuario
 export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) => {
   const [dni, setDni] = useState('');
@@ -524,7 +525,7 @@ export default function Component() {
   const configuracion = recortarRutaHastaSegmento(pathname, 'subConfiguraciones');
   const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
   //definimos valores para el breadCrumb
-  const breadcrumbData = [
+  const breadcrumbData:BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href:`${inicio}/${dni}/${idrol}/${idsubuni}` },
     {
       type: "dropdown",

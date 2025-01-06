@@ -25,6 +25,7 @@ import { API_PROJECT_ACTIVITIES, API_PROJECTS, API_URL, API_ESCUELA_PROFESIONAL 
 import { usePathname, useRouter, useParams } from "next/navigation"
 import Swal from 'sweetalert2';
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb"
+import {BreadcrumbItemType} from "@/tipos/typos"
 ///
 interface ProjectDetails {
   plan: string;
@@ -193,7 +194,7 @@ export default function EditProject() {
   const configuracion = recortarRutaHastaSegmento(pathname, 'proyectos');
   const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
   //definimos valores para el breadCrumb
-  const breadcrumbData = [
+  const breadcrumbData:BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
     { type: "link", label: "Proyectos", href: configuracion },
     { type: "page", label: "Editar proyecto" },

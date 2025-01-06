@@ -10,6 +10,7 @@ import DynamicTable from "@/components/DynamicTable";
 import { usePathname, useRouter, useParams } from "next/navigation";
 import Swal from 'sweetalert2';
 import { BreadcrumbWithDropdown } from '@/components/breadcrumb';
+import { BreadcrumbItemType } from '@/tipos/typos';
 interface Project {
   idproj: number;
   estado: string;
@@ -410,7 +411,7 @@ export default function Component() {
   const configuracion = recortarRutaHastaSegmento(pathname, 'proyectos');
   const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
   //definimos valores para el breadCrumb
-  const breadcrumbData = [
+  const breadcrumbData:BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
     { type: "page", label: "Proyectos" },
   ];

@@ -12,6 +12,7 @@ import Swal from 'sweetalert2';
 import { routeModule } from "next/dist/build/templates/pages";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import {BreadcrumbItemType} from '@/tipos/typos';
 // Modal para agregar un nuevo Usuario
 export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) => {
   const [dni, setDni] = useState('');
@@ -553,7 +554,7 @@ export default function Component() {
   const configuracion = recortarRutaHastaSegmento(pathname, 'configuracion');
   const inicio = recortarRutaHastaSegmento(pathname, 'usuarios');
   //definimos valores para el breadCrumb
-  const breadcrumbData = [
+  const breadcrumbData:BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: inicio },
     {
       type: "dropdown",

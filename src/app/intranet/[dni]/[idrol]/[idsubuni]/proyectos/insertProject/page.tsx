@@ -10,7 +10,7 @@ import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import Spinner from "@/components/ui/spinner"; // Import the spinner component
-
+import { BreadcrumbItemType } from "@/tipos/typos";
 /// Interface escuela profesional
 interface Escuelas {
   idpe: number;
@@ -152,7 +152,7 @@ export default function ProjectForm() {
   const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
 
   //definimos valores para el breadCrumb
-  const breadcrumbData = [
+  const breadcrumbData:BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}`},
     { type: "link", label: "Proyectos", href: configuracion },
     { type: "page", label: "Insertar proyecto" },

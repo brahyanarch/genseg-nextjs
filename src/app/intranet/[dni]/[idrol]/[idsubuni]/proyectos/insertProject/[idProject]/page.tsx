@@ -8,6 +8,7 @@ import { useState, useEffect } from "react"
 import { useParams, usePathname, useRouter } from "next/navigation"
 import { API_PROJECT_ACTIVITIES, API_ACTIVITIES } from "@/config/apiconfig"
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
+import { BreadcrumbItemType } from "@/tipos/typos";
 import Swal from 'sweetalert2';
 
 interface Activities {
@@ -423,7 +424,7 @@ export default function ProjectForm() {
   const configuracion = recortarRutaHastaSegmento(pathname, 'proyectos');
   const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
   //definimos valores para el breadCrumb
-  const breadcrumbData = [
+  const breadcrumbData:BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
     { type: "link", label: "Proyectos", href: configuracion },
     { type: "page", label: "Insertar actividades" },

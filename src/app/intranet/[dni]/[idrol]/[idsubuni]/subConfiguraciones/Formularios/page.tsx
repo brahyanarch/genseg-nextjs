@@ -9,6 +9,7 @@ import { API_FORM , API_GET_FORM_BY_SUBUNI} from "@/config/apiconfig";
 import { AvisoContext } from '@/context/avisoContext'
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
+import { BreadcrumbItemType } from "@/tipos/typos";
 type FormEntry = {
   idf: number;
   nmForm: string;
@@ -560,7 +561,7 @@ export default function Component() {
   const configuracion = recortarRutaHastaSegmento(pathname, 'subConfiguraciones');
   const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
   //definimos valores para el breadCrumb
-  const breadcrumbData = [
+  const breadcrumbData:BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href:`${inicio}/${dni}/${idrol}/${idsubuni}` },
     {
       type: "dropdown",
