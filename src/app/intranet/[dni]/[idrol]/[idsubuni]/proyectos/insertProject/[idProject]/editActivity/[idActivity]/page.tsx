@@ -49,26 +49,30 @@ export default function ActivityForm() {
   };
 
 
-
-  // Manejar cambios para opciones múltiples
   const handleMultipleChoiceChange = (questionId: number, optionId: number) => {
-      setAnswers((prev) => {
-        const currentAnswers = prev[questionId] || [];
-        const isSelected = currentAnswers.some(
-          (response: { idomul: number }) => response.idomul === optionId
-        );
-
+    setAnswers((prev) => {
+      // Obtiene las respuestas actuales para esta pregunta o un array vacío
+      const currentAnswers = prev[questionId] || [];
+  
+      // Verifica si la opción ya está seleccionada
+      const isSelected = currentAnswers.some(
+        (response: { idomul: number }) => response.idomul === optionId
+      );
+  
+      // Actualiza las respuestas de la pregunta
+      const updatedAnswers = isSelected
+        ? currentAnswers.filter((response: { idomul: number }) => response.idomul !== optionId) // Quita la opción si ya está seleccionada
+        : [...currentAnswers, optionId]; // Agrega la opción si no está seleccionada
+  
+      // Retorna el nuevo estado con las respuestas actualizadas
       return {
         ...prev,
-        [questionId]: isSelected
-          ? currentAnswers.filter((response: { idomul: number }) => response.idomul !== optionId) // Quita si ya está seleccionado
-          : [
-            ...currentAnswers,
-            { idomul: optionId, idp: questionId }, // Agrega la opción seleccionada
-          ],
+        [questionId]: updatedAnswers, // Actualiza solo esta pregunta
       };
     });
   };
+  
+
 
   //
   const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
@@ -229,7 +233,7 @@ export default function ActivityForm() {
   const breadcrumbData:BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
     { type: "link", label: "Proyectos", href: configuracion },
-    { type: "page", label: "Insertar actividad" },
+    { type: "page", label: "Editar actividad" },
   ];
   return (
     <div className="min-h-screen bg-background p-6">
@@ -305,30 +309,33 @@ export default function ActivityForm() {
                   </div>
                 );
 
-              case "multipleChoice": 
-                return (
-                  <div key={question.id} className="space-y-4">
-                    <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
-                    {question.options?.map((option) => (
-                      <div key={option.idop}>
-                        <label className="flex items-center gap-2 text-gray-700 dark:text-white">
-                          <input
-                            type="checkbox"
-                            className="border rounded-lg text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
-                            value={option.idop}
-                            checked={
-                              answers[question.id]?.some(
-                                (response: { idomul: number }) => response.idomul === option.idop
-                              ) || answers[question.id]?.includes(option.idop)
-                            }
-                            onChange={() => handleMultipleChoiceChange(question.id, option.idop)}
-                          />
-                          {option.optionTxt}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                );
+                case "multipleChoice":
+                  return (
+                    <div key={question.id} className="space-y-4">
+                      <label className="text-lg font-medium text-gray-700 dark:text-gray-300">
+                        {question.questionText}
+                      </label>
+                      {question.options?.map((option) => (
+                        <div key={option.idop}>
+                          <label className="flex items-center gap-2 text-gray-700 dark:text-white">
+                            <input
+                              type="checkbox"
+                              className="border rounded-lg text-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500"
+                              value={option.idop}
+                              checked={
+                                answers[question.id]?.some(
+                                  (response: { idomul: number }) => response.idomul === option.idop
+                                ) || answers[question.id]?.includes(option.idop)
+                              }
+                              onChange={() => handleMultipleChoiceChange(question.id, option.idop)}
+                            />
+                            {option.optionTxt}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                
 
               case "singleChoice":
                 return (
@@ -410,7 +417,7 @@ export default function ActivityForm() {
           <Button
             className="bg-blue-600 hover:bg-blue-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-blue-500 transition-all duration-300"
           >
-            Insertar Actividad
+            Editar Actividad
           </Button>
         </div>
         </form>

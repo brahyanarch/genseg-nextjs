@@ -383,7 +383,7 @@ export default function ActivityForm() {
                           value={option.idop}
                           checked={answers[question.id]?.includes(option.idop) || false}
                           onChange={() => handleMultipleChoiceChange(question.id, option.idop)}
-                          required
+                          
                         />
                         <Label htmlFor={`${question.id}-${option.idop}`} className="text-gray-700 dark:text-white">
                           {option.optionTxt}
