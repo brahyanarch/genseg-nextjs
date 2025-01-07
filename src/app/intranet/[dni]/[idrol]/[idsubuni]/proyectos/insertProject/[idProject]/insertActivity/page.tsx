@@ -51,7 +51,24 @@ export default function ActivityForm() {
       return { ...prev, [id]: updatedValues };
     });
   };
-  //
+  // Función que valida si todas las preguntas están completas
+  const validateForm = () => {
+    let isValid = true;
+    // Verifica las 3 preguntas fijas
+    if (!nombreActividad || !fechaInicio || !fechaFinal) {
+      isValid = false;
+      return isValid;
+    }
+    // Verifica las preguntas dinámicas
+    questions.forEach((question) => {
+      if (!answers[question.id]) {
+        isValid = false;
+        return isValid;
+      }
+    });
+    return isValid;
+  };
+
   const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
     const partes = ruta.split('/'); // Divide la ruta en partes
     const indice = partes.indexOf(segmento); // Encuentra el índice del segmento clave
@@ -84,25 +101,24 @@ export default function ActivityForm() {
   const handleSubmitAnswers = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // Verificación de campos vacíos
-    const requiredFields = [
-      nombreActividad,
-      fechaInicio,
-      fechaFinal,
-      ...questions.map((question) => answers[question.id] || "") // Respuestas dinámicas
-    ];
+    // Si el formulario no es válido, muestra los errores
+    if (!validateForm()) {
+      setErrorForm(true);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al crear la actividad',
+        text: 'Rellene todos los campos del formulario',
+        confirmButtonText: 'OK',
+        customClass: {
+          confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+        },
+      });
+      console.log(errorForm);
+    } else {
+      // Si todo está correcto, haz algo con los datos del formulario
 
-    // Si alguno de los campos requeridos está vacío, establece errorForm como true
-    const isValid = requiredFields.every((field) => field !== "" && field !== undefined && field !== null);
-
-    if (!isValid) {
-      setErrorForm(true); // Si hay algún campo vacío, activa el error
-      return; // No continuar con el envío al backend
-    }
-
-    // Si todos los campos están completos, desactivar errorForm
-    setErrorForm(false);
-
+      console.log("dentro de la solicitud",errorForm);
+      console.log(errorForm);
     // Crear el objeto FormData
     const formData = new FormData();
 
@@ -181,6 +197,7 @@ export default function ActivityForm() {
         },
       });
     }
+  }
   };
 
 
@@ -247,7 +264,7 @@ export default function ActivityForm() {
           Insertar Actividad
         </h1>
 
-        <form className="space-y-6" onSubmit={handleSubmitAnswers}>
+        <form className="space-y-6" >
           {/* Nombre de la actividad */}
           <div className="space-y-4">
             <Label htmlFor="activity-name" className="text-lg font-medium text-gray-700 dark:text-gray-300">
@@ -258,7 +275,7 @@ export default function ActivityForm() {
               placeholder="Nombre de la actividad"
               className={clsx(
                 "w-full bg-gray-100 dark:bg-gray-800  dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3",
-                { "border-red-400 ring-1 ring-red-400": errorForm && nombreActividad}, // Estilo condicional si el campo está vacío
+                { "border-red-400 ring-1 ring-red-400": errorForm && !nombreActividad}, // Estilo condicional si el campo está vacío
                 { "border-green-400 ring-1 ring-green-400": !errorForm && nombreActividad } // Estilo si el campo está lleno
               )}
               value={nombreActividad}
@@ -327,8 +344,8 @@ export default function ActivityForm() {
                       className={clsx(
                         "w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-4 focus:ring-red-500",
                         {
-                          "border-red-400 ring-1 ring-red-400": errorForm, // Error
-                          "border-green-400 ring-1 ring-green-400": !errorForm, // Validez
+                          "border-red-400 ring-1 ring-red-400": errorForm && !answers[question.id], // Error
+                          "border-green-400 ring-1 ring-green-400": !errorForm && answers[question.id], // Validez
                         }
                       )}
                       placeholder="Escribe tu respuesta"
@@ -356,8 +373,8 @@ export default function ActivityForm() {
                       className={clsx(
                         "w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3",
                         {
-                          "border-red-400 ring-1 ring-red-400": errorForm, // Error
-                          "border-green-400 ring-1 ring-green-400": !errorForm, // Validez
+                          "border-red-400 ring-1 ring-red-400": errorForm && !answers[question.id], // Error
+                          "border-green-400 ring-1 ring-green-400": !errorForm && answers[question.id], // Validez
                         }
                       )}
                       required
@@ -436,10 +453,8 @@ export default function ActivityForm() {
                       className={clsx(
                         "w-full bg-gray-100 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 px-4 py-3 file:bg-blue-600 file:text-white file:rounded-md file:px-6 file:py-3",
                         {
-
-                          "border-red-400 ring-1 ring-red-400": errorForm, // Error
-                          "border-green-400 ring-1 ring-green-400": !errorForm, // Validez
-
+                          "border-red-400 ring-1 ring-red-400": errorForm && !answers[question.id], // Error
+                          "border-green-400 ring-1 ring-green-400": !errorForm && answers[question.id], // Validez
                         }
                       )}
                       onChange={(e) => handleChangeFile(question.id, e.target.files?.[0] || null)}
@@ -464,8 +479,8 @@ export default function ActivityForm() {
                       className={clsx(
                         "w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500",
                         {
-                          "border-red-400 ring-1 ring-red-400": errorForm, // Error
-                          "border-green-400 ring-1 ring-green-400": !errorForm, // Validez
+                          "border-red-400 ring-1 ring-red-400": errorForm && !answers[question.id], // Error
+                          "border-green-400 ring-1 ring-green-400": !errorForm && answers[question.id], // Validez
                         }
                       )}
                       value={answers[question.id]?.[0] || ""}
@@ -486,8 +501,9 @@ export default function ActivityForm() {
                 return null;
             }
           })}
-          {/* Botones */}
-          <div className="w-full mx-auto flex justify-end space-x-6 pt-8">
+        </form>
+                  {/* Botones */}
+                  <div className="w-full mx-auto flex justify-end space-x-6 pt-8">
             <Button
               variant="destructive"
               className="bg-red-600 hover:bg-red-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-red-500 transition-all duration-300"
@@ -497,12 +513,11 @@ export default function ActivityForm() {
             </Button>
             <Button
               className="bg-blue-600 hover:bg-blue-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-blue-500 transition-all duration-300"
-              type="submit"
+              onClick={handleSubmitAnswers}
             >
               Insertar Actividad
             </Button>
           </div>
-        </form>
       </div>
 
     </div>
