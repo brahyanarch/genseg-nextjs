@@ -24,7 +24,7 @@ export default function ActivityForm() {
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
   const [answers, setAnswers] = useState<{ [key: number]: any }>({}); // Estado para almacenar respuestas
-  const { projectId, idActivity, dni, idrol, idsubuni } = useParams();
+  const { projectId, activityId, dni, idrol, idsubuni } = useParams();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -187,7 +187,7 @@ export default function ActivityForm() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_ACTIVITIES}/${idActivity}`); // Nuevo endpoint
+        const response = await fetch(`${API_ACTIVITIES}/${activityId}`); // Nuevo endpoint
 
         if (!response.ok) {
           // Si el servidor no responde correctamente
@@ -233,6 +233,7 @@ export default function ActivityForm() {
   const breadcrumbData: BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
     { type: "link", label: "Proyectos", href: configuracion },
+    { type: "link", label: "Editar proyecto", href: `${configuracion}/editProyect/${projectId}` },
     { type: "page", label: "Ver actividad" },
   ];
   return (
