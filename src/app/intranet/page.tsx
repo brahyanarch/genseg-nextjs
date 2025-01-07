@@ -54,7 +54,7 @@ function RoleCard({ title, subtitle, onClick }: RoleProps) {
 }
 
 const RoleSelectionPage: React.FC = () => {
-  const [usuario, setUsuario] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [userRoles, setUserRoles] = useState<User[]>([]);
@@ -74,7 +74,7 @@ const RoleSelectionPage: React.FC = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          usuario: usuario,
+          email: email,
           password: password,
         }),
       });
@@ -192,7 +192,7 @@ const RoleSelectionPage: React.FC = () => {
                 id="email"
                 type="text"
                 required
-                onChange={(e) => setUsuario(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Ingrese su correo electrónico"
               />
             </div>
