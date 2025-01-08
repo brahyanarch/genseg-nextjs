@@ -2,21 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { API_PROJECTS, API_ESCUELA_PROFESIONAL } from "@/config/apiconfig";
+import { API_PROJECTS } from "@/config/apiconfig";
 import Swal from 'sweetalert2';
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import Spinner from "@/components/ui/spinner"; // Import the spinner component
 import { BreadcrumbItemType } from "@/tipos/typos";
 /// Interface escuela profesional
-interface Escuelas {
-  idpe: number;
-  nmPE: string;
-  idesc: number;
-}
+
 
 const ALLOWED_FILE_TYPES = [
   'application/pdf',
@@ -35,13 +30,11 @@ const formatFileSize = (bytes: number): string => {
 
 export default function ProjectForm() {
   /// Variables importantes
-  const [escuelas, setEscuelas] = useState<Escuelas[]>([]);
   const [escuelaProfesional, setEscuelaProfesional] = useState<string>("");
   const [planProyecto, setPlanProyecto] = useState<File | null>(null);
   const { idrol, idsubuni, dni } = useParams();
   const router = useRouter();
   const pathname = usePathname();
-  const [comboboxOpen, setComboboxOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false); // State to manage uploading status
@@ -96,11 +89,9 @@ export default function ProjectForm() {
         const resIdProject = JSON.parse(xhr.responseText);
         Swal.fire({
           icon: 'success',
-          title: '¡Éxito!',
-          text: 'El Proyecto fue creado correctamente.',
+          title: 'Proyecto creado exitosamente',
+          text: 'El proyecto fue creado correctamente.',
           confirmButtonText: 'OK',
-          background: 'bg-gray-800',
-          color: 'text-gray-200',
           customClass: {
             confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
           },
@@ -111,11 +102,9 @@ export default function ProjectForm() {
       } else {
         Swal.fire({
           icon: 'error',
-          title: 'Error',
+          title: 'Proyecto no creado',
           text: 'Hubo un problema al crear el Proyecto.',
           confirmButtonText: 'OK',
-          background: 'bg-gray-800',
-          color: 'text-gray-200',
           customClass: {
             confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
           },
@@ -129,7 +118,11 @@ export default function ProjectForm() {
         icon: 'error',
         title: 'Error',
         text: 'Error al conectar con la API.',
-        confirmButtonText: 'OK'
+        confirmButtonText: 'OK',
+        customClass: {
+          confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+          
+        },
       });
       setIsUploading(false);
     };

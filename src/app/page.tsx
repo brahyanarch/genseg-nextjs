@@ -1,17 +1,14 @@
 "use client";
 //importando
 import { useState, useEffect, useContext } from "react";
-import { Menu, X, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import { API_URL } from "@/config/apiconfig";
 import Carrusel from "../components/comPageMain/carrusel";
 import Navbarr from "../components/comPageMain/navbar";
 import Footer from "@/components/comPageMain/Footer";
 import ObtenerCertificado from "@/components/comPageMain/getCertificate";
 import AvisoModal from "@/components/comPageMain/avisoModal";
-import Aviso from '@/components/aviso';
 import {AvisoContext} from '@/context/avisoContext'
-import ModalForm from '@/components/componentesFormulario/noteForm'
+
 //funcion principal que controla el Modal de aviso
 
 const datos = [
@@ -70,8 +67,16 @@ const frameworks = [
 export default function Home() {
   const [mostrarAlerta, setMostrarAlerta] = useState(false);
   const {mostrarAviso} = useContext<any>(AvisoContext);
-  
+  const [datos, setDatos] = useState([]);
 
+  const getDateCarrusel = async () =>{
+    const res = await fetch(`${API_URL}/api/carrusel`);
+    const data = await res.json();
+    setDatos(data);
+
+  }
+  const sortedArray = datos.sort((a, b) => a.idcarrusel - b.idcarrusel);
+  console.log(sortedArray)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const isValid = Math.random() > 0.5; // Simular validación
@@ -82,8 +87,8 @@ export default function Home() {
     }
   };
   useEffect(() => {
+    getDateCarrusel();
     setMostrarAlerta(true);
-
     const timer = setTimeout(() => {
       setMostrarAlerta(false);
     }, 100);
@@ -95,7 +100,7 @@ export default function Home() {
     <div className="bg-ColorPrincipal">
       <AvisoModal timeOff={mostrarAlerta} />
       <Navbarr />
-      <Carrusel data={datos}/>
+      <Carrusel data={sortedArray}/>
       {/*<ObtenerCertificado key={frameworks} />*/}
       <ObtenerCertificado data={frameworks} />
       <Footer />
