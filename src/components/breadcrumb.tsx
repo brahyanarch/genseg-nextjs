@@ -22,7 +22,7 @@ interface items {
   external?: boolean;
 }
 
-interface Data {   
+interface Data {
   type: string;
   label: string;
   href?: string;
@@ -54,7 +54,8 @@ interface BreadcrumbProps {
   items: BreadcrumbItemType[];
 }
 
-export function BreadcrumbWithDropdown({ items }:BreadcrumbProps) {
+export function BreadcrumbWithDropdown({ items }: BreadcrumbProps) {
+
   return (
     <Breadcrumb className="text-base font-semibold " >
       <BreadcrumbList>
@@ -90,7 +91,17 @@ export function BreadcrumbWithDropdown({ items }:BreadcrumbProps) {
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
-              {item.type === "page" && <BreadcrumbPage className="text-blue-600 font-semibold" >{item.label}</BreadcrumbPage>}
+              {item.type === "page" && (
+                <BreadcrumbPage
+                  className={`${index === items.reduce((lastIndex, curr, idx) => (curr.type === "page" ? idx : lastIndex), -1)
+                      ? "text-blue-600 font-semibold" // Estilo para el último "page"
+                      : "text-gray-400" // Estilo opaco para los anteriores
+                    }`}
+                >
+                  {item.label}
+                </BreadcrumbPage>
+              )}
+
             </BreadcrumbItem>
             {/* Renderiza un separador excepto después del último elemento */}
             {index < items.length - 1 && (

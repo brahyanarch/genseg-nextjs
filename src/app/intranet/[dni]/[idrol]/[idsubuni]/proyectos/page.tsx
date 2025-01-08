@@ -238,7 +238,7 @@ export default function Component() {
   // Función para filtrar los datos basados en el término de búsqueda
   const getFilteredData = () => {
     if (!searchTerm) return sortedProjects;
-  
+
     return sortedProjects.filter((user) =>
       Object.values(user).some((value) =>
         value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
@@ -246,7 +246,7 @@ export default function Component() {
     );
   };
 
-  const filteredUsers = getFilteredData();  
+  const filteredUsers = getFilteredData();
   // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -411,7 +411,7 @@ export default function Component() {
   const configuracion = recortarRutaHastaSegmento(pathname, 'proyectos');
   const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
   //definimos valores para el breadCrumb
-  const breadcrumbData:BreadcrumbItemType[] = [
+  const breadcrumbData: BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
     { type: "page", label: "Proyectos" },
   ];
@@ -420,7 +420,7 @@ export default function Component() {
       <div className="flex gap-4 items-center mx-auto text-sm breadcrumbs mb-6 text-muted-foreground">
         <BreadcrumbWithDropdown items={breadcrumbData} />
       </div>
-      
+
 
       <div className="flex flex-col items-center my-8 space-y-4">
         <h1 className="text-5xl font-extrabold text-gray-800 tracking-tight dark:text-white">
@@ -438,16 +438,16 @@ export default function Component() {
         <p className="font-bold" >Nuevo</p>
       </Button>
       <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar..."
-                type="text"
-                className="pl-8 w-[250px] bg-background"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                
-              />
-            </div>
+        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Buscar..."
+          type="text"
+          className="pl-8 w-[250px] bg-background"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+
+        />
+      </div>
       <div className="bg-[#E3E6ED] rounded-lg ">
         <DynamicTable
           configuration={configurationUser}
