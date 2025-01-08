@@ -5,10 +5,9 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileImage, ArrowUpDown } from 'lucide-react';
 import { API_URL } from '@/config/apiconfig';
-import Image from 'next/image';
 import { BreadcrumbWithDropdown } from '@/components/breadcrumb';
 import { BreadcrumbItemType } from '@/tipos/typos';
-import { useParams, usePathname, useRouter } from 'next/navigation';
+import { useParams, usePathname,  } from 'next/navigation';
 
 interface ImageItemProps {
   index: number;
@@ -217,7 +216,6 @@ const ImageGallery: React.FC = () => {
     return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
   };
   //recortamos las rutas requeridas
-  const configuracion = recortarRutaHastaSegmento(pathname, 'proyectos');
   const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
   //definimos valores para el breadCrumb
   const breadcrumbData:BreadcrumbItemType[] = [
@@ -227,10 +225,10 @@ const ImageGallery: React.FC = () => {
   ];
   return (
     <div className="p-4  min-h-screen">
-      <div className="flex gap-4 p-4 items-center mx-auto text-sm breadcrumbs mb-6 text-muted-foreground">
+      <div className="flex gap-4 p-4 items-center mx-auto text-sm breadcrumbs mb-4 text-muted-foreground">
         <BreadcrumbWithDropdown items={breadcrumbData} />
       </div>
-      <h1 className="text-xl font-bold text-black mb-6 text-center">Configurar imagenes para carrusel</h1>
+      <h1 className="text-xl font-bold text-black mb-6 text-center dark:text-white">Configurar imagenes para carrusel</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
         {images.map((image, index) => (
