@@ -107,6 +107,10 @@ export default function ActivityForm() {
       showCancelButton: true,
       confirmButtonText: 'Sí, no editar actividad',
       cancelButtonText: 'No, regresar.',
+      customClass: {
+        confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+        cancelButton: 'bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded',
+      },
     });
     if (result.isConfirmed) {
       const recortada = recortarRutaHastaSegmento(pathname, 'editProyect');
@@ -116,7 +120,10 @@ export default function ActivityForm() {
         icon: 'success',
         title: 'Actividad no editada',
         text: 'los datos de la actividad no fueron editados.',
-        confirmButtonText: 'OK'
+        confirmButtonText: 'OK',
+        customClass: {
+          confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+        },
       });
     }
   }
@@ -191,7 +198,10 @@ export default function ActivityForm() {
             icon: 'success',
             title: 'Actividad editada',
             text: 'La actividad fue editada correctamente.',
-            confirmButtonText: 'OK'
+            confirmButtonText: 'OK',
+            customClass: {
+              confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+            },
           });
           router.back(); // Volver a la ruta anterior
           formData.forEach((value, key) => {
@@ -203,7 +213,10 @@ export default function ActivityForm() {
             icon: 'error',
             title: 'No se pudo editar la actividad',
             text: 'Hubo un problema al editar la actividad.',
-            confirmButtonText: 'OK'
+            confirmButtonText: 'OK',
+            customClass: {
+              confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+            },
           });
           formData.forEach((value, key) => {
             console.log(`${key}:`, value);
@@ -216,7 +229,10 @@ export default function ActivityForm() {
           icon: 'error',
           title: 'Error',
           text: `Error al conectar con la API. ${error.message}`,
-          confirmButtonText: 'OK'
+          confirmButtonText: 'OK',
+          customClass: {
+            confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+          },
         });
       }
     };
@@ -245,7 +261,10 @@ export default function ActivityForm() {
             icon: 'error',
             title: 'Error',
             text: 'Hubo un problema al obtener los datos de la Actividad.',
-            confirmButtonText: 'OK'
+            confirmButtonText: 'OK',
+            customClass: {
+              confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+            },
           });
         }
 
@@ -263,7 +282,10 @@ export default function ActivityForm() {
           icon: 'error',
           title: 'Error',
           text: `Error al conectar con la API. ${err.message}`,
-          confirmButtonText: 'OK'
+          confirmButtonText: 'OK',
+          customClass: {
+            confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+          },
         });
       }
     };
@@ -297,12 +319,12 @@ export default function ActivityForm() {
 
         <form className="space-y-6" >
           <div className="space-y-4">
-            <Label htmlFor="activity-name" className="text-lg font-medium text-gray-700 dark:text-gray-300">Nombre de la actividad</Label>
-            <Input
+            <Label htmlFor="activity-name" className="text-lg font-semibold text-gray-900 dark:text-gray-300">Nombre de la actividad</Label>
+            <input
               id="activity-name"
               placeholder="Nombre de la actividad"
               className={clsx(
-                "w-full bg-gray-100 dark:bg-gray-800  dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3",
+                "w-full bg-gray-100 text-gray-700 dark:bg-gray-800  dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3",
                 { "border-red-400 ring-1 ring-red-400": errorForm && !nombreActividad }, // Estilo condicional si el campo está vacío
                 { "border-green-400 ring-1 ring-green-400": !errorForm && nombreActividad } // Estilo si el campo está lleno
               )}
@@ -313,14 +335,14 @@ export default function ActivityForm() {
           </div>
 
           <div className="space-y-4">
-            <Label htmlFor="start-date" className="text-lg font-medium text-gray-700 dark:text-gray-300">Fecha inicial</Label>
+            <Label htmlFor="start-date" className="text-lg font-semibold text-gray-900 dark:text-gray-300">Fecha inicial</Label>
             <input
               id="start-date"
               type="date"
               placeholder="Fecha inicial"
               value={fechaInicio}
               onChange={(e) => setFechaInicio(e.target.value)}
-              className={clsx('w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-4 focus:ring-red-500 px-4 py-3',
+              className={clsx('w-full bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-4 focus:ring-red-500 px-4 py-3',
                 { "border-red-400 ring-1 ring-red-400": errorForm && !fechaFinal }, // Estilo condicional si el campo está vacío
                 { "border-green-400 ring-1 ring-green-400": !errorForm && fechaInicio } // Estilo si el campo está lleno
               )}
@@ -329,12 +351,12 @@ export default function ActivityForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="end-date" className="text-lg font-medium text-gray-700 dark:text-gray-300">Fecha final</Label>
+            <Label htmlFor="end-date" className="text-lg font-semibold text-gray-900 dark:text-gray-300">Fecha final</Label>
             <input
               id="end-date"
               type="date"
               placeholder="Fecha final"
-              className={clsx('w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-4 focus:ring-red-500 px-4 py-3',
+              className={clsx('w-full bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-4 focus:ring-red-500 px-4 py-3',
                 { "border-red-400 ring-1 ring-red-400": errorForm && !fechaFinal }, // Estilo condicional si el campo está vacío
                 { "border-green-400 ring-1 ring-green-400": !errorForm && fechaFinal } // Estilo si el campo está lleno
               )}
@@ -348,11 +370,11 @@ export default function ActivityForm() {
               case "text":
                 return (
                   <div key={question.id} className="space-y-4">
-                    <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
+                    <label className="text-lg font-semibold text-gray-900 dark:text-gray-300">{question.questionText}</label>
                     <input
                       type="text"
                       className={clsx(
-                        "w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-4 focus:ring-red-500",
+                        "w-full border rounded-lg text-gray-700 bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-4 focus:ring-red-500",
                         {
                           "border-red-400 ring-1 ring-red-400": errorForm && !answers[question.id], // Error
                           "border-green-400 ring-1 ring-green-400": !errorForm && answers[question.id], // Validez
@@ -370,11 +392,11 @@ export default function ActivityForm() {
               case "date":
                 return (
                   <div key={question.id} className="space-y-4">
-                    <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
+                    <label className="text-lg font-semibold text-gray-900 dark:text-gray-300">{question.questionText}</label>
                     <input
                       type="date"
                       className={clsx(
-                        "w-full bg-gray-100 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3",
+                        "w-full bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3",
                         {
                           "border-red-400 ring-1 ring-red-400": errorForm && !answers[question.id], // Error
                           "border-green-400 ring-1 ring-green-400": !errorForm && answers[question.id], // Validez
@@ -390,7 +412,7 @@ export default function ActivityForm() {
               case "multipleChoice":
                 return (
                   <div key={question.id} className="space-y-4">
-                    <label className="text-lg font-medium text-gray-700 dark:text-gray-300">
+                    <label className="text-lg font-semibold text-gray-900 dark:text-gray-300">
                       {question.questionText}
                     </label>
                     {question.options?.map((option) => (
@@ -398,7 +420,7 @@ export default function ActivityForm() {
                         <label className="flex items-center gap-2 text-gray-700 dark:text-white">
                           <input
                             type="checkbox"
-                            className="border text-black rounded-lg  dark:text-white focus:ring-2 focus:ring-blue-500"
+                            className="border text-gray-700 rounded-lg  dark:text-white focus:ring-2 focus:ring-blue-500"
                             value={option.idop}
                             checked={
                               answers[question.id]?.some(
@@ -418,7 +440,7 @@ export default function ActivityForm() {
               case "singleChoice":
                 return (
                   <div key={question.id}>
-                    <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
+                    <label className="text-lg font-semibold text-gray-900 dark:text-gray-300">{question.questionText}</label>
                     {question.options?.map((option) => (
                       <div key={option.idop}>
                         <label className="flex items-center gap-2 text-gray-700 dark:text-white">
@@ -444,10 +466,10 @@ export default function ActivityForm() {
               case "dropdown":
                 return (
                   <div key={question.id} className="space-y-4">
-                    <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
+                    <label className="text-lg font-semibold text-gray-900 dark:text-gray-300">{question.questionText}</label>
                     <select
                       className={clsx(
-                        "w-full border rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500",
+                        "w-full border rounded-lg text-gray-700 bg-gray-100 dark:bg-gray-800 dark:text-white px-4 py-3 focus:ring-2 focus:ring-blue-500",
                         {
                           "border-red-400 ring-1 ring-red-400": errorForm && !answers[question.id], // Error
                           "border-green-400 ring-1 ring-green-400": !errorForm && answers[question.id], // Validez
@@ -472,11 +494,11 @@ export default function ActivityForm() {
               case "archive":
                 return (
                   <div key={question.id} className="space-y-4">
-                    <label className="text-lg font-medium text-gray-700 dark:text-gray-300">{question.questionText}</label>
+                    <label className="text-lg font-semibold text-gray-900 dark:text-gray-300">{question.questionText}</label>
                     <input
                       type="file" accept=".pdf,.xls,.xlsx,.doc,.docx"
                       className={clsx(
-                        "w-full bg-gray-100 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 px-4 py-3 file:bg-blue-600 file:text-white file:rounded-md file:px-6 file:py-3",
+                        "w-full bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 px-4 py-3 file:bg-blue-600 file:text-white file:rounded-md file:px-6 file:py-3",
                         {
                           "border-red-400 ring-1 ring-red-400": errorForm && !answers[question.id], // Error
                           "border-green-400 ring-1 ring-green-400": !errorForm && answers[question.id], // Validez

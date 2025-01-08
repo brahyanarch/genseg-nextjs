@@ -84,6 +84,10 @@ export default function ActivityForm() {
       showCancelButton: true,
       confirmButtonText: 'Sí, no crear actividad',
       cancelButtonText: 'No, regresar.',
+      customClass: {
+        confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+        cancelButton: 'bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded',
+      },
     });
     if (result.isConfirmed) {
       const recortada = recortarRutaHastaSegmento(pathname, 'insertProject');
@@ -93,7 +97,11 @@ export default function ActivityForm() {
         icon: 'success',
         title: 'Actividad no creada',
         text: 'La actividad no ha sido creada.',
-        confirmButtonText: 'OK'
+        confirmButtonText: 'OK',
+        customClass: {
+          confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+          
+        },
       });
     }
   }
@@ -117,87 +125,87 @@ export default function ActivityForm() {
     } else {
       // Si todo está correcto, haz algo con los datos del formulario
 
-      console.log("dentro de la solicitud",errorForm);
+      console.log("dentro de la solicitud", errorForm);
       console.log(errorForm);
-    // Crear el objeto FormData
-    const formData = new FormData();
+      // Crear el objeto FormData
+      const formData = new FormData();
 
-    // Agregar datos básicos
-    formData.append("name", String(nombreActividad)); // Nombre de la actividad
-    formData.append("fInit", String(fechaInicio));    // Fecha de inicio
-    formData.append("fFin", String(fechaFinal));      // Fecha final
-    formData.append("idproj", String(idProject));     // ID del proyecto
+      // Agregar datos básicos
+      formData.append("name", String(nombreActividad)); // Nombre de la actividad
+      formData.append("fInit", String(fechaInicio));    // Fecha de inicio
+      formData.append("fFin", String(fechaFinal));      // Fecha final
+      formData.append("idproj", String(idProject));     // ID del proyecto
 
-    // Crear un objeto para almacenar las respuestas
-    const responses = {};
+      // Crear un objeto para almacenar las respuestas
+      const responses = {};
 
-    // Recorrer las respuestas y agregarlas al objeto responses
-    Object.entries(answers).forEach(([key, value]) => {
-      if (value instanceof File) {
-        // Si el valor es un archivo, lo agregamos con el tipo "file"
-        responses[key] = "file";
-        formData.append(`${key}`, value); // Agregar el archivo al FormData
-      } else {
-        // Si no es un archivo, simplemente lo agregamos como está
-        responses[key] = value;
-      }
-    });
-
-    // Agregar el objeto de respuestas al FormData como JSON string
-    formData.append("responses", JSON.stringify(responses));
-
-
-    // Enviar la solicitud al backend
-    try {
-      const response = await fetch(`${API_ACTIVITIES}/${idsubuni}`, {
-        method: 'POST',
-        body: formData, // Enviar el FormData como cuerpo
+      // Recorrer las respuestas y agregarlas al objeto responses
+      Object.entries(answers).forEach(([key, value]) => {
+        if (value instanceof File) {
+          // Si el valor es un archivo, lo agregamos con el tipo "file"
+          responses[key] = "file";
+          formData.append(`${key}`, value); // Agregar el archivo al FormData
+        } else {
+          // Si no es un archivo, simplemente lo agregamos como está
+          responses[key] = value;
+        }
       });
 
-      if (response.ok) {
-        const resIdProject = await response.json();
-        // Mostrar un SweetAlert de éxito
-        Swal.fire({
-          icon: 'success',
-          title: 'Actividad Creada',
-          text: 'La actividad fue creada correctamente.',
-          confirmButtonText: 'OK',
-          customClass: {
-            confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
-          },
+      // Agregar el objeto de respuestas al FormData como JSON string
+      formData.append("responses", JSON.stringify(responses));
+
+
+      // Enviar la solicitud al backend
+      try {
+        const response = await fetch(`${API_ACTIVITIES}/${idsubuni}`, {
+          method: 'POST',
+          body: formData, // Enviar el FormData como cuerpo
         });
-        router.back(); // Volver a la ruta anterior
-        formData.forEach((value, key) => {
-          console.log(`${key}:`, value);
-        });
-      } else {
-        // Si el servidor no responde correctamente
+
+        if (response.ok) {
+          const resIdProject = await response.json();
+          // Mostrar un SweetAlert de éxito
+          Swal.fire({
+            icon: 'success',
+            title: 'Actividad Creada',
+            text: 'La actividad fue creada correctamente.',
+            confirmButtonText: 'OK',
+            customClass: {
+              confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+            },
+          });
+          router.back(); // Volver a la ruta anterior
+          formData.forEach((value, key) => {
+            console.log(`${key}:`, value);
+          });
+        } else {
+          // Si el servidor no responde correctamente
+          Swal.fire({
+            icon: 'error',
+            title: 'Error al crear la actividad',
+            text: 'Rellene todos los campos del formulario correctamente',
+            confirmButtonText: 'OK',
+            customClass: {
+              confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+            },
+          });
+          formData.forEach((value, key) => {
+            console.log(`${key}:`, value);
+          });
+        }
+      } catch (error) {
+        // Si ocurre un error de conexión
         Swal.fire({
           icon: 'error',
-          title: 'Error al crear la actividad',
-          text: 'Rellene todos los campos del formulario correctamente',
+          title: 'Error',
+          text: `Error al conectar con la API. ${error}`,
           confirmButtonText: 'OK',
           customClass: {
             confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
           },
         });
-        formData.forEach((value, key) => {
-          console.log(`${key}:`, value);
-        });
       }
-    } catch (error) {
-      // Si ocurre un error de conexión
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: `Error al conectar con la API. ${error}`,
-        confirmButtonText: 'OK',
-        customClass: {
-          confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
-        },
-      });
     }
-  }
   };
 
 
@@ -252,7 +260,7 @@ export default function ActivityForm() {
   const breadcrumbData = [
     { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
     { type: "link", label: "Proyectos", href: configuracion },
-    { type: "page", label: "Insertar Proyecto"},
+    { type: "page", label: "Insertar Proyecto" },
     { type: "link", label: "Insertar Actividades", href: `${configuracion1}` },
     { type: "page", label: "Insertar actividad" },
   ];
@@ -270,7 +278,7 @@ export default function ActivityForm() {
         <form className="space-y-6" >
           {/* Nombre de la actividad */}
           <div className="space-y-4">
-            <Label htmlFor="activity-name" className="text-lg font-medium text-gray-700 dark:text-gray-300">
+            <Label htmlFor="activity-name" className="text-lg font-semibold text-gray-900 dark:text-gray-300">
               Nombre de la actividad
             </Label>
             <input
@@ -278,7 +286,7 @@ export default function ActivityForm() {
               placeholder="Nombre de la actividad"
               className={clsx(
                 "w-full bg-gray-100 dark:bg-gray-800  dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 px-4 py-3",
-                { "border-red-400 ring-1 ring-red-400": errorForm && !nombreActividad}, // Estilo condicional si el campo está vacío
+                { "border-red-400 ring-1 ring-red-400": errorForm && !nombreActividad }, // Estilo condicional si el campo está vacío
                 { "border-green-400 ring-1 ring-green-400": !errorForm && nombreActividad } // Estilo si el campo está lleno
               )}
               value={nombreActividad}
@@ -289,7 +297,7 @@ export default function ActivityForm() {
 
           {/* Fecha inicial */}
           <div className="space-y-4">
-            <Label htmlFor="start-date" className="text-lg font-medium text-gray-700 dark:text-gray-300">
+            <Label htmlFor="start-date" className="text-lg font-semibold text-gray-900 dark:text-gray-300">
               Fecha inicial
             </Label>
             <div className="relative">
@@ -312,7 +320,7 @@ export default function ActivityForm() {
 
           {/* Fecha final */}
           <div className="space-y-4">
-            <Label htmlFor="end-date" className="text-lg font-medium text-gray-700 dark:text-gray-300">
+            <Label htmlFor="end-date" className="text-lg font-semibold text-gray-900 dark:text-gray-300">
               Fecha final
             </Label>
             <div className="relative">
@@ -337,7 +345,7 @@ export default function ActivityForm() {
                   <div key={question.id} className="space-y-4">
                     <Label
                       htmlFor={`text-${question.id}`}
-                      className="text-lg font-medium text-gray-700 dark:text-gray-300"
+                      className="text-lg font-semibold text-gray-900 dark:text-gray-300"
                     >
                       {question.questionText}
                     </Label>
@@ -364,7 +372,7 @@ export default function ActivityForm() {
                   <div key={question.id} className="space-y-4">
                     <Label
                       htmlFor={`date-${question.id}`}
-                      className="text-lg font-medium text-gray-700 dark:text-gray-300"
+                      className="text-lg font-semibold text-gray-900 dark:text-gray-300"
                     >
                       {question.questionText}
                     </Label>
@@ -390,7 +398,7 @@ export default function ActivityForm() {
                   <div key={question.id} className="space-y-4">
                     <Label
                       htmlFor={`multipleChoice-${question.id}`}
-                      className="text-lg font-medium text-gray-700 dark:text-gray-300"
+                      className="text-lg font-semibold text-gray-900 dark:text-gray-300"
                     >
                       {question.questionText}
                     </Label>
@@ -403,7 +411,7 @@ export default function ActivityForm() {
                           value={option.idop}
                           checked={answers[question.id]?.includes(option.idop) || false}
                           onChange={() => handleMultipleChoiceChange(question.id, option.idop)}
-                          
+
                         />
                         <Label htmlFor={`${question.id}-${option.idop}`} className="text-gray-700 dark:text-white">
                           {option.optionTxt}
@@ -418,7 +426,7 @@ export default function ActivityForm() {
                   <div key={question.id} className="space-y-4">
                     <Label
                       htmlFor={`singleChoice-${question.id}`}
-                      className="text-lg font-medium text-gray-700 dark:text-gray-300"
+                      className="text-lg font-semibold text-gray-900 dark:text-gray-300"
                     >
                       {question.questionText}
                     </Label>
@@ -445,7 +453,7 @@ export default function ActivityForm() {
                   <div key={question.id} className="space-y-4">
                     <Label
                       htmlFor={`file-upload-${question.id}`}
-                      className="text-lg font-medium text-gray-700 dark:text-gray-300"
+                      className="text-lg font-semibold text-gray-900 dark:text-gray-300"
                     >
                       {question.questionText}
                     </Label>
@@ -474,7 +482,7 @@ export default function ActivityForm() {
                   <div key={question.id} className="space-y-4">
                     <Label
                       htmlFor={`dropdown-${question.id}`}
-                      className="text-lg font-medium text-gray-700 dark:text-gray-300"
+                      className="text-lg font-semibold text-gray-900 dark:text-gray-300"
                     >
                       {question.questionText}
                     </Label>
@@ -505,22 +513,22 @@ export default function ActivityForm() {
             }
           })}
         </form>
-                  {/* Botones */}
-                  <div className="w-full mx-auto flex justify-end space-x-6 pt-8">
-            <Button
-              variant="destructive"
-              className="bg-red-600 hover:bg-red-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-red-500 transition-all duration-300"
-              onClick={handleCancelActivity}
-            >
-              Cancelar
-            </Button>
-            <Button
-              className="bg-blue-600 hover:bg-blue-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-blue-500 transition-all duration-300"
-              onClick={handleSubmitAnswers}
-            >
-              Insertar Actividad
-            </Button>
-          </div>
+        {/* Botones */}
+        <div className="w-full mx-auto flex justify-end space-x-6 pt-8">
+          <Button
+            variant="destructive"
+            className="bg-red-600 hover:bg-red-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-red-500 transition-all duration-300"
+            onClick={handleCancelActivity}
+          >
+            Cancelar
+          </Button>
+          <Button
+            className="bg-blue-600 hover:bg-blue-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-blue-500 transition-all duration-300"
+            onClick={handleSubmitAnswers}
+          >
+            Insertar Actividad
+          </Button>
+        </div>
       </div>
 
     </div>

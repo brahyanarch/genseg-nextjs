@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { useState, useEffect } from "react"
-import { useParams, usePathname, useRouter } from "next/navigation"
+import {  useParams, usePathname, useRouter } from "next/navigation"
 import { API_FORM, API_ACTIVITIES } from "@/config/apiconfig"
 import Swal from 'sweetalert2';
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb"
@@ -83,6 +83,10 @@ export default function ActivityForm() {
       showCancelButton: true,
       confirmButtonText: 'Sí, no crear actividad',
       cancelButtonText: 'No, regresar.',
+      customClass: {
+        confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+        cancelButton: 'bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded',
+      },
     });
     if (result.isConfirmed) {
       const recortada = recortarRutaHastaSegmento(pathname, 'editProyect');
@@ -92,7 +96,10 @@ export default function ActivityForm() {
         icon: 'success',
         title: 'Actividad no creada',
         text: 'La actividad no ha sido creada.',
-        confirmButtonText: 'OK'
+        confirmButtonText: 'OK',
+        customClass: {
+          confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+        },
       });
     }
   }
@@ -215,6 +222,8 @@ export default function ActivityForm() {
             confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
           },
         });
+          
+        
       }
       const data = await response.json();
       setQuestions(data);
@@ -267,7 +276,7 @@ export default function ActivityForm() {
         <form className="space-y-6" >
           {/* Nombre de la actividad */}
           <div className="space-y-4">
-            <Label htmlFor="activity-name" className="text-lg font-medium text-gray-700 dark:text-gray-300">
+            <Label htmlFor="activity-name" className="text-lg font-semibold text-gray-900 dark:text-gray-300">
               Nombre de la actividad
             </Label>
             <input
@@ -286,7 +295,7 @@ export default function ActivityForm() {
 
           {/* Fecha inicial */}
           <div className="space-y-4">
-            <Label htmlFor="start-date" className="text-lg font-medium text-gray-700 dark:text-gray-300">
+            <Label htmlFor="start-date" className="text-lg font-semibold text-gray-900 dark:text-gray-300">
               Fecha inicial
             </Label>
             <div className="relative">
@@ -309,7 +318,7 @@ export default function ActivityForm() {
 
           {/* Fecha final */}
           <div className="space-y-4">
-            <Label htmlFor="end-date" className="text-lg font-medium text-gray-700 dark:text-gray-300">
+            <Label htmlFor="end-date" className="text-lg font-semibold text-gray-900 dark:text-gray-300">
               Fecha final
             </Label>
             <div className="relative">
@@ -334,7 +343,7 @@ export default function ActivityForm() {
                   <div key={question.id} className="space-y-4">
                     <Label
                       htmlFor={`text-${question.id}`}
-                      className="text-lg font-medium text-gray-700 dark:text-gray-300"
+                      className="text-lg font-semibold text-gray-900 dark:text-gray-300"
                     >
                       {question.questionText}
                     </Label>
@@ -361,7 +370,7 @@ export default function ActivityForm() {
                   <div key={question.id} className="space-y-4">
                     <Label
                       htmlFor={`date-${question.id}`}
-                      className="text-lg font-medium text-gray-700 dark:text-gray-300"
+                      className="text-lg font-semibold text-gray-900 dark:text-gray-300"
                     >
                       {question.questionText}
                     </Label>
@@ -387,7 +396,7 @@ export default function ActivityForm() {
                   <div key={question.id} className="space-y-4">
                     <Label
                       htmlFor={`multipleChoice-${question.id}`}
-                      className="text-lg font-medium text-gray-700 dark:text-gray-300"
+                      className="text-lg font-semibold text-gray-900 dark:text-gray-300"
                     >
                       {question.questionText}
                     </Label>
@@ -415,7 +424,7 @@ export default function ActivityForm() {
                   <div key={question.id} className="space-y-4">
                     <Label
                       htmlFor={`singleChoice-${question.id}`}
-                      className="text-lg font-medium text-gray-700 dark:text-gray-300"
+                      className="text-lg font-semibold text-gray-900 dark:text-gray-300"
                     >
                       {question.questionText}
                     </Label>
@@ -442,7 +451,7 @@ export default function ActivityForm() {
                   <div key={question.id} className="space-y-4">
                     <Label
                       htmlFor={`file-upload-${question.id}`}
-                      className="text-lg font-medium text-gray-700 dark:text-gray-300"
+                      className="text-lg font-semibold text-gray-900 dark:text-gray-300"
                     >
                       {question.questionText}
                     </Label>
@@ -471,7 +480,7 @@ export default function ActivityForm() {
                   <div key={question.id} className="space-y-4">
                     <Label
                       htmlFor={`dropdown-${question.id}`}
-                      className="text-lg font-medium text-gray-700 dark:text-gray-300"
+                      className="text-lg font-semibold text-gray-900 dark:text-gray-300"
                     >
                       {question.questionText}
                     </Label>
