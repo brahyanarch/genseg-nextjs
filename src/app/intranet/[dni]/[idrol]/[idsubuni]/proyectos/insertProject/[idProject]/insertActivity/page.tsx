@@ -246,11 +246,14 @@ export default function ActivityForm() {
     return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
   };
   const configuracion = recortarRutaHastaSegmento1(pathname, 'proyectos');
+  const configuracion1 = recortarRutaHastaSegmento(pathname, 'insertProject');
   const inicio = recortarRutaHastaSegmento1(pathname, 'intranet');
   //definimos valores para el breadCrumb
   const breadcrumbData = [
     { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
     { type: "link", label: "Proyectos", href: configuracion },
+    { type: "page", label: "Insertar Proyecto"},
+    { type: "link", label: "Insertar Actividades", href: `${configuracion1}` },
     { type: "page", label: "Insertar actividad" },
   ];
   return (
