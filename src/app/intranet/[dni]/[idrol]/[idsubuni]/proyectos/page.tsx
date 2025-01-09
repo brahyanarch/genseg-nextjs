@@ -11,9 +11,10 @@ import { usePathname, useRouter, useParams } from "next/navigation";
 import Swal from 'sweetalert2';
 import { BreadcrumbWithDropdown } from '@/components/breadcrumb';
 import { BreadcrumbItemType } from '@/tipos/typos';
+import StatusBadge from "@/components/componentesGraficos/estadosProyecto";
 interface Project {
   idproj: number;
-  estado: string;
+  estado: "Completado" | "Pendiente" | "Archivado" | "Curso" | "nothing";
   escuelaProfesional: string;
   fInit: string;
   fFin: string;
@@ -290,7 +291,7 @@ export default function Component() {
     {
       key: "estado",
       label: "Estado",
-      render: (item: Project) => item.estado,
+      render: (item: Project) => <StatusBadge status={item.estado} />,
       sortable: true,
     },
     {

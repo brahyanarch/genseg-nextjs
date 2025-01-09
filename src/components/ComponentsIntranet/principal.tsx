@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { API_ACTIVITIES } from "@/config/apiconfig";
 import { useParams } from "next/navigation";
+import StatusBadge from "@/components/componentesGraficos/estadosProyecto";
 interface items {
     label: string;
     href: string;
@@ -77,7 +78,7 @@ export default function Principal (){
         <EnCurso />
         <p className="pr-7">{activities?.Curso||0} Actividades en curso</p>
         </div>
-
+        <StatusBadge status="COMPLETADO" />
         <Graficos />   
         <Dona/>
         </>

@@ -12,6 +12,7 @@ import AvisoModal from "@/components/comPageMain/avisoModal";
 import Aviso from '@/components/aviso';
 import {AvisoContext} from '@/context/avisoContext'
 import ModalForm from '@/components/componentesFormulario/noteForm'
+import {API_URL} from '@/config/apiconfig'
 //funcion principal que controla el Modal de aviso
 
 const datos = [
@@ -70,30 +71,25 @@ const frameworks = [
 export default function Home() {
   const [mostrarAlerta, setMostrarAlerta] = useState(false);
   const {mostrarAviso} = useContext<any>(AvisoContext);
-  
+  const [aviso, setAviso] = useState<any>(null); // Cambia el tipo según tu modelo
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const isValid = Math.random() > 0.5; // Simular validación
-    if (isValid) {
-      mostrarAviso('succefull', 'Formulario enviado correctamente.');
-    } else {
-      mostrarAviso('warning', 'Ocurrió un error al enviar el formulario.',true);
+  const getAviso = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/anuncio`);
+      const data = await res.json();
+      setAviso(data); // Asegúrate de que la API envíe un solo objeto de aviso
+    } catch (error) {
+      console.error("Error al obtener el aviso:", error);
     }
   };
+
   useEffect(() => {
-    setMostrarAlerta(true);
-
-    const timer = setTimeout(() => {
-      setMostrarAlerta(false);
-    }, 100);
-
-    return () => clearTimeout(timer);
+    getAviso();
   }, []);
 
   return (
     <div className="bg-ColorPrincipal">
-      <AvisoModal timeOff={mostrarAlerta} />
+      {aviso && <AvisoModal aviso={aviso} />} {/* Muestra el modal si hay datos */}
       <Navbarr />
       <Carrusel data={datos}/>
       {/*<ObtenerCertificado key={frameworks} />*/}
