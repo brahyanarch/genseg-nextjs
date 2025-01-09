@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
+import { API_URL } from "@/config/apiconfig"
+import Swal from 'sweetalert2'
 
 interface Anuncio {
   titulo: string
@@ -34,12 +36,52 @@ export default function ConfiguradorAnuncio() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     console.log('Anuncio guardado:', {
       ...anuncio,
       fecha: anuncio.fecha.toLocaleDateString('es-ES')
     })
+    const bodyAnuncion = {
+      title: anuncio.titulo,
+      description: anuncio.detalle,
+      endDate: new Date(anuncio.fecha).toISOString()
+    };
+    console.log('Body:', bodyAnuncion);
+    try {
+      const respuesta = await fetch(`${API_URL}/api/anuncio`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // Indica que el contenido está en formato JSON
+        },
+        body: JSON.stringify(bodyAnuncion), // Convierte el objeto anuncio en un string JSON
+      });
+  
+      if (!respuesta.ok) {
+        Swal.fire({
+          title: 'Error al enviar el anuncio',
+          icon: 'error',
+        });
+        throw new Error(`Error en la solicitud: ${respuesta.status}`);
+      }
+      Swal.fire({
+        title: 'Anuncio enviado correctamente',
+        icon: 'success',
+      });
+  
+      const data = await respuesta.json(); // Procesa la respuesta del servidor
+      console.log("Anuncio enviado correctamente:", data);
+    } catch (error) {
+      Swal.fire({
+        title: 'Error al enviar el anuncio',
+        icon: 'error',
+      });
+      const footer = Swal.getFooter();
+      if (footer) {
+        footer.innerText = 'La fecha de expiración debe ser posterior a la fecha actual';
+      }
+      console.error("Error al enviar el anuncio:", error);
+    }
   }
 
   const formatDate = (date: Date): string => {
@@ -83,7 +125,7 @@ export default function ConfiguradorAnuncio() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="fecha" className="text-sm font-semibold">Fecha de Publicación/Modificación</Label>
+            <Label htmlFor="fecha" className="text-sm font-semibold">Fecha de expiración</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button

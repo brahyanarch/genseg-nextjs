@@ -3,13 +3,16 @@ import { Search, X, PenSquare, Trash2, Circle, CirclePlus, FilePenLine } from "l
 import { useState, useContext, useEffect } from 'react'
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import DynamicTable from "@/components/DynamicTable";
-import { API_FORM , API_GET_FORM_BY_SUBUNI} from "@/config/apiconfig";
+import { API_FORM , API_GET_FORM_BY_SUBUNI, API_URL} from "@/config/apiconfig";
 import { AvisoContext } from '@/context/avisoContext'
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
 import { BreadcrumbItemType } from "@/tipos/typos";
+import Swal from 'sweetalert2';
+import { set } from "date-fns";
 type FormEntry = {
   idf: number;
   nmForm: string;
@@ -43,19 +46,19 @@ type FormEntry = {
   },
 ];*/
 // modal para editar o añadir  un formulario
-export const EditModal = ({
-  isOpen,
-  closeModal,
-  onSaveForm,
-  editingForm,
-}: any) => {
+export const EditModal = ({isOpen,closeModal,onSaveForm,editingForm,}: any) => {
   const [name, setName] = useState("");
   const [abbreviation, setAbbreviation] = useState("");
   const { mostrarAviso } = useContext<any>(AvisoContext);
+  const { dni, idrol, idsubuni } = useParams();
   useEffect(() => {
     if (editingForm) {
       setName(editingForm.nmForm);
       setAbbreviation(editingForm.abre);
+    }
+    else {
+      setName("");
+      setAbbreviation("");
     }
   }, [editingForm]);
 
@@ -64,11 +67,13 @@ export const EditModal = ({
     const updatedForm = {
       name: name,
       abrev: abbreviation,
+      idsubunidad: idsubuni,
     };
-
+    console.log(updatedForm, "datos del formulario");
     try {
+      console.log("entro al try", updatedForm );
       const response = await fetch(
-        editingForm ? `${API_FORM}/${editingForm.idf}` : API_FORM,
+        editingForm ? `${API_URL}/api/form/${editingForm.idf}` : `${API_URL}/api/form`,
         {
           method: editingForm ? "PUT" : "POST",
           headers: {
@@ -82,14 +87,34 @@ export const EditModal = ({
         const savedRole = await response.json();
         onSaveForm(savedRole);
         mostrarAviso('succefull', 'Formulario guardado correctamente.');
+        // Mostrar un SweetAlert de éxito con el check
+        Swal.fire({
+          icon: 'success',
+          title: '¡Éxito!',
+          text: 'Rol actualizado correctamente.',
+          confirmButtonText: 'OK',
+        });
+
         closeModal();
       } else {
-        mostrarAviso('warning', 'Error al guardar el Formulario.');
+        Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Hubo un problema al actualizar el Formulario.',
+              confirmButtonText: 'OK',
+            });
       }
     } catch (error) {
-      mostrarAviso('warning', 'Error al conectar con la API.');
+      // Si el servidor no responde bien, mostrar un SweetAlert de error
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un problema al actualizar el rol.',
+        confirmButtonText: 'OK',
+      });
     }
   };
+
 
   if (!isOpen) return null;
 
@@ -176,6 +201,13 @@ export default function Component() {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [searchTerm, setSearchTerm] = useState("");
+
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+
+  
   if (loading) {
     return (
       <>
@@ -291,6 +323,56 @@ export default function Component() {
     setCurrentPage(page);
   };
 
+  const toggleStateForm = async (idf: number) => {
+      try {
+        
+        // Realiza la petición PUT para actualizar el estado del usuario
+        const response = await fetch(`${API_URL}/api/form/toggle`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            idf: idf,
+            idsubuni: idsubuni,
+          }),
+        });
+        console.log("Respuesta del servidor:", response);
+  
+        if (response.ok) {
+          const updatedData = await response.json();
+          // Actualiza el estado local de los usuarios en el frontend
+          setForm(updatedData.allform);
+          console.log("Estado actualizado:", updatedData);
+          Swal.fire({
+            icon: 'success',
+            title: 'Estado actualizado',
+            text: 'El estado del usuario ha sido actualizado correctamente.',
+            confirmButtonText: 'OK',
+          });
+
+        } else {
+          const errorData = await response.json();
+          console.error("Error al actualizar el estado del usuario:", errorData.message);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error al actualizar el estado',
+            text: 'Hubo un problema al actualizar el estado del usuario.',
+            confirmButtonText: 'OK',
+          });
+        }
+      } catch (error) {
+
+        console.error("Error al cambiar el estado del usuario:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al actualizar el estado',
+          text: 'Hubo un problema al actualizar el estado del usuario.',
+          confirmButtonText: 'OK',
+        });
+      }
+    };
+
   // Configuración de la tabla
   const configurationUser = [
     {
@@ -302,19 +384,19 @@ export default function Component() {
     {
       key: "nmForm",
       label: "Nombre",
-      render: (item: FormEntry) => item.nmForm,
-      sortable: true,
-    },
-    {
-      key: "Fcreate",
-      label: "Fecha Creación",
-      render: (item: FormEntry) => item.Fcreate,
+      render: (item: FormEntry) => <div className="w-32 truncate">{item.nmForm}</ div>,
       sortable: true,
     },
     {
       key: "abre",
       label: "Abreviatura",
-      render: (item: FormEntry) => item.abre,
+      render: (item: FormEntry) => <div className="w-32 truncate">{item.abre}</ div>,
+      sortable: true,
+    },
+    {
+      key: "Fcreate",
+      label: "Fecha Creación",
+      render: (item: FormEntry) => new Date(item.Fcreate).toLocaleDateString(),
       sortable: true,
     },
     {
@@ -322,7 +404,7 @@ export default function Component() {
       label: "Opciones",
       render: (item: FormEntry) => (
         <>
-          <Button variant="ghost" size="icon" onClick={() => openEditModal(form)}>
+          <Button variant="ghost" size="icon" onClick={() => openEditModal(item)}>
             <PenSquare className="h-5 w-5" strokeWidth={2.5} />
           </Button>
           <Button variant="ghost" size="icon" onClick={() => deleteForm(item.idf)}>
@@ -330,9 +412,9 @@ export default function Component() {
           </Button>
           <Button variant="ghost" size="icon">
             <Circle
-              className={`h-5 w-5 ${item.estado ? "fill-primary" : ""
-                }`}
-              strokeWidth={2.5}
+              className={`h-5 w-5 ${item.estado ? "fill-primary dark:fill-slate-950" : ""}`}
+              strokeWidth={2}
+              onClick={ item.estado ? () => {} : () => toggleStateForm(item.idf)}
             />
           </Button>
           <Button variant="ghost" size="icon" onClick={() => editForm(item.idf)} >
@@ -473,7 +555,7 @@ export default function Component() {
   //función para eliminar un Rol
   const deleteForm = async (id: number) => {
     try {
-      const response = await fetch(`${API_FORM}/${id}`, {
+      const response = await fetch(`${API_URL}/api/form/${id}`, {
         method: "DELETE",
       });
 
@@ -481,13 +563,31 @@ export default function Component() {
         setForm((prevForms: any) =>
           prevForms.filter((form: any) => form.idf !== id)
         );
-        mostrarAviso('succefull', 'Formulario Eliminado correctamente.');
+        // Si el servidor no responde bien, mostrar un SweetAlert de error
+        Swal.fire({
+          icon: 'success',
+          title: 'Formulario eliminado correctamente',
+          text: 'El formulario se ha creado correctamente.',
+          confirmButtonText: 'OK',
+        });
         fetchForms();
       } else {
-        mostrarAviso('warning', 'Error al eliminar el Formulario.');
+        // Si el servidor no responde bien, mostrar un SweetAlert de error
+        Swal.fire({
+          icon: 'error',
+          title: 'El formulario no se eliminio correctamente',
+          text: 'Hubo un problema al eliminar el formulario.',
+          confirmButtonText: 'OK',
+        });
       }
     } catch (error) {
-      mostrarAviso('warning', "Error al conectar con la API:", error);
+      // Si el servidor no responde bien, mostrar un SweetAlert de error
+      Swal.fire({
+        icon: 'error',
+        title: 'El formulario no se eliminio correctamente',
+        text: 'Hubo un problema al eliminar el formulario.',
+        confirmButtonText: 'OK',
+      });
     }
   };
 
@@ -578,7 +678,9 @@ export default function Component() {
       <BreadcrumbWithDropdown items={breadcrumbData} />
       <h1 className="text-2xl font-bold  ">Formularios</h1>
       <div className="flex justify-between items-center gap-4 flex-wrap">
-        <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 "   >
+        <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 "   
+          onClick={toggleModal}
+        >
           <CirclePlus className="h-8 w-8 " />
           <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
           <p className="font-bold" >Nuevo</p>
@@ -606,9 +708,9 @@ export default function Component() {
       <div className="flex justify-center space-x-2 mt-4">
         {renderPaginationButtons()}
       </div>
-      {/*
+      
     <EditModal isOpen={isModalOpen} closeModal={toggleModal} onSaveForm={saveForm} editingForm={editingForm} />
-      */}
+      
 
     </div>
   );
