@@ -208,61 +208,6 @@ export default function Component() {
   };
 
   
-  if (loading) {
-    return (
-      <>
-        <div className="p-6 space-y-6">
-          {/* Breadcrumb skeleton */}
-          <div className="flex items-center gap-2 text-sm">
-            <Skeleton className="h-4 w-12" />
-            <Skeleton className="h-4 w-4" />
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-4" />
-            <Skeleton className="h-4 w-16" />
-          </div>
-
-          {/* Title skeleton */}
-          <div className="space-y-4">
-            <Skeleton className="h-8 w-32" />
-
-            {/* New button skeleton */}
-            <Button variant="outline" disabled className="gap-2">
-              <Skeleton className="h-4 w-12" />
-            </Button>
-          </div>
-
-          {/* Table skeleton */}
-          <div className="rounded-lg border">
-            {/* Header */}
-            <div className="grid grid-cols-[100px_1fr_100px] bg-muted p-4 gap-4">
-              <Skeleton className="h-4 w-8" />
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-4 w-20" />
-            </div>
-
-            {/* Table row */}
-            <div className="grid grid-cols-[100px_1fr_100px] p-4 gap-4 items-center">
-              <Skeleton className="h-4 w-6" />
-              <Skeleton className="h-4 w-32" />
-              <div className="flex gap-2">
-                <Skeleton className="h-8 w-8" />
-                <Skeleton className="h-8 w-8" />
-              </div>
-            </div>
-          </div>
-
-          {/* Pagination skeleton */}
-          <div className="flex justify-center gap-2 mt-4">
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-          </div>
-        </div>
-      </>
-    );
-  }
   if (error) {
     return <p>Error: {error}</p>;
   }
@@ -519,7 +464,7 @@ export default function Component() {
       const data = await response.json();
       setForm(data);
     } catch (err: any) {
-      setError(err.message);
+      
     } finally {
       setLoading(false);
     }
@@ -647,9 +592,6 @@ export default function Component() {
     );
   }
 
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
    ///recortar rutas
    const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
     const partes = ruta.split('/'); // Divide la ruta en partes

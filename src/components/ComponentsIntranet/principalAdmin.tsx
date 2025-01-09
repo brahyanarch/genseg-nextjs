@@ -2,7 +2,7 @@
 import {BreadcrumbWithDropdown} from "@/components/breadcrumb";
 import { EnCurso, Archivado, Pendiente, Completado } from "@/components/componentesGraficos/estadosProyecto";
 import Graficos from "@/components/componentesGraficos/graficosAdmin";
-import Dona from "@/components/componentesGraficos/graficoDona"
+import Dona from "@/components/componentesGraficos/graficoDonaAdmin"
 import StatusBadge from "@/components/componentesGraficos/estadosProyecto";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -78,7 +78,6 @@ export default function Principal (){
         <EnCurso />
         <p className="pr-7">{activities?.Curso||0} Actividades en curso</p>
         </div>
-        <StatusBadge status="Archivado" />
         <Graficos />   
         <Dona/>
         </>

@@ -78,7 +78,6 @@ export default function Principal (){
         <EnCurso />
         <p className="pr-7">{activities?.Curso||0} Actividades en curso</p>
         </div>
-        <StatusBadge status="COMPLETADO" />
         <Graficos />   
         <Dona/>
         </>

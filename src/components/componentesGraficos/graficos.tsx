@@ -85,7 +85,7 @@ const chartConfig = {
   },
   pendiente: {
     label: "Pendiente",
-    color: "#ffcc85",
+    color: "#fabe6b",
   },
   archivado: {
     label: "Archivado",
