@@ -280,13 +280,13 @@ export default function Component() {
       key: "fInit",
       label: "Fecha Inicio",
       render: (item: Project) => formatearFecha(item.fInit),
-      sortable: false,
+      sortable: true,
     },
     {
       key: "fFin",
       label: "Fecha Final",
       render: (item: Project) => formatearFecha(item.fFin),
-      sortable: false,
+      sortable: true,
     },
     {
       key: "estado",
@@ -433,10 +433,10 @@ export default function Component() {
         <div className="w-full border-t border-gray-300"></div>
       </div>
 
-      <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 " onClick={insertProject} >
+      <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-42 " onClick={insertProject} >
         <CirclePlus className="h-8 w-8 " />
         <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
-        <p className="font-bold" >Nuevo</p>
+        <p className="font-bold" >Nuevo Proyecto</p>
       </Button>
       <div className="relative">
         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -450,6 +450,7 @@ export default function Component() {
         />
       </div>
       <div className="bg-[#E3E6ED] rounded-lg ">
+        <label className='block text-lg text-center font-semibold text-gray-700 rounded-lg py-2 px-4 shadow-md'>Lista de todos los proyectos asociados que creaste</label>
         <DynamicTable
           configuration={configurationUser}
           data={currentItems}
