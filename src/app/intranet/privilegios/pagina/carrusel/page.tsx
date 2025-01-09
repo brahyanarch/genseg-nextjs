@@ -1,11 +1,15 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileImage, ArrowUpDown } from 'lucide-react';
 import { API_URL } from '@/config/apiconfig';
+import Swal from 'sweetalert2';
 import Image from 'next/image';
+import { usePathname } from "next/navigation";
+import { BreadcrumbWithDropdown } from '@/components/breadcrumb';
+import { BreadcrumbItemType } from '@/tipos/typos';
 
 interface ImageItemProps {
   index: number;
@@ -134,7 +138,9 @@ const ImageGallery: React.FC = () => {
   const [selectedImages, setSelectedImages] = useState<(File | null)[]>([]);
   const [titles, setTitles] = useState<string[]>([]);
   const [descriptions, setDescriptions] = useState<string[]>([]);
-
+  const [datos, setDatos] = useState([]);
+  //navegación
+  const pathname = usePathname();
   const handleFileChange = (index: number, file: File | null) => {
     const updatedImages = [...selectedImages];
     updatedImages[index] = file;
@@ -181,6 +187,15 @@ const ImageGallery: React.FC = () => {
         const data = await response.json();
         console.log('Respuesta del servidor:', data);
         alert('Imágenes subidas exitosamente.');
+        Swal.fire({
+          title: 'Datos guardados correctamente',
+          text: 'Imágenes subidas exitosamente.',
+          icon: 'success',
+          confirmButtonText: 'OK',
+          customClass: {
+            confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+          },
+        });
         formData.forEach((value, key) => {
           console.log(`${key}:`, value);
         });
@@ -188,16 +203,40 @@ const ImageGallery: React.FC = () => {
         setTitles([]);
         setDescriptions([]);
       } else {
-        alert('Error al subir las imágenes.');
+        Swal.fire({
+          title: 'Error al guardar las imágenes.',
+          text: 'Hubo un problema al intentar guardar las imágenes.',
+          icon: 'error',
+          confirmButtonText: 'OK',
+          customClass: {
+            confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+          },
+        });
         formData.forEach((value, key) => {
           console.log(`${key}:`, value);
         });
       }
     } catch (error) {
-      console.error('Error al subir las imágenes:', error);
-      alert('Error al subir las imágenes.');
+           Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: `Error al conectar con la API. ${error.message}`,
+              confirmButtonText: 'OK',
+              customClass: {
+                confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
+              },
+            });
     }
   };
+  const getDateCarrusel = async () =>{
+    const res = await fetch(`${API_URL}/api/carrusel`);
+    const data = await res.json();
+    setDatos(data);
+
+  }
+  useEffect(() => {
+    getDateCarrusel();
+  },[]);
 
   const images = [
     {
@@ -225,10 +264,29 @@ const ImageGallery: React.FC = () => {
       imageUrl: '/resources/images/56.png',
     },
   ];
+  //
+    ///recortar rutas
+    const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
+      const partes = ruta.split('/'); // Divide la ruta en partes
+      const indice = partes.indexOf(segmento); // Encuentra el índice del segmento clave
+      if (indice === -1) return ruta; // Si no encuentra el segmento, retorna la ruta completa
+      return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
+    };
+    //recortamos las rutas requeridas
+    const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
+    //definimos valores para el breadCrumb
+    const breadcrumbData: BreadcrumbItemType[] = [
+      { type: "link", label: "Inicio", href: `${inicio}/privilegios` },
+      { type: "page", label: "Pagina" },
+      { type: "page", label: "Carrusel" },
+    ];
 
   return (
-    <div className="p-4 bg-slate-950 min-h-screen">
-      <h1 className="text-xl font-bold text-slate-100 mb-6">Subir y previsualizar imágenes</h1>
+    <div className="p-4  min-h-screen">
+      <div className="flex gap-4 items-center mx-auto text-sm text-gray-900 breadcrumbs mb-6 text-muted-foreground">
+        <BreadcrumbWithDropdown items={breadcrumbData} />
+      </div>
+      <h1 className="text-xl font-bold text-gray-900 dark:text-slate-100  mb-6 text-center">Subir y previsualizar imágenes del carrusel</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
         {images.map((image, index) => (
