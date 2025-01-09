@@ -11,7 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useParams } from 'next/navigation';
 import { API_URL } from "@/config/apiconfig";
 export type QuestionType = 'text' | 'multipleChoice' | 'singleChoice' | 'dropdown' | 'date' | 'archive';
-
+import { useRouter, usePathname } from 'next/navigation';
+import Swal from 'sweetalert2';
 export interface Question {
   id: string;
   type: QuestionType;
@@ -133,7 +134,7 @@ export const DynamicForm: React.FC = () => {
   });
 
   const { idForm } = useParams();
-
+  const router = useRouter();
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
@@ -183,9 +184,13 @@ export const DynamicForm: React.FC = () => {
     }));
   };
 
+  const redirigir = () => {
+    router.back();
+  }
+
   const saveForm = async () => {
     try {
-      const response = await fetch(`https://2nlfx0w1-3000.brs.devtunnels.ms/api/form/preguntas/${idForm}`, {
+      const response = await fetch(`${API_URL}/api/form/preguntas/${idForm}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -193,12 +198,23 @@ export const DynamicForm: React.FC = () => {
         body: JSON.stringify({ questions: formData.questions }),
       });
 
-      if (!response.ok) {
-        throw new Error('Error saving form');
+      if (!response.ok){ 
+        Swal.fire({
+            title: 'Error al guardar el formulario',
+            icon: 'error',
+          });
       }
-
+      Swal.fire({
+        title: 'Formulario guardado',
+        icon: 'success',
+      })
+      redirigir();
       console.log('Form saved successfully');
     } catch (error) {
+      Swal.fire({
+        title: 'Error al guardar el formulario',
+        icon: 'error',
+      });
       console.error('Error saving form:', error);
     }
   };
