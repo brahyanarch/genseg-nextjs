@@ -1,10 +1,18 @@
+'use client'
 import Image from 'next/image'
-
-export default function Card({nombre,encargado}:any) {
+import { ParticipateModal } from '@/components/comPageMain/participateModal';
+import { useEffect, useState } from 'react';
+import { API_URL } from '@/config/apiconfig';
+import Swal from 'sweetalert2';
+export default function Card({ nombreAct, encargado, idActivity}: any) {
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const toggleModal = () => {
+    setIsOpenModal(!isOpenModal);
+  }
   return (
-    <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white mb-10 mx-auto w-80">
+    <div className="max-w-sm h-[450px] rounded overflow-hidden shadow-lg bg-white mb-10 mx-auto w-80 ">
       {/* Imagen */}
-      <div className="relative h-48 w-full">
+      <div className="relative h-36 w-full">
         <Image
           src="/resources/images/5.jpg" // Cambia esto por la ruta real de la imagen
           alt="Lisa Mamani"
@@ -13,40 +21,73 @@ export default function Card({nombre,encargado}:any) {
           className="rounded-t-lg"
         />
       </div>
-      
+
       {/* Contenido de la tarjeta */}
       <div className="p-4">
         <h3 className="text-base font-semibold text-blue-700">{encargado} <span className="text-gray-500 font-light text-xs">Encargad@</span></h3>
-        <p className="text-xl font-bold text-gray-900">{nombre}</p>
-        <p className="text-gray-600 mt-2 font-normal">
-          Some quick example text to build on the card title and make up the bulk of the card's content.
+        <p className="text-xl font-bold text-gray-900">{nombreAct.length > 40 ? nombreAct.slice(0, 40) + "..." : nombreAct}
+        </p>
+        <p className="text-gray-600 h-28 mt-2 font-normal">
+          {nombreAct.length > 80 ? nombreAct.slice(0, 80) + "..." : nombreAct}
         </p>
 
         {/* Botones */}
         <div className="mt-4 flex justify-between items-center ">
-          <button className="bg-white-800 h-[40px] w-[130px] hover:bg-blue-700 hover:text-white text-blue-500 border-[1px] border-blue-500 font-medium py-2 px-4 rounded">
+          <button className="bg-white-800   h-[40px] w-[130px] hover:bg-blue-700 hover:text-white text-blue-500 border-[1px] border-blue-500 font-medium py-2 px-4 rounded">
             Ver más
           </button>
-          <button className="bg-blue-500 h-[40px] w-[130px] hover:bg-blue-700  text-white font-medium py-2 px-4 rounded">
+          <button className="bg-blue-500 h-[40px] w-[130px] hover:bg-blue-700  text-white font-medium py-2 px-4 rounded" onClick={toggleModal} >
             Participar
           </button>
         </div>
       </div>
+      {isOpenModal && (<ParticipateModal toggleModal={toggleModal} idActivity={idActivity} />)}
+
     </div>
   );
 }
 
-export function Cards(){
+export function Cards() {
+  const [actividades, setActividades] = useState([]);
 
+     ///funcion para obtener los datos del estudiante(participante)
+     const handleGetActivitiesPublic = async () => {
+         try {
+             const response = await fetch(`${API_URL}/api/actividades/pagina`);
+             if (response.ok) {
+                 const data = await response.json();
+                 setActividades(data);
+             } else {
+                 Swal.fire({
+                     icon: 'error',
+                     title: 'Error',
+                     text: 'No se pudo obtener los datos del participante'
+ 
+                 })
+             }
+         } catch (error) {
+             Swal.fire({
+                 icon: 'error',
+                 title: 'Error no se pudo obtener los datos del participante',
+                 text: 'Compruebe su conexion a internet'
+ 
+             })
+         }
+ 
+ 
+     }
 
-  return(
-    <div className='grid grid-cols-3 gap-4 w-4/5 mx-auto my-10'>
-      <Card nombre="Actividad 1" encargado="David Larota" />
-      <Card nombre="Actividad 2" encargado="Bernardo Pari"/>
-      <Card nombre="Actividad 3" encargado="Lennin Chura"/>
-      <Card nombre="Actividad 4" encargado="Marco Quispe"/>
-      <Card nombre="Actividad 3" encargado="Lennin Chura"/>
-      <Card nombre="Actividad 4" encargado="Marco Quispe"/>
+     useEffect(() => {
+         handleGetActivitiesPublic();
+     }, [])
+  return (
+    <div className='grid grid-cols-3 gap-4 w-4/5 mx-auto my-10 relative'>
+
+      {
+        actividades.map((actividad, index) => (
+          <Card key={actividad.idActivi} nombreAct={actividad.name} encargado={actividad.project.usuario.n_usu} idActivity={actividad.idActivi} />
+        ))
+      }
 
     </div>
   )
