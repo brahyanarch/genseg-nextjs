@@ -1,17 +1,18 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileImage, ArrowUpDown } from 'lucide-react';
 import { API_URL } from '@/config/apiconfig';
-import { BreadcrumbWithDropdown } from '@/components/breadcrumb';
-import { BreadcrumbItemType } from '@/tipos/typos';
-import { useParams, usePathname,  } from 'next/navigation';
+import Image from 'next/image';
 
 interface ImageItemProps {
   index: number;
-  img: string;
+  filename: string;
+  size: string;
+  timestamp: string;
+  imageUrl: string;
   onFileChange: (index: number, file: File | null) => void;
   onTitleChange: (index: number, title: string) => void;
   onDescChange: (index: number, desc: string) => void;
@@ -19,7 +20,10 @@ interface ImageItemProps {
 
 function ImageItem({
   index,
-  img,
+  filename,
+  size,
+  timestamp,
+  imageUrl,
   onFileChange,
   onTitleChange,
   onDescChange
@@ -54,14 +58,14 @@ function ImageItem({
           <span>{imageFile && (imageFile.name)}</span>
         </div>
         <div className="flex items-center justify-between text-xs text-slate-400">
-          <span>{imageFile ? (imageFile.size / 1024).toFixed(2) : 10} KB</span>
+          <span>{imageFile ? (imageFile.size / 1024).toFixed(2): size} KB</span>
           <span>|</span>
-          <span>{imageFile ? (imageFile.type) : "timestamp"}</span>
+          <span>{imageFile ? (imageFile.type):timestamp}</span>
         </div>
         <div className="relative aspect-video mt-2 overflow-hidden rounded-sm">
-          <img
-            src={imageFile ? URL.createObjectURL(imageFile) : `${API_URL}/${img}`}
-            alt={"filename"}
+          <Image
+            src={imageFile ? URL.createObjectURL(imageFile) : imageUrl}
+            alt={filename}
             className="object-cover w-full h-full"
             width={200}
             height={100}
@@ -71,7 +75,7 @@ function ImageItem({
       <CardFooter className="p-2">
         <input
           type="file"
-          id={`fileInput-${"filename"}`}
+          id={`fileInput-${filename}`}
           className="hidden"
           onChange={handleChange}
         />
@@ -79,7 +83,7 @@ function ImageItem({
           variant="ghost"
           size="sm"
           className="w-full text-blue-400 hover:text-blue-300 hover:bg-blue-950"
-          onClick={() => document.getElementById(`fileInput-${"filename"}`)?.click()}
+          onClick={() => document.getElementById(`fileInput-${filename}`)?.click()}
         >
           <ArrowUpDown className="h-4 w-4 mr-2" />
           Cambiar imagen
@@ -130,10 +134,6 @@ const ImageGallery: React.FC = () => {
   const [selectedImages, setSelectedImages] = useState<(File | null)[]>([]);
   const [titles, setTitles] = useState<string[]>([]);
   const [descriptions, setDescriptions] = useState<string[]>([]);
-  const [images, setImages] = useState([]);
-  ///navegación
-  const pathname = usePathname();
-  const { dni, idsubuni, idrol } = useParams();
 
   const handleFileChange = (index: number, file: File | null) => {
     const updatedImages = [...selectedImages];
@@ -198,44 +198,47 @@ const ImageGallery: React.FC = () => {
       alert('Error al subir las imágenes.');
     }
   };
-  const getDateCarrusel = async () => {
-    const res = await fetch(`${API_URL}/api/carrusel`);
-    const data = await res.json();
-    setImages(data);
-  }
-  useEffect(() => {
-    getDateCarrusel();
-  }, []);
 
-
-   ///recortar rutas
-   const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
-    const partes = ruta.split('/'); // Divide la ruta en partes
-    const indice = partes.indexOf(segmento); // Encuentra el índice del segmento clave
-    if (indice === -1) return ruta; // Si no encuentra el segmento, retorna la ruta completa
-    return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
-  };
-  //recortamos las rutas requeridas
-  const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
-  //definimos valores para el breadCrumb
-  const breadcrumbData:BreadcrumbItemType[] = [
-    { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
-    { type: "page", label: "Pagina" },
-    { type: "page", label: "Carrusel" },
+  const images = [
+    {
+      filename: 'Image 1',
+      size: '768 kb',
+      timestamp: '21st Dec, 12:56 PM',
+      imageUrl: '/resources/images/53.png',
+    },
+    {
+      filename: 'Image 2',
+      size: '512 kb',
+      timestamp: '22nd Dec, 10:30 AM',
+      imageUrl: '/resources/images/54.png',
+    },
+    {
+      filename: 'Image 3',
+      size: '1 MB',
+      timestamp: '23rd Dec, 03:20 PM',
+      imageUrl: '/resources/images/55.png',
+    },
+    {
+      filename: 'Image 4',
+      size: '256 kb',
+      timestamp: '24th Dec, 06:45 PM',
+      imageUrl: '/resources/images/56.png',
+    },
   ];
+
   return (
-    <div className="p-4  min-h-screen">
-      <div className="flex gap-4 p-4 items-center mx-auto text-sm breadcrumbs mb-4 text-muted-foreground">
-        <BreadcrumbWithDropdown items={breadcrumbData} />
-      </div>
-      <h1 className="text-xl font-bold text-black mb-6 text-center dark:text-white">Configurar imagenes para carrusel</h1>
+    <div className="p-4 bg-slate-950 min-h-screen">
+      <h1 className="text-xl font-bold text-slate-100 mb-6">Subir y previsualizar imágenes</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
         {images.map((image, index) => (
           <ImageItem
             key={index}
             index={index}
-            img={image.img}
+            filename={image.filename}
+            size={image.size}
+            timestamp={image.timestamp}
+            imageUrl={image.imageUrl}
             onFileChange={handleFileChange}
             onTitleChange={handleTitleChange}
             onDescChange={handleDescChange}
