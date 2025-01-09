@@ -72,7 +72,7 @@ export default function Home() {
   const [mostrarAlerta, setMostrarAlerta] = useState(false);
   const {mostrarAviso} = useContext<any>(AvisoContext);
   const [aviso, setAviso] = useState<any>(null); // Cambia el tipo según tu modelo
-
+  const [datos, setDatos] = useState([]);
   const getAviso = async () => {
     try {
       const res = await fetch(`${API_URL}/api/anuncio`);
@@ -82,8 +82,19 @@ export default function Home() {
       console.error("Error al obtener el aviso:", error);
     }
   };
+  const getDateCarrusel = async () =>{
+    const res = await fetch(`${API_URL}/api/carrusel`);
+    const data = await res.json();
+    setDatos(data);
+  }
+
+  const sortedArray = datos.sort((a, b) => a.idcarrusel - b.idcarrusel);
+  console.log(sortedArray)
+
+  
 
   useEffect(() => {
+    getDateCarrusel();
     getAviso();
   }, []);
 
@@ -91,7 +102,7 @@ export default function Home() {
     <div className="bg-ColorPrincipal">
       {aviso && <AvisoModal aviso={aviso} />} {/* Muestra el modal si hay datos */}
       <Navbarr />
-      <Carrusel data={datos}/>
+      <Carrusel data={sortedArray}/>
       {/*<ObtenerCertificado key={frameworks} />*/}
       <ObtenerCertificado data={frameworks} />
       <Footer />
