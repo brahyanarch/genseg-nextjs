@@ -9,17 +9,25 @@ import { BreadcrumbWithDropdown } from "@/components/breadcrumb"
 import { BreadcrumbItemType } from "@/tipos/typos"
 import { API_GET_PROJECTS } from "@/config/apiconfig";
 import { Edit, Trash2, Eye } from "lucide-react";
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
+import { Input } from "@/components/ui/input"
+import { Search } from "lucide-react"
 import DynamicTable from "@/components/DynamicTable";
 import Image from "next/image"
 import clsx from "clsx"
 
-interface Project {
-  idproj: number;
-  estado: string;
-  escuelaProfesional: string;
-  fInit: string;
-  fFin: string;
-  idString: string;
+interface Alumno {
+  idest: number;
+  dni: string;
+  codigo: string;
+  nombre: string;
+  aPaterno: string;
+  aMaterno: string;
+  email: string;
+}
+interface Asistente {
+  alumno: Alumno;
 }
 export function Card({ nombre, encargado }: any) {
   return (
@@ -71,8 +79,8 @@ export default function ActivityForm() {
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFinal, setFechaFinal] = useState("");
   const [answers, setAnswers] = useState<{ [key: number]: any }>({}); // Estado para almacenar respuestas
-  const [publicar, setPublicar] = useState(false);
-  const [participantes, setParticipantes] = useState([]);
+
+  const [participantes, setParticipantes] = useState<Asistente[]>([]);
   const { projectId, activityId, dni, idrol, idsubuni } = useParams();
   const pathname = usePathname();
   const router = useRouter();
@@ -83,6 +91,7 @@ export default function ActivityForm() {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [searchTerm, setSearchTerm] = useState("");
+  const [isPublic, setisPublic] = useState(false)
 
   // función para ver detalles del proyecto
   const viewProject = (projectId: number) => {
@@ -95,12 +104,12 @@ export default function ActivityForm() {
   //función para obtener datos desde la API
   const fetchParticipantes = async () => {
     try {
-      const response = await fetch(`${API_GET_PROJECTS}/${dni}/${idsubuni}`);
+      const response = await fetch(`${API_URL}/api/alumnos/actividad/${activityId}/`);
       if (!response.ok) {
         throw new Error("Error al obtener los Proyectos");
       }
       const data = await response.json();
-      setParticipantes(data.projectSubUnidad);
+      setParticipantes(data);
     } catch (err: any) {
 
     } finally {
@@ -178,53 +187,52 @@ export default function ActivityForm() {
 
 
   // Configuración de la tabla
-  const configurationUser = [
+  const configurationData = [
     {
       key: "idproj",
       label: "ID",
-      render: (item: Project) => <>{participantes.indexOf(item) + 1}</>,
+      render: (item: Asistente) => <>{participantes.indexOf(item) + 1}</>,
       sortable: true,
     },
     {
       key: "idString",
       label: "Nombre",
-      render: (item: Project) => item.idString,
+      render: (item: Asistente) => item.alumno.codigo,
       sortable: true,
     },
     {
       key: "fInit",
       label: "Fecha Inicio",
-      render: (item: Project) => formatearFecha(item.fInit),
+      render: (item: Asistente) => item.alumno.nombre,
       sortable: false,
     },
     {
       key: "fFin",
       label: "Fecha Final",
-      render: (item: Project) => formatearFecha(item.fFin),
+      render: (item: Asistente) => item.alumno.aPaterno,
       sortable: false,
     },
     {
       key: "estado",
       label: "Estado",
-      render: (item: Project) => item.estado,
+      render: (item: Asistente) => item.alumno.aMaterno,
       sortable: true,
     },
     {
       key: "opciones",
       label: "Opciones",
-      render: (item: Project) => (
+      render: (item: Asistente) => (
         <>
-          <Button variant="ghost" size="icon" onClick={() => editProject(item.idproj)}>
+          <Button variant="ghost" size="icon" >
             <Edit className="h-5 w-5" strokeWidth={2.5} />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => console.log(item.idproj)}
           >
             <Trash2 className="h-5 w-5" strokeWidth={2.5} />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => viewProject(item.idproj)} >
+          <Button variant="ghost" size="icon"  >
             <Eye className="h-5 w-5" strokeWidth={2.5} />
           </Button>
         </>
@@ -323,6 +331,32 @@ export default function ActivityForm() {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
+
+  const handleToggle = async (checked: boolean) => {
+    setisPublic(checked); // Cambia el estado visualmente antes de la API call
+    try {
+      const response = await fetch(`${API_URL}/api/actividad/toggle/${activityId}/`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          public: checked, // Envía el nuevo estado del toggle
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al actualizar el estado de la actividad");
+      }
+
+      const result = await response.json();
+      console.log("Estado actualizado:", result);
+    } catch (error) {
+      console.error("Error en la solicitud:", error);
+      setisPublic(!checked); // Revierte el cambio si la solicitud falla
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -343,7 +377,7 @@ export default function ActivityForm() {
         setQuestions(data.preguntas); // Ajusta según la estructura de datos
         setAnswers(data.respuestas);     // Ajusta según la estructura de datos
         setNombreActividad(data.actividad.name); // Ajusta según la estructura de datos
-
+        setisPublic(data.actividad.public); // Ajusta según la estructura de datos
         setFechaInicio(formatDate(data.actividad.fInit));    // Ajusta según la estructura de datos
         setFechaFinal(formatDate(data.actividad.fFin));   // Ajusta según la estructura de datos
       } catch (err: any) {
@@ -463,31 +497,40 @@ export default function ActivityForm() {
 
       {/* Botones */}
       <div className="w-[90%] mx-auto flex justify-end space-x-6 pt-8">
-        <Button
-          variant="destructive"
-          className={clsx(" h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md  transition-all duration-300",
-            { "bg-red-600 hover:bg-red-700 w-40": publicar },
-            { "bg-blue-600 hover:bg-blue-700": !publicar }
-          )}
-          onClick={() => setPublicar(!publicar)}
-        >
-          {!publicar ? "Publicar Actividad" : "Desactivar Publicación"}
-        </Button>
-        <Button
-          className="bg-blue-600 hover:bg-blue-700 h-12 w-36 text-white px-6 py-3 rounded-lg shadow-md focus:ring-4 focus:ring-blue-500 transition-all duration-300"
-        >
-          Editar Card
-        </Button>
+       
       </div>
 
-      <div className="pt-2">
+      <div className="bg-[#E3E6ED] rounded-lg p-4 flex items-center space-x-4 mx-auto">
+      <Switch
+      className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-slate-400"
+          thumbColor="bg-white"
+          checked={isPublic}
+          onCheckedChange={handleToggle}
+          />
+          
+      <Label className="text-black">Publicar Actividad</Label>
+      </div>
+      
+      <div className="pt-2 ">
         <Card />
       </div>
+      <div className="relative">
+        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Buscar..."
+          type="text"
+          className="pl-8 w-[250px] bg-background"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+
+        />
+      </div>
       <div className="w-[80%] mx-auto">
+        
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white my-4">Lista de participantes en la actividad ({participantes.length})</h2>
         <div className="bg-[#E3E6ED] rounded-lg pt-6  ">
           <DynamicTable
-            configuration={configurationUser}
+            configuration={configurationData}
             data={currentItems}
             onSort={handleSort}
           />
