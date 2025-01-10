@@ -1,18 +1,12 @@
 "use client";
 //importando
 import { useState, useEffect, useContext } from "react";
-import { Menu, X, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
 import Carrusel from "../components/comPageMain/carrusel";
 import Navbarr from "../components/comPageMain/navbar";
 import Footer from "@/components/comPageMain/Footer";
 import ObtenerCertificado from "@/components/comPageMain/getCertificate";
 import AvisoModal from "@/components/comPageMain/avisoModal";
-import Aviso from '@/components/aviso';
-import {AvisoContext} from '@/context/avisoContext'
-import ModalForm from '@/components/componentesFormulario/noteForm'
-import {API_URL} from '@/config/apiconfig'
+import { API_URL } from '@/config/apiconfig'
 //funcion principal que controla el Modal de aviso
 
 const datos = [
@@ -32,7 +26,7 @@ const datos = [
     src: "/resources/images/fb3.jpg",
     alt: "Third slide",
     heading: "Seguimiento al egresado",
-    
+
   },
   {
     src: "/resources/images/fb4.jpg",
@@ -40,9 +34,9 @@ const datos = [
     heading: "Proyección Social y Extensión Cultural",
     description: "Evidencia de las que no estamos, y sobre todo el respeto",
   },
-  ];
+];
 
-  
+
 // Lista de frameworks
 const frameworks = [
   {
@@ -69,10 +63,9 @@ const frameworks = [
 
 
 export default function Home() {
-  const [mostrarAlerta, setMostrarAlerta] = useState(false);
-  const {mostrarAviso} = useContext<any>(AvisoContext);
   const [aviso, setAviso] = useState<any>(null); // Cambia el tipo según tu modelo
   const [datos, setDatos] = useState([]);
+  const [subUnidades, setSubunidades] = useState([]);
   const getAviso = async () => {
     try {
       const res = await fetch(`${API_URL}/api/anuncio`);
@@ -82,29 +75,40 @@ export default function Home() {
       console.error("Error al obtener el aviso:", error);
     }
   };
-  const getDateCarrusel = async () =>{
+  const getDataCarrusel = async () => {
     const res = await fetch(`${API_URL}/api/carrusel`);
     const data = await res.json();
     setDatos(data);
   }
 
+
   const sortedArray = datos.sort((a, b) => a.idcarrusel - b.idcarrusel);
   console.log(sortedArray)
 
-  
+  const getSubUnidades = async () => {
+      const res = await fetch(`${API_URL}/api/subunidad`);
+
+      console.log("subunidades obtenidos exitosamente")
+      const data = await res.json();
+      setSubunidades(
+        data
+      );
+  };
+  console.log(subUnidades)
+
 
   useEffect(() => {
-    getDateCarrusel();
+    getDataCarrusel();
     getAviso();
+    getSubUnidades();
   }, []);
-
   return (
     <div className="bg-ColorPrincipal">
       {aviso && <AvisoModal aviso={aviso} />} {/* Muestra el modal si hay datos */}
       <Navbarr />
-      <Carrusel data={sortedArray}/>
+      <Carrusel data={sortedArray} />
       {/*<ObtenerCertificado key={frameworks} />*/}
-      <ObtenerCertificado data={frameworks} />
+     <ObtenerCertificado data={subUnidades} />
       <Footer />
     </div>
   );

@@ -23,68 +23,76 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-
+import { API_URL } from '@/config/apiconfig';
 
 
 interface comboValores {
-  value: String;
-  label: String;
+  id_subuni: number,
+  n_subuni: string,
+  abreviatura: string,
+  createAt: string,
+  updateAt: string,
 }
 interface vectorComboValores {
+  value: number,
+  setValue: ()=>void,
   data: comboValores[];
 }
 
-// Componente de demostración de Combobox
-function ComboboxDemo({ data }: vectorComboValores) {
-  const [open, setOpen] = useState(false)
-  const [value, setValue] = useState("")
-
+function ComboboxDemo({ data, value, setValue }: vectorComboValores) {
+  const [open, setOpen] = useState(false);
+ 
+  console.log(value)
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-[300px] justify-between"
-        >
-          {value
-            ? data.find((data) => data.value === value)?.label
-            : data[0].label.toString()}
-          <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
-        <Command>
-          <CommandList>
-
-            <CommandEmpty>No se encontró ningúna sub unidad.</CommandEmpty>
-            <CommandGroup>
-              {data.map((framework, index) => (
-                <CommandItem
-                  key={index}
-                  value={framework.value.toString()}
-                  onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue)
-                    setOpen(false)
-                  }}
-                >
-                  {framework.label}
-                  <CheckIcon
-                    className={cn(
-                      "ml-auto h-4 w-4",
-                      value === framework.value ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  )
+    <>
+      {data && data.length > 0 ? (
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className="w-[300px] justify-between"
+            >
+              {value !== null
+                ? (data.find((item) => item.id_subuni === value)?.n_subuni?.length ?? 0) > 32 ? (data.find((item) => item.id_subuni === value)?.n_subuni?.slice(0,32) +"...") : (data.find((item) => item.id_subuni === value)?.n_subuni)
+                : "Seleccionar una subunidad"}
+              <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[200px] p-0">
+            <Command>
+              <CommandList>
+                <CommandEmpty>No se encontró ninguna subunidad.</CommandEmpty>
+                <CommandGroup>
+                  {data.map((item) => (
+                    <CommandItem
+                      key={item.id_subuni}
+                      value={item.id_subuni.toString()}
+                      onSelect={() => {
+                        setValue(item.id_subuni);
+                        setOpen(false);
+                      }}
+                    >
+                      {item.n_subuni}
+                      <CheckIcon
+                        className={cn(
+                          "ml-auto h-4 w-4",
+                          value === item.id_subuni ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      ) : null}
+    </>
+  );
 }
+
 
 ///informacion del certificado
 const activities = [
@@ -146,7 +154,7 @@ export const ObtenerCertificadoModal = ({ isOpen, setIsOpen }: any) => {
             ))}
           </ul>
         </div>
-        <Button className="mt-4 w-full " onClick={() => setIsOpen(false)}>
+        <Button className="w-full bg-indigo-600 text-white hover:bg-indigo-700 transition rounded-md py-2" onClick={() => setIsOpen(false)}>
           Solicitar
         </Button>
       </DialogContent>
@@ -158,9 +166,29 @@ export const ObtenerCertificadoModal = ({ isOpen, setIsOpen }: any) => {
 const ObtenerCertificado = ({ data }: vectorComboValores) => {
   //estado para manejar el el valor de activo e inactivo del modal obtener certificado.
   const [isOpen, setIsOpen] = useState(false)
+  const [dni, setDni] = useState('');
+  const [value, setValue] = useState<number | null>(null);
+  const [infoParticipante, setInfoParticipante] = useState();
   //funcion para cambiar el esatao(valor) del modal obtener certificado
-  function changeModalObCertificado() {
+  const changeModalObCertificado = () => {
     setIsOpen(!isOpen);
+    console.log(value);
+  }
+  //funcion para Consultar el certificado
+  const handleCertificate = async () => {
+      try{
+        const response = await fetch(`${API_URL}/api/certificado/${value}/${dni}`)
+
+        if(response.ok){
+         const data = await response.json();
+         setInfoParticipante(data);
+        }else{
+
+        }
+
+      }catch(error){
+
+      }
   }
   return (
     <>
@@ -173,12 +201,14 @@ const ObtenerCertificado = ({ data }: vectorComboValores) => {
         <div className="flex justify-between items-center w-[90%]  mb-4">
           <h3 className="text-lg"></h3>
           {/*<ComboboxDemo {data} />*/}
-          <ComboboxDemo data={data} />
+          <ComboboxDemo data={data} value={value} setValue={setValue} />
           <div className="flex space-x-4">
             <input
               type="text"
               className="border border-gray-300 p-2 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="DNI"
+              value={dni}
+              onChange={(e)=>setDni(e.target.value)}
             />
             <button
               type="submit"
