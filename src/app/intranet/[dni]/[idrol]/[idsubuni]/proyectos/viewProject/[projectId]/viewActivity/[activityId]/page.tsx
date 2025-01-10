@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
 import DynamicTable from "@/components/DynamicTable";
 import Image from "next/image"
 import clsx from "clsx"
@@ -28,6 +29,7 @@ interface Alumno {
 }
 interface Asistente {
   alumno: Alumno;
+  asistio: boolean;
 }
 export function Card({ nombre, encargado }: any) {
   return (
@@ -185,56 +187,84 @@ export default function ActivityForm() {
     return fechaFormateada;
   }
 
+  const handleAsistance = async (asistio: boolean, idEstudiante: number) => {
+    console.log("handleAsistance llamado:", { asistio, idEstudiante });
+    setParticipantes((prev) =>
+      prev.map((item) =>
+        item.alumno.idest === idEstudiante
+          ? { ...item, asistio } // Actualiza directamente el valor de `asistio`
+          : item
+      )
+    ); // Cambia el estado visualmente antes de la API call
+    try {
+      const response = await fetch(`${API_URL}/api/asistencia/toggle/${idEstudiante}/`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          participo: asistio, // Envía el nuevo estado del toggle
+          idsubunidad: idsubuni,
+          idActivi: activityId,
+        }),
+      });
 
+      if (!response.ok) {
+        throw new Error("Error al actualizar el estado de la actividad");
+      }
+
+      const result = await response.json();
+      console.log("Estado actualizado:", result);
+    } catch (error) {
+      console.error("Error en la solicitud:", error);
+      // Revierte el cambio si la solicitud falla
+      setParticipantes((prev) =>
+        prev.map((item) =>
+          item.alumno.idest === idEstudiante
+            ? { ...item, asistio: !asistio } // Revertir el estado de `asistio`
+            : item
+        )
+      );
+    }
+  };
   // Configuración de la tabla
   const configurationData = [
     {
-      key: "idproj",
+      key: "alumno.idest",
       label: "ID",
       render: (item: Asistente) => <>{participantes.indexOf(item) + 1}</>,
       sortable: true,
     },
     {
-      key: "idString",
-      label: "Nombre",
+      key: "alumno.codigo",
+      label: "Codigo",
       render: (item: Asistente) => item.alumno.codigo,
       sortable: true,
     },
     {
-      key: "fInit",
-      label: "Fecha Inicio",
+      key: "alumno.nombre",
+      label: "Nombre",
       render: (item: Asistente) => item.alumno.nombre,
       sortable: false,
     },
     {
-      key: "fFin",
-      label: "Fecha Final",
+      key: "alumno.aPaterno",
+      label: "Apellido Paterno",
       render: (item: Asistente) => item.alumno.aPaterno,
       sortable: false,
     },
     {
-      key: "estado",
-      label: "Estado",
+      key: "alumno.aMaterno",
+      label: "Apellido Materno",
       render: (item: Asistente) => item.alumno.aMaterno,
       sortable: true,
     },
     {
-      key: "opciones",
-      label: "Opciones",
+      key: "Asistencia",
+      label: "Asistencia",
       render: (item: Asistente) => (
         <>
-          <Button variant="ghost" size="icon" >
-            <Edit className="h-5 w-5" strokeWidth={2.5} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-          >
-            <Trash2 className="h-5 w-5" strokeWidth={2.5} />
-          </Button>
-          <Button variant="ghost" size="icon"  >
-            <Eye className="h-5 w-5" strokeWidth={2.5} />
-          </Button>
+          <Checkbox  checked={item.asistio} onClick={() => handleAsistance(!item.asistio, item.alumno.idest)}/>
         </>
       ),
     },
@@ -331,6 +361,8 @@ export default function ActivityForm() {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
+
+  
 
   const handleToggle = async (checked: boolean) => {
     setisPublic(checked); // Cambia el estado visualmente antes de la API call
