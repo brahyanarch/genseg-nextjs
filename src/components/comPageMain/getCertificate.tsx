@@ -102,50 +102,54 @@ const activities = [
   { id: 4, name: "Control de bolas dentro del campus universitario", completed: true },
 ]
 ///componente Modal Obtener certificado
-export const ObtenerCertificadoModal = ({ isOpen, setIsOpen }: any) => {
+export const ObtenerCertificadoModal = ({ isOpen, setIsOpen, infoParticipante, certificado }: any) => {
   return (
+    
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[530px] max-w-[350px] bg-white  text-black">
         <DialogHeader>
           <DialogTitle>Estado del Certificado</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="nombres" className="text-right">
-              Nombres
-            </Label>
-            <Input id="nombres" defaultValue="David Brahyan" className="col-span-3" />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="apellidos" className="text-right">
-              Apellidos
-            </Label>
-            <Input id="apellidos" defaultValue="Larota pilco" className="col-span-3" />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="codigo" className="text-right">
-              Código
-            </Label>
-            <Input id="codigo" defaultValue="201861" className="col-span-3" />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="escuela" className="text-right">
-              Escuela Profesional
-            </Label>
-            <Input id="escuela" defaultValue="Ing. Sistemas" className="col-span-3" />
-          </div>
-        </div>
+        { infoParticipante.length > 0 && (
+           <div className="grid gap-4 py-4">
+           <div className="grid grid-cols-4 items-center gap-4">
+             <Label htmlFor="nombres" className="text-right">
+             {infoParticipante[0].alumno.nombre}
+             </Label>
+             <Input id="nombres" defaultValue="David Brahyan" className="col-span-3" />
+           </div>
+           <div className="grid grid-cols-4 items-center gap-4">
+             <Label htmlFor="apellidos" className="text-right">
+             {infoParticipante[0].alumno.aPaterno} {infoParticipante[0].alumno.aMaterno}
+             </Label>
+             <Input id="apellidos" defaultValue="Larota pilco" className="col-span-3" />
+           </div>
+           <div className="grid grid-cols-4 items-center gap-4">
+             <Label htmlFor="codigo" className="text-right">
+             {infoParticipante[0].alumno.codigo}
+             </Label>
+             <Input id="codigo" defaultValue="201861" className="col-span-3" />
+           </div>
+           <div className="grid grid-cols-4 items-center gap-4">
+             <Label htmlFor="escuela" className="text-right">
+             {infoParticipante[0].alumno.prgest.nmPE}
+             </Label>
+             <Input id="escuela" defaultValue="Ing. Sistemas" value={infoParticipante[0].alumno.prgest.nmPE} className="col-span-3" />
+           </div>
+         </div>
+        )}
+        
         <div className="mt-4 ">
           <h3 className="mb-2 font-semibold">Actividades</h3>
           <ul className="space-y-2 h-[150px] p-2 border-black border-[2px] border-opacity-30 rounded-[5px] overflow-auto">
-            {activities.map((activity) => (
+            {infoParticipante.map((activity) => (
               <li
                 key={activity.id}
-                className={`flex items-center justify-between p-2 rounded ${activity.completed ? 'bg-green-100' : 'bg-red-100'
+                className={`flex items-center justify-between p-2 rounded ${activity.asistio ? 'bg-green-100' : 'bg-red-100'
                   }`}
               >
-                <span>{activity.name}</span>
-                {activity.completed ? (
+                <span>{activity.actividad.name}</span>
+                {activity.asistio ? (
                   <CheckIcon className="h-5 w-5 text-green-600" />
                 ) : (
                   <XIcon className="h-5 w-5 text-red-600" />
@@ -154,9 +158,11 @@ export const ObtenerCertificadoModal = ({ isOpen, setIsOpen }: any) => {
             ))}
           </ul>
         </div>
-        <Button className="w-full bg-indigo-600 text-white hover:bg-indigo-700 transition rounded-md py-2" onClick={() => setIsOpen(false)}>
+        <Button className="w-full bg-indigo-600 text-white hover:bg-indigo-700 transition rounded-md py-2" onClick={() => setIsOpen(false)}
+          {...(certificado ? { disabled: true } : {})}>
           Solicitar
         </Button>
+        
       </DialogContent>
     </Dialog>
   )
@@ -168,7 +174,8 @@ const ObtenerCertificado = ({ data }: vectorComboValores) => {
   const [isOpen, setIsOpen] = useState(false)
   const [dni, setDni] = useState('');
   const [value, setValue] = useState<number | null>(null);
-  const [infoParticipante, setInfoParticipante] = useState();
+  const [infoParticipante, setInfoParticipante] = useState([]);
+  const [certificado, setCertificado] = useState(false);
   //funcion para cambiar el esatao(valor) del modal obtener certificado
   const changeModalObCertificado = () => {
     setIsOpen(!isOpen);
@@ -177,12 +184,17 @@ const ObtenerCertificado = ({ data }: vectorComboValores) => {
   //funcion para Consultar el certificado
   const handleCertificate = async () => {
       try{
-        const response = await fetch(`${API_URL}/api/certificado/${value}/${dni}`)
+        const response = await fetch(`${API_URL}/api/completados/actividades/${dni}/${value}`)
 
         if(response.ok){
          const data = await response.json();
-         setInfoParticipante(data);
+         setInfoParticipante(data.actividadesAsistidas);
+         setCertificado(data.certificado);
+         console.log("datos obtenidos exitosamente");
+         changeModalObCertificado();
+
         }else{
+          console.log("error al obtener los datos del participante");
 
         }
 
@@ -213,7 +225,7 @@ const ObtenerCertificado = ({ data }: vectorComboValores) => {
             <button
               type="submit"
               className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition duration-300"
-              onClick={changeModalObCertificado}
+              onClick={handleCertificate}
             >
               Consultar
             </button>
@@ -224,7 +236,11 @@ const ObtenerCertificado = ({ data }: vectorComboValores) => {
           Los certificados se entregarán de manera digital a su correo institucional, si requiere en físico apersonarse a la oficina de la DPSEC.
         </p>
       </div>
-      <ObtenerCertificadoModal isOpen={isOpen} setIsOpen={setIsOpen} />
+      { infoParticipante.length > 0 && (
+        <ObtenerCertificadoModal isOpen={isOpen} setIsOpen={setIsOpen} infoParticipante={infoParticipante} certificado={certificado} />
+      )
+      }
+      
     </>
   );
 }
