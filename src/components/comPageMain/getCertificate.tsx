@@ -1,249 +1,183 @@
-//importando recursos
+'use client'
 
-"use client"
-import { useState } from 'react';
-//import * as React from "react"
-import { CaretSortIcon } from "@radix-ui/react-icons"
-import { cn } from "@/lib/utils"
+import { useState, useMemo } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { CheckIcon, XIcon } from "lucide-react"
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { API_URL } from '@/config/apiconfig';
+import { Eye, Download } from 'lucide-react'
+import { FilterableTable } from '@/components/filterableTable'
+import { PaginationButtons } from '@/components/paginationButtons'
+import { SearchComponent } from '@/components/searchComponent'
 
-
-interface comboValores {
-  id_subuni: number,
-  n_subuni: string,
-  abreviatura: string,
-  createAt: string,
-  updateAt: string,
-}
-interface vectorComboValores {
-  value: number,
-  setValue: ()=>void,
-  data: comboValores[];
+interface Certificado {
+  id: string
+  actividad: string
+  tipo: string
+  codigoEstudiante: string
 }
 
-function ComboboxDemo({ data, value, setValue }: vectorComboValores) {
-  const [open, setOpen] = useState(false);
- 
-  console.log(value)
-  return (
-    <>
-      {data && data.length > 0 ? (
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              role="combobox"
-              aria-expanded={open}
-              className="w-[300px] justify-between"
-            >
-              {value !== null
-                ? (data.find((item) => item.id_subuni === value)?.n_subuni?.length ?? 0) > 32 ? (data.find((item) => item.id_subuni === value)?.n_subuni?.slice(0,32) +"...") : (data.find((item) => item.id_subuni === value)?.n_subuni)
-                : "Seleccionar una subunidad"}
-              <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[200px] p-0">
-            <Command>
-              <CommandList>
-                <CommandEmpty>No se encontró ninguna subunidad.</CommandEmpty>
-                <CommandGroup>
-                  {data.map((item) => (
-                    <CommandItem
-                      key={item.id_subuni}
-                      value={item.id_subuni.toString()}
-                      onSelect={() => {
-                        setValue(item.id_subuni);
-                        setOpen(false);
-                      }}
-                    >
-                      {item.n_subuni}
-                      <CheckIcon
-                        className={cn(
-                          "ml-auto h-4 w-4",
-                          value === item.id_subuni ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
-      ) : null}
-    </>
-  );
-}
+export default function ConsultaCertificados() {
+  const [dni, setDni] = useState('')
+  const [certificados, setCertificados] = useState<Certificado[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [searchTerm, setSearchTerm] = useState('')
+  const itemsPerPage = 5
 
+  const handleConsulta = async () => {
+    // Aquí iría la lógica para consultar los certificados con el DNI
+    // Por ahora, usaremos datos de ejemplo
+    const certificadosEjemplo: Certificado[] = [
+      { id: '1', actividad: 'Curso de React', tipo: 'Participación', codigoEstudiante: 'E001' },
+      { id: '2', actividad: 'Taller de Diseño UX', tipo: 'Aprobación', codigoEstudiante: 'E001' },
+      { id: '3', actividad: 'Conferencia de IA', tipo: 'Asistencia', codigoEstudiante: 'E001' },
+      { id: '4', actividad: 'Bootcamp de Node.js', tipo: 'Aprobación', codigoEstudiante: 'E001' },
+      { id: '5', actividad: 'Seminario de Blockchain', tipo: 'Participación', codigoEstudiante: 'E001' },
+      { id: '6', actividad: 'Curso de Python', tipo: 'Aprobación', codigoEstudiante: 'E001' },
+      { id: '7', actividad: 'Taller de Data Science', tipo: 'Asistencia', codigoEstudiante: 'E001' },
+    ]
+    setCertificados(certificadosEjemplo)
+    setCurrentPage(1)
+    setSearchTerm('')
+  }
 
-///informacion del certificado
-const activities = [
-  { id: 1, name: "Limpieza en el bosque", completed: true },
-  { id: 2, name: "Capacitación para primeros auxilios", completed: false },
-  { id: 3, name: "Mantenimiento de las áreas verdes", completed: true },
-  { id: 4, name: "Control de bolas dentro del campus universitario", completed: true },
-]
-///componente Modal Obtener certificado
-export const ObtenerCertificadoModal = ({ isOpen, setIsOpen, infoParticipante, certificado }: any) => {
-  return (
-    
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[530px] max-w-[350px] bg-white  text-black">
-        <DialogHeader>
-          <DialogTitle>Estado del Certificado</DialogTitle>
-        </DialogHeader>
-        { infoParticipante.length > 0 && (
-           <div className="grid gap-4 py-4">
-           <div className="grid grid-cols-4 items-center gap-4">
-             <Label htmlFor="nombres" className="text-right">
-             {infoParticipante[0].alumno.nombre}
-             </Label>
-             <Input id="nombres" defaultValue="David Brahyan" className="col-span-3" />
-           </div>
-           <div className="grid grid-cols-4 items-center gap-4">
-             <Label htmlFor="apellidos" className="text-right">
-             {infoParticipante[0].alumno.aPaterno} {infoParticipante[0].alumno.aMaterno}
-             </Label>
-             <Input id="apellidos" defaultValue="Larota pilco" className="col-span-3" />
-           </div>
-           <div className="grid grid-cols-4 items-center gap-4">
-             <Label htmlFor="codigo" className="text-right">
-             {infoParticipante[0].alumno.codigo}
-             </Label>
-             <Input id="codigo" defaultValue="201861" className="col-span-3" />
-           </div>
-           <div className="grid grid-cols-4 items-center gap-4">
-             <Label htmlFor="escuela" className="text-right">
-             {infoParticipante[0].alumno.prgest.nmPE}
-             </Label>
-             <Input id="escuela" defaultValue="Ing. Sistemas" value={infoParticipante[0].alumno.prgest.nmPE} className="col-span-3" />
-           </div>
-         </div>
-        )}
-        
-        <div className="mt-4 ">
-          <h3 className="mb-2 font-semibold">Actividades</h3>
-          <ul className="space-y-2 h-[150px] p-2 border-black border-[2px] border-opacity-30 rounded-[5px] overflow-auto">
-            {infoParticipante.map((activity) => (
-              <li
-                key={activity.id}
-                className={`flex items-center justify-between p-2 rounded ${activity.asistio ? 'bg-green-100' : 'bg-red-100'
-                  }`}
-              >
-                <span>{activity.actividad.name}</span>
-                {activity.asistio ? (
-                  <CheckIcon className="h-5 w-5 text-green-600" />
-                ) : (
-                  <XIcon className="h-5 w-5 text-red-600" />
-                )}
-              </li>
-            ))}
-          </ul>
+  const handleVerCertificado = (id: string) => {
+    // Lógica para ver el certificado
+    console.log(`Ver certificado ${id}`)
+  }
+
+  const handleDescargarCertificado = (id: string) => {
+    // Lógica para descargar el certificado
+    console.log(`Descargar certificado ${id}`)
+  }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term)
+    setCurrentPage(1)
+  }
+
+  const columns = [
+    {
+      key: "id",
+      label: "ID",
+      render: (item: Certificado) => <>{certificados.indexOf(item) + 1}</>,
+      sortable: true,
+    },
+    {
+      key: "actividad",
+      label: "Actividad",
+      render: (item: Certificado) => item.actividad,
+      sortable: true,
+    },
+    {
+      key: "tipo",
+      label: "Tipo de Certificado",
+      render: (item: Certificado) => item.tipo,
+      sortable: true,
+    },
+    {
+      key: "codigoEstudiante",
+      label: "Código de Estudiante",
+      render: (item: Certificado) => item.codigoEstudiante,
+      sortable: true,
+    },
+    {
+      key: "opciones",
+      label: "Opciones",
+      render: (item: Certificado) => (
+        <div className="flex space-x-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleVerCertificado(item.id)}
+          >
+            <Eye className="h-4 w-4 mr-1" />
+            Ver
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleDescargarCertificado(item.id)}
+          >
+            <Download className="h-4 w-4 mr-1" />
+            Descargar
+          </Button>
         </div>
-        <Button className="w-full bg-indigo-600 text-white hover:bg-indigo-700 transition rounded-md py-2" onClick={() => setIsOpen(false)}
-          {...(certificado ? { disabled: true } : {})}>
-          Solicitar
-        </Button>
-        
-      </DialogContent>
-    </Dialog>
+      ),
+    },
+  ];
+
+  const filteredCertificados = useMemo(() => {
+    return certificados.filter((cert) =>
+      Object.values(cert).some((value) =>
+        value.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [certificados, searchTerm]);
+
+  const totalPages = Math.ceil(filteredCertificados.length / itemsPerPage)
+  const paginatedData = filteredCertificados.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
+
+  return (
+    <div className="bg-gray-300 gap-4 text-gray-800 flex flex-col justify-center items-center mx-auto my-[50px] p-8 rounded-lg shadow-lg w-4/5">
+      <h2 className="text-2xl font-bold mb-4 text-gray-700">Consulta de Certificados</h2>
+      <p className="text-sm bg-blue-100 text-blue-600 p-2 rounded-md w-[90%] text-center mb-4">
+        ¡Atención! Los certificados se solicitan una vez que el voluntario participante culminó con las 3 actividades designadas.
+        <br /> Ingrese su número de DNI para consultar los certificados disponibles.
+      </p>
+      <div className="flex justify-between items-center w-[90%] mb-4">
+        <h3 className="text-lg"></h3>
+        <div className="w-[60%] flex justify-between items-center space-x-8 mx-auto">
+          <Input
+            type="text"
+            placeholder="Ingrese su DNI"
+            value={dni}
+            onChange={(e) => setDni(e.target.value)}
+            className="border border-gray-900 p-2 bg-white rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 max-w-xs"
+            maxLength={8}
+          />
+          <Button
+            onClick={handleConsulta}
+            className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-md transition duration-300"
+          >
+            Consultar
+          </Button>
+        </div>
+      </div>
+      <p className="text-sm bg-yellow-100 text-yellow-600 p-2 rounded-md w-[90%] text-center mb-2">
+        Los certificados se entregarán de manera digital a su correo institucional. Si requiere en físico, apersónese a la oficina de la DPSEC.
+      </p>
+    
+      {certificados.length > 0 && (
+        <div className="w-full bg-white rounded-lg p-6 shadow-md mt-2">
+          <h3 className="text-gray-700 font-bold text-xl mb-4">
+            Certificados encontrados
+          </h3>
+          <SearchComponent
+            onSearchChange={handleSearchChange}
+          />
+          <div className="mt-4">
+            <FilterableTable
+              data={paginatedData}
+              columns={columns}
+              filterConfig={columns}
+            />
+          </div>
+          <div className="mt-4">
+            <PaginationButtons
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 
-//const PrivilegiosPage = () => {
-const ObtenerCertificado = ({ data }: vectorComboValores) => {
-  //estado para manejar el el valor de activo e inactivo del modal obtener certificado.
-  const [isOpen, setIsOpen] = useState(false)
-  const [dni, setDni] = useState('');
-  const [value, setValue] = useState<number | null>(null);
-  const [infoParticipante, setInfoParticipante] = useState([]);
-  const [certificado, setCertificado] = useState(false);
-  //funcion para cambiar el esatao(valor) del modal obtener certificado
-  const changeModalObCertificado = () => {
-    setIsOpen(!isOpen);
-    console.log(value);
-  }
-  //funcion para Consultar el certificado
-  const handleCertificate = async () => {
-      try{
-        const response = await fetch(`${API_URL}/api/completados/actividades/${dni}/${value}`)
-
-        if(response.ok){
-         const data = await response.json();
-         setInfoParticipante(data.actividadesAsistidas);
-         setCertificado(data.certificado);
-         console.log("datos obtenidos exitosamente");
-         changeModalObCertificado();
-
-        }else{
-          console.log("error al obtener los datos del participante");
-
-        }
-
-      }catch(error){
-
-      }
-  }
-  return (
-    <>
-      <div className="bg-gray-300 gap-4 text-gray-800 flex flex-col justify-center items-center mx-auto my-[50px] p-8 rounded-lg shadow-lg w-4/5">
-        <h2 className="text-2xl font-bold mb-4 text-gray-700">Buscar Certificado</h2>
-        <p className="text-sm bg-blue-100 text-blue-600 p-2 rounded-md w-[90%] text-center mb-4">
-          ¡Atención! Los certificados se solicitan una vez que el voluntario participante culminó con las 3 actividades designadas.
-          <br /> seleccione la subunidad y  luego ingrese su número de DNI
-        </p>
-        <div className="flex justify-between items-center w-[90%]  mb-4">
-          <h3 className="text-lg"></h3>
-          {/*<ComboboxDemo {data} />*/}
-          <ComboboxDemo data={data} value={value} setValue={setValue} />
-          <div className="flex space-x-4">
-            <input
-              type="text"
-              className="border border-gray-300 p-2 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="DNI"
-              value={dni}
-              maxLength={8}
-              onChange={(e)=>setDni(e.target.value)}
-            />
-            <button
-              type="submit"
-              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition duration-300"
-              onClick={handleCertificate}
-            >
-              Consultar
-            </button>
-          </div>
-        </div>
-
-        <p className="text-sm bg-yellow-100 text-yellow-600 p-2 rounded-md w-[90%] text-center">
-          Los certificados se entregarán de manera digital a su correo institucional, si requiere en físico apersonarse a la oficina de la DPSEC.
-        </p>
-      </div>
-      { infoParticipante.length > 0 && (
-        <ObtenerCertificadoModal isOpen={isOpen} setIsOpen={setIsOpen} infoParticipante={infoParticipante} certificado={certificado} />
-      )
-      }
-      
-    </>
-  );
-}
-
-export default ObtenerCertificado;

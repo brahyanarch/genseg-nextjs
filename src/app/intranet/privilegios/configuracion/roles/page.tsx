@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import React, { useState, useEffect, useContext } from "react";
 import { Input } from "@/components/ui/input";
-import { X, Edit, Trash2, List, CirclePlus } from "lucide-react";
+import { X, Edit, Trash2, List, CirclePlus, Search } from "lucide-react";
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
 import { API_ROLES } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,11 +11,12 @@ import { Rol } from "@/tipos/typos"
 import { AvisoContext } from '@/context/avisoContext'
 import PermissionsManager from '@/components/ComponentsIntranet/permisosmanages'
 import { usePathname } from "next/navigation";
-import {BreadcrumbItemType} from '@/tipos/typos'
+import { BreadcrumbItemType } from '@/tipos/typos'
 
 // Notificaciones
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
+import SkeletonTable from "@/components/skeletonTable";
 // Modal para agregar un nuevo Rol
 
 export const EditModal = ({
@@ -36,14 +37,14 @@ export const EditModal = ({
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-  
+
     // Si estamos editando un rol (actualizando), no pedimos confirmación
     if (editingRole) {
       const updatedRole = {
         n_rol: name,
         abrev: abbreviation,
       };
-  
+
       try {
         const response = await fetch(
           `${API_ROLES}/${editingRole.id_rol}`, // Asegúrate de que el ID esté correctamente asignado
@@ -55,11 +56,11 @@ export const EditModal = ({
             body: JSON.stringify(updatedRole),
           }
         );
-  
+
         if (response.ok) {
           const savedRole = await response.json();
           onSaveRole(savedRole); // Guardar el rol actualizado en el estado
-  
+
           // Mostrar un SweetAlert de éxito con el check
           Swal.fire({
             icon: 'success',
@@ -67,7 +68,7 @@ export const EditModal = ({
             text: 'Rol actualizado correctamente.',
             confirmButtonText: 'OK',
           });
-  
+
           closeModal();  // Cerrar modal
         } else {
           // Si el servidor no responde bien, mostrar un SweetAlert de error
@@ -101,13 +102,13 @@ export const EditModal = ({
           confirmButton: 'bg-blue-500 text-white hover:bg-blue-600',
         },
       });
-  
+
       if (result.isConfirmed) {
         const newRole = {
           n_rol: name,
           abrev: abbreviation,
         };
-  
+
         try {
           const response = await fetch(API_ROLES, {
             method: 'POST',
@@ -116,11 +117,11 @@ export const EditModal = ({
             },
             body: JSON.stringify(newRole),
           });
-  
+
           if (response.ok) {
             const savedRole = await response.json();
             onSaveRole(savedRole); // Guardar el rol recién creado
-  
+
             // Mostrar un SweetAlert de éxito
             Swal.fire({
               icon: 'success',
@@ -128,7 +129,7 @@ export const EditModal = ({
               text: 'Rol creado correctamente.',
               confirmButtonText: 'OK',
             });
-  
+
             closeModal();  // Cerrar modal
           } else {
             // Si hay un error al guardar el rol
@@ -154,7 +155,7 @@ export const EditModal = ({
       }
     }
   };
-  
+
 
   if (!isOpen) return null;
 
@@ -279,7 +280,7 @@ const ConfiRoles = () => {
   // Función para filtrar los datos basados en el término de búsqueda
   const getFilteredData = () => {
     if (!searchTerm) return sortedUsers;
-  
+
     return sortedUsers.filter((user) =>
       Object.values(user).some((value) =>
         value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
@@ -287,7 +288,7 @@ const ConfiRoles = () => {
     );
   };
   const filteredUsers = getFilteredData();
-  
+
   const handleSort = (column: string) => {
     setSortColumn(column);
     setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -550,64 +551,11 @@ const ConfiRoles = () => {
       });
     }
   };
-
-
   if (loading) {
     return (
-      <>
-        <div className="p-6 space-y-6">
-          {/* Breadcrumb skeleton */}
-          <div className="flex items-center gap-2 text-sm">
-            <Skeleton className="h-4 w-12" />
-            <Skeleton className="h-4 w-4" />
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-4" />
-            <Skeleton className="h-4 w-16" />
-          </div>
-
-          {/* Title skeleton */}
-          <div className="space-y-4">
-            <Skeleton className="h-8 w-32" />
-
-            {/* New button skeleton */}
-            <Button variant="outline" disabled className="gap-2">
-              <Skeleton className="h-4 w-12" />
-            </Button>
-          </div>
-
-          {/* Table skeleton */}
-          <div className="rounded-lg border">
-            {/* Header */}
-            <div className="grid grid-cols-[100px_1fr_100px] bg-muted p-4 gap-4">
-              <Skeleton className="h-4 w-8" />
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-4 w-20" />
-            </div>
-
-            {/* Table row */}
-            <div className="grid grid-cols-[100px_1fr_100px] p-4 gap-4 items-center">
-              <Skeleton className="h-4 w-6" />
-              <Skeleton className="h-4 w-32" />
-              <div className="flex gap-2">
-                <Skeleton className="h-8 w-8" />
-                <Skeleton className="h-8 w-8" />
-              </div>
-            </div>
-          </div>
-
-          {/* Pagination skeleton */}
-          <div className="flex justify-center gap-2 mt-4">
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-          </div>
-        </div>
-      </>
-    );
+      <SkeletonTable />
+    )
   }
-
   if (error) {
     return <p>Error: {error}</p>;
   }
@@ -622,7 +570,7 @@ const ConfiRoles = () => {
   const configuracion = recortarRutaHastaSegmento(pathname, 'configuracion');
   const inicio = recortarRutaHastaSegmento(pathname, 'usuarios');
   //definimos valores para el breadCrumb
-  const breadcrumbData:BreadcrumbItemType[] = [
+  const breadcrumbData: BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: inicio },
     {
       type: "page", label: "Configuración"
@@ -645,7 +593,17 @@ const ConfiRoles = () => {
           <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
           <p className="font-bold" >Nuevo</p>
         </Button>
-        <Input className="w-64" placeholder="Buscar..." />
+        <div className="relative">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar..."
+            type="text"
+            className="pl-8 w-[250px] bg-background text-gray-800"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+
+          />
+        </div>
       </div>
       <div className="bg-[#E3E6ED] rounded-lg">
         <DynamicTable

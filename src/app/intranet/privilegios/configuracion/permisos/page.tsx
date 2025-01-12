@@ -1,7 +1,7 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { X, Edit, Trash2, CirclePlus } from "lucide-react";
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, Suspense } from 'react';
 import { API_PERMISOS } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
@@ -12,7 +12,8 @@ import { usePathname } from "next/navigation";
 import Swal from 'sweetalert2';
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import {BreadcrumbItemType} from '@/tipos/typos'
+import { BreadcrumbItemType } from '@/tipos/typos'
+import SkeletonTable from "@/components/skeletonTable";
 
 
 // Modal para agregar o editar un Permiso
@@ -29,14 +30,14 @@ export const EditModal = ({ isOpen, closeModal, onSavePermission, editingPermiss
   }, [editingPermission]);
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-  
+
     if (editingPermission) {
       // Si estamos editando, no pedimos confirmación, solo actualizamos
       const updatedPermission = {
         n_per: name,
         abrev: abbreviation,
       };
-  
+
       try {
         const response = await fetch(`${API_PERMISOS}/${editingPermission.id_per}`, {
           method: 'PUT',
@@ -45,7 +46,7 @@ export const EditModal = ({ isOpen, closeModal, onSavePermission, editingPermiss
           },
           body: JSON.stringify(updatedPermission)
         });
-  
+
         if (response.ok) {
           const savedPermission = await response.json();
           onSavePermission(savedPermission);
@@ -86,13 +87,13 @@ export const EditModal = ({ isOpen, closeModal, onSavePermission, editingPermiss
           confirmButton: 'bg-blue-500 text-white hover:bg-blue-600',
         },
       });
-  
+
       if (result.isConfirmed) {
         const newPermission = {
           n_per: name,
           abrev: abbreviation,
         };
-  
+
         try {
           const response = await fetch(API_PERMISOS, {
             method: 'POST',
@@ -101,7 +102,7 @@ export const EditModal = ({ isOpen, closeModal, onSavePermission, editingPermiss
             },
             body: JSON.stringify(newPermission)
           });
-  
+
           if (response.ok) {
             const savedPermission = await response.json();
             onSavePermission(savedPermission);
@@ -131,7 +132,7 @@ export const EditModal = ({ isOpen, closeModal, onSavePermission, editingPermiss
       }
     }
   };
-  
+
 
   if (!isOpen) return null;
 
@@ -271,7 +272,7 @@ export default function Component() {
       if (result.isConfirmed) {
         try {
           const response = await fetch(`${API_PERMISOS}/${id}`, { method: 'DELETE' });
-  
+
           if (response.ok) {
             setUsers((prevPermisos) => prevPermisos.filter((permiso: any) => permiso.id_per !== id));
             Swal.fire('¡Eliminado!', 'Permiso eliminado correctamente.', 'success');
@@ -285,16 +286,6 @@ export default function Component() {
       }
     });
   };
-  
-  
-
-  if (loading) {
-    return (
-      <div className="p-6 space-y-6">
-        <Skeleton className="h-4 w-12" />
-      </div>
-    );
-  }
 
   if (error) {
     return <p>Error: {error}</p>;
@@ -340,7 +331,7 @@ export default function Component() {
   // Función para filtrar los datos basados en el término de búsqueda
   const getFilteredData = () => {
     if (!searchTerm) return sortedUsers;
-  
+
     return sortedUsers.filter((user) =>
       Object.values(user).some((value) =>
         value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
@@ -385,7 +376,7 @@ export default function Component() {
       render: (item: Permisos) => (
         <>
           <Button variant="ghost" size="icon"
-          onClick={()=>openEditModal(item)}
+            onClick={() => openEditModal(item)}
           >
             <Edit className="h-5 w-5" strokeWidth={2.5} />
           </Button>
@@ -494,7 +485,7 @@ export default function Component() {
   const configuracion = recortarRutaHastaSegmento(pathname, 'configuracion');
   const inicio = recortarRutaHastaSegmento(pathname, 'usuarios');
   //definimos valores para el breadCrumb
-  const breadcrumbData:BreadcrumbItemType[] = [
+  const breadcrumbData: BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: inicio },
     {
       type: "page", label: "Configuración"
@@ -502,28 +493,35 @@ export default function Component() {
     { type: "page", label: "Permisos" },
   ];
   ////////////
+  if (loading) {
+    return (
+      <SkeletonTable />
+    )
+  }
   return (
     <div className="w-[90%] mx-auto  py-4  space-y-4 text-white min-h-screen">
       <BreadcrumbWithDropdown items={breadcrumbData} />
       <div>
         <h1 className="text-2xl font-bold text-black dark:text-white">Permisos</h1>
       </div>
-      <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 "  onClick={() => { setEditingPermission(null); toggleModal(); }} >
-        <CirclePlus className="h-8 w-8 " />
-        <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
-            <p  className="font-bold" >Nuevo</p>
-      </Button>
-      <div className="relative ">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar..."
-                type="text"
-                className="pl-8 w-[250px] bg-background text-gray-900"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                
-              />
-            </div>
+      <div className="flex justify-between">
+        <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 " onClick={() => { setEditingPermission(null); toggleModal(); }} >
+          <CirclePlus className="h-8 w-8 " />
+          <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
+          <p className="font-bold" >Nuevo</p>
+        </Button>
+        <div className="relative ">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar..."
+            type="text"
+            className="pl-8 w-[250px] bg-background text-gray-800"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+
+          />
+        </div>
+      </div>
       <DynamicTable
         configuration={configurationUser}
         data={currentItems}
