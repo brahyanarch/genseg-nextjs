@@ -557,13 +557,7 @@ export default function Component() {
   const breadcrumbData:BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: inicio },
     {
-      type: "dropdown",
-      label: "Configuración",
-      items: [
-        { label: "Permisos", href: `${configuracion}/permisos` },
-        { label: "Roles", href: `${configuracion}/roles` },
-        { label: "SubUnidades", href: `${configuracion}/subUnidades` },
-      ],
+      type: "page", label: "Configuración",
     },
     { type: "page", label: "Usuarios" },
   ];

@@ -128,7 +128,7 @@ export function ParticipateModal({ toggleModal, idActivity }: { toggleModal: () 
                             pattern="\d*"
                             value={dni}
                             onChange={(e) => setDni(e.target.value)}
-                            placeholder="Ingrese su código"
+                            placeholder="Ingrese su DNI"
                             className={cn(
                                 "mt-1 block w-full rounded-md border-gray-300 shadow-sm",
                                 "focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -148,7 +148,7 @@ export function ParticipateModal({ toggleModal, idActivity }: { toggleModal: () 
                             pattern="\d*"
                             value={codigo}
                             onChange={(e) => setCodigo(e.target.value)}
-                            placeholder="Ingrese su DNI"
+                            placeholder="Ingrese su código"
                             className={cn(
                                 "mt-1 block w-full rounded-md border-gray-300 shadow-sm",
                                 "focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"

@@ -31,7 +31,41 @@ interface Asistente {
   alumno: Alumno;
   asistio: boolean;
 }
-export function Card({ nombre, encargado }: any) {
+export function Card() {
+  const { activityId } = useParams(); // activityId es un string
+  const [currentActivity, setCurrentActivity] = useState({}); // Estado para la actividad actual
+
+
+  //funcion para obtener datos de una actividad
+  const getDataActivity = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/actividades/pagina`);
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentActivity(data.find((activity) => activity.idActivi === Number(activityId)));
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo obtener los datos del participante'
+
+        })
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error no se pudo obtener los datos del participante',
+        text: 'Compruebe su conexion a internet'
+
+      })
+    }
+  }
+  useEffect(() => {
+    getDataActivity();
+  }, []); // Solo se ejecuta al montar el componente
+
+
+
   return (
     <div className="max-w-sm rounded-md overflow-hidden shadow-lg bg-white mb-10 mx-auto w-80">
       {/* Imagen */}
@@ -46,26 +80,33 @@ export function Card({ nombre, encargado }: any) {
       </div>
 
       {/* Contenido de la tarjeta */}
-      <div className="p-4">
-        <h3 className="text-base font-semibold text-blue-700">{encargado} <span className="text-gray-500 font-light text-xs">Encargad@</span></h3>
-        <p className="text-xl font-bold text-gray-900">{nombre}</p>
-        <p className="text-gray-600 mt-2 font-normal">
-          Some quick example text to build on the card title and make up the bulk of the card's content.
-        </p>
+      {
+        currentActivity && (
+        <div className="p-4">
+          <h3 className="text-base font-semibold text-blue-700">{currentActivity.project.usuario.n_usu} <span className="text-gray-500 font-light text-xs">Encargad@</span></h3>
+          <p className="text-xl font-bold text-gray-900">{currentActivity.name}</p>
+          <p className="text-gray-600 mt-2 font-normal">
+            Some quick example text to build on the card title and make up the bulk of the card's content.
+          </p>
 
-        {/* Botones */}
-        <div className="mt-4 flex justify-between items-center ">
-          <button className="bg-white-800 h-[40px] w-[130px] hover:bg-blue-700 hover:text-white text-blue-500 border-[1px] border-blue-500 font-medium py-2 px-4 rounded">
-            Ver más
-          </button>
-          <button className="bg-blue-500 h-[40px] w-[130px] hover:bg-blue-700  text-white font-medium py-2 px-4 rounded">
-            Participar
-          </button>
+          {/* Botones */}
+          <div className="mt-4 flex justify-between items-center ">
+            <button className="bg-white-800 h-[40px] w-[130px] hover:bg-blue-700 hover:text-white text-blue-500 border-[1px] border-blue-500 font-medium py-2 px-4 rounded">
+              Ver más
+            </button>
+            <button className="bg-blue-500 h-[40px] w-[130px] hover:bg-blue-700  text-white font-medium py-2 px-4 rounded">
+              Participar
+            </button>
+          </div>
         </div>
-      </div>
+
+        )
+      }
+
     </div>
   );
 }
+
 
 export default function ActivityForm() {
   interface Question {
@@ -264,7 +305,7 @@ export default function ActivityForm() {
       label: "Asistencia",
       render: (item: Asistente) => (
         <>
-          <Checkbox  checked={item.asistio} onClick={() => handleAsistance(!item.asistio, item.alumno.idest)}/>
+          <Checkbox checked={item.asistio} onClick={() => handleAsistance(!item.asistio, item.alumno.idest)} />
         </>
       ),
     },
@@ -362,7 +403,7 @@ export default function ActivityForm() {
     return `${year}-${month}-${day}`;
   };
 
-  
+
 
   const handleToggle = async (checked: boolean) => {
     setisPublic(checked); // Cambia el estado visualmente antes de la API call
@@ -456,7 +497,7 @@ export default function ActivityForm() {
       case "singleChoice":
         return answers[question.id]?.[0]?.opcuni?.txtOpc || "Sin respuesta";
       case "dropdown":
-        return answers[question.id]?.[0]?.optionTxt || "Sin respuesta";
+        return answers[question.id]?.[0]?.opcdes?.txtOpc || "Sin respuesta";
       case "archive":
         return (
           <a
@@ -484,9 +525,9 @@ export default function ActivityForm() {
           Detalles de la Actividad
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-center text-center content-center">
           <div className="shadow-lg rounded-xl p-6 bg-white dark:bg-gray-900 dark:text-white">
-            <label htmlFor="activity-name" className="block text-lg font-semibold text-gray-700 dark:text-gray-300">
+            <label htmlFor="activity-name" className="block text-lg  font-semibold text-gray-700 dark:text-gray-300">
               Nombre de la Actividad
             </label>
             <p className="mt-2 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-lg px-4 py-3 border border-gray-300 dark:border-gray-700">
@@ -529,24 +570,24 @@ export default function ActivityForm() {
 
       {/* Botones */}
       <div className="w-[90%] mx-auto flex justify-end space-x-6 pt-8">
-       
+
       </div>
 
-      <div className="bg-[#E3E6ED] rounded-lg p-4 flex items-center space-x-4 mx-auto">
-      <Switch
-      className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-slate-400"
+      <div className="bg-[#E3E6ED] w-[90%] rounded-lg p-4 flex items-center space-x-4 mx-auto">
+        <Switch
+          className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-slate-400"
           thumbColor="bg-white"
           checked={isPublic}
           onCheckedChange={handleToggle}
-          />
-          
-      <Label className="text-black">Publicar Actividad</Label>
+        />
+
+        <Label className="text-black">Publicar Actividad</Label>
       </div>
-      
+
       <div className="pt-2 ">
         <Card />
       </div>
-      <div className="relative">
+      <div className="relative w-[80%] mx-auto">
         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Buscar..."
@@ -558,7 +599,7 @@ export default function ActivityForm() {
         />
       </div>
       <div className="w-[80%] mx-auto">
-        
+
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white my-4">Lista de participantes en la actividad ({participantes.length})</h2>
         <div className="bg-[#E3E6ED] rounded-lg pt-6  ">
           <DynamicTable

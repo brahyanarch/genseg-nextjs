@@ -449,15 +449,9 @@ export default function Component() {
   const breadcrumbData:BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: inicio },
     {
-      type: "dropdown",
-      label: "Configuración",
-      items: [
-        { label: "Permisos", href: `${configuracion}/permisos` },
-        { label: "Roles", href: `${configuracion}/roles` },
-        { label: "Usuarios", href: `${configuracion}/usuarios` },
-      ],
+      type: "page", label: "Configuración",
     },
-    { type: "page", label: "SubUbidades" },
+    { type: "page", label: "Sub Unidades" },
   ];
   ////////////
 
@@ -466,7 +460,7 @@ export default function Component() {
     <div className="w-[90%] mx-auto  py-4  space-y-4 text-white min-h-screen">
       <BreadcrumbWithDropdown items={breadcrumbData} />
       <div>
-        <h1 className="text-2xl font-bold text-black dark:text-white">Sub Unidad</h1>
+        <h1 className="text-2xl font-bold text-black dark:text-white">Sub Unidades</h1>
       </div>
       <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 " onClick={toggleModal} >
         <CirclePlus className="h-8 w-8 " />
