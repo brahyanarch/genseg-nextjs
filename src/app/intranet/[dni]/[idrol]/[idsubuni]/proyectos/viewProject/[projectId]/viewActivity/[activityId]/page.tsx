@@ -81,9 +81,9 @@ export function Card() {
 
       {/* Contenido de la tarjeta */}
       {
-        currentActivity && (
+        currentActivity  && (
         <div className="p-4">
-          <h3 className="text-base font-semibold text-blue-700">{currentActivity.project.usuario.n_usu} <span className="text-gray-500 font-light text-xs">Encargad@</span></h3>
+          <h3 className="text-base font-semibold text-blue-700">{currentActivity?.project?.usuario?.n_usu} <span className="text-gray-500 font-light text-xs">Encargad@</span></h3>
           <p className="text-xl font-bold text-gray-900">{currentActivity.name}</p>
           <p className="text-gray-600 mt-2 font-normal">
             Some quick example text to build on the card title and make up the bulk of the card's content.
@@ -305,7 +305,7 @@ export default function ActivityForm() {
       label: "Asistencia",
       render: (item: Asistente) => (
         <>
-          <Checkbox checked={item.asistio} onClick={() => handleAsistance(!item.asistio, item.alumno.idest)} />
+          <Checkbox checked={item.asistio} onClick={() => handleAsistance(!item.asistio, item.alumno.idest)}  />
         </>
       ),
     },

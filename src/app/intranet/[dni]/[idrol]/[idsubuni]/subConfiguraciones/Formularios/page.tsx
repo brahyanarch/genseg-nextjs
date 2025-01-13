@@ -6,13 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import DynamicTable from "@/components/DynamicTable";
-import { API_FORM , API_GET_FORM_BY_SUBUNI, API_URL} from "@/config/apiconfig";
+import { API_FORM, API_GET_FORM_BY_SUBUNI, API_URL } from "@/config/apiconfig";
 import { AvisoContext } from '@/context/avisoContext'
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
 import { BreadcrumbItemType } from "@/tipos/typos";
 import Swal from 'sweetalert2';
 import { set } from "date-fns";
+import SkeletonTable from "@/components/skeletonTable";
 type FormEntry = {
   idf: number;
   nmForm: string;
@@ -46,7 +47,7 @@ type FormEntry = {
   },
 ];*/
 // modal para editar o añadir  un formulario
-export const EditModal = ({isOpen,closeModal,onSaveForm,editingForm,}: any) => {
+export const EditModal = ({ isOpen, closeModal, onSaveForm, editingForm, }: any) => {
   const [name, setName] = useState("");
   const [abbreviation, setAbbreviation] = useState("");
   const { mostrarAviso } = useContext<any>(AvisoContext);
@@ -71,7 +72,7 @@ export const EditModal = ({isOpen,closeModal,onSaveForm,editingForm,}: any) => {
     };
     console.log(updatedForm, "datos del formulario");
     try {
-      console.log("entro al try", updatedForm );
+      console.log("entro al try", updatedForm);
       const response = await fetch(
         editingForm ? `${API_URL}/api/form/${editingForm.idf}` : `${API_URL}/api/form`,
         {
@@ -98,11 +99,11 @@ export const EditModal = ({isOpen,closeModal,onSaveForm,editingForm,}: any) => {
         closeModal();
       } else {
         Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Hubo un problema al actualizar el Formulario.',
-              confirmButtonText: 'OK',
-            });
+          icon: 'error',
+          title: 'Error',
+          text: 'Hubo un problema al actualizar el Formulario.',
+          confirmButtonText: 'OK',
+        });
       }
     } catch (error) {
       // Si el servidor no responde bien, mostrar un SweetAlert de error
@@ -188,7 +189,7 @@ export default function Component() {
   const [form, setForm] = useState<FormEntry[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingForm, setEditingForm] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { mostrarAviso } = useContext<any>(AvisoContext);
   const pathname = usePathname();
@@ -207,7 +208,7 @@ export default function Component() {
     setIsModalOpen(!isModalOpen);
   };
 
-  
+
   if (error) {
     return <p>Error: {error}</p>;
   }
@@ -251,7 +252,7 @@ export default function Component() {
   // Función para filtrar los datos basados en el término de búsqueda
   const getFilteredData = () => {
     if (!searchTerm) return sortedProjects;
-  
+
     return sortedProjects.filter((user) =>
       Object.values(user).some((value) =>
         value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
@@ -269,46 +270,36 @@ export default function Component() {
   };
 
   const toggleStateForm = async (idf: number) => {
-      try {
-        
-        // Realiza la petición PUT para actualizar el estado del usuario
-        const response = await fetch(`${API_URL}/api/form/toggle`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            idf: idf,
-            idsubuni: idsubuni,
-          }),
+    try {
+
+      // Realiza la petición PUT para actualizar el estado del usuario
+      const response = await fetch(`${API_URL}/api/form/toggle`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          idf: idf,
+          idsubuni: idsubuni,
+        }),
+      });
+      console.log("Respuesta del servidor:", response);
+
+      if (response.ok) {
+        const updatedData = await response.json();
+        // Actualiza el estado local de los usuarios en el frontend
+        setForm(updatedData.allform);
+        console.log("Estado actualizado:", updatedData);
+        Swal.fire({
+          icon: 'success',
+          title: 'Estado actualizado',
+          text: 'El estado del usuario ha sido actualizado correctamente.',
+          confirmButtonText: 'OK',
         });
-        console.log("Respuesta del servidor:", response);
-  
-        if (response.ok) {
-          const updatedData = await response.json();
-          // Actualiza el estado local de los usuarios en el frontend
-          setForm(updatedData.allform);
-          console.log("Estado actualizado:", updatedData);
-          Swal.fire({
-            icon: 'success',
-            title: 'Estado actualizado',
-            text: 'El estado del usuario ha sido actualizado correctamente.',
-            confirmButtonText: 'OK',
-          });
 
-        } else {
-          const errorData = await response.json();
-          console.error("Error al actualizar el estado del usuario:", errorData.message);
-          Swal.fire({
-            icon: 'error',
-            title: 'Error al actualizar el estado',
-            text: 'Hubo un problema al actualizar el estado del usuario.',
-            confirmButtonText: 'OK',
-          });
-        }
-      } catch (error) {
-
-        console.error("Error al cambiar el estado del usuario:", error);
+      } else {
+        const errorData = await response.json();
+        console.error("Error al actualizar el estado del usuario:", errorData.message);
         Swal.fire({
           icon: 'error',
           title: 'Error al actualizar el estado',
@@ -316,7 +307,17 @@ export default function Component() {
           confirmButtonText: 'OK',
         });
       }
-    };
+    } catch (error) {
+
+      console.error("Error al cambiar el estado del usuario:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al actualizar el estado',
+        text: 'Hubo un problema al actualizar el estado del usuario.',
+        confirmButtonText: 'OK',
+      });
+    }
+  };
 
   // Configuración de la tabla
   const configurationUser = [
@@ -359,7 +360,7 @@ export default function Component() {
             <Circle
               className={`h-5 w-5 ${item.estado ? "fill-primary dark:fill-slate-950" : ""}`}
               strokeWidth={2}
-              onClick={ item.estado ? () => {} : () => toggleStateForm(item.idf)}
+              onClick={item.estado ? () => { } : () => toggleStateForm(item.idf)}
             />
           </Button>
           <Button variant="ghost" size="icon" onClick={() => editForm(item.idf)} >
@@ -404,7 +405,7 @@ export default function Component() {
     // Rango de páginas cercanas a la actual
     const maxVisiblePages = 3;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, currentPage + Math.floor(maxVisiblePages / 2));
+    const endPage = Math.min(totalPages, currentPage + Math.floor(maxVisiblePages / 2));
 
     if (endPage - startPage < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
@@ -464,7 +465,7 @@ export default function Component() {
       const data = await response.json();
       setForm(data);
     } catch (err: any) {
-      
+
     } finally {
       setLoading(false);
     }
@@ -538,79 +539,24 @@ export default function Component() {
 
   if (loading) {
     return (
-      <>
-        <div className="p-6 space-y-6">
-          {/* Breadcrumb skeleton */}
-          <div className="flex items-center gap-2 text-sm">
-            <Skeleton className="h-4 w-12" />
-            <Skeleton className="h-4 w-4" />
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-4" />
-            <Skeleton className="h-4 w-16" />
-          </div>
-
-          {/* Title skeleton */}
-          <div className="space-y-4">
-            <Skeleton className="h-8 w-32" />
-
-            {/* New button skeleton */}
-            <Button variant="outline" disabled className="gap-2">
-              <Skeleton className="h-4 w-12" />
-            </Button>
-          </div>
-
-          {/* Table skeleton */}
-          <div className="rounded-lg border">
-            {/* Header */}
-            <div className="grid grid-cols-[100px_1fr_100px] bg-muted p-4 gap-4">
-              <Skeleton className="h-4 w-8" />
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-4 w-20" />
-            </div>
-
-            {/* Table row */}
-            <div className="grid grid-cols-[100px_1fr_100px] p-4 gap-4 items-center">
-              <Skeleton className="h-4 w-6" />
-              <Skeleton className="h-4 w-32" />
-              <div className="flex gap-2">
-                <Skeleton className="h-8 w-8" />
-                <Skeleton className="h-8 w-8" />
-              </div>
-            </div>
-          </div>
-
-          {/* Pagination skeleton */}
-          <div className="flex justify-center gap-2 mt-4">
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-          </div>
-        </div>
-      </>
+      <SkeletonTable />
     );
   }
 
-   ///recortar rutas
-   const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
+  ///recortar rutas
+  const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
     const partes = ruta.split('/'); // Divide la ruta en partes
     const indice = partes.indexOf(segmento); // Encuentra el índice del segmento clave
     if (indice === -1) return ruta; // Si no encuentra el segmento, retorna la ruta completa
     return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
   };
   //recortamos las rutas requeridas
-  const configuracion = recortarRutaHastaSegmento(pathname, 'subConfiguraciones');
   const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
   //definimos valores para el breadCrumb
-  const breadcrumbData:BreadcrumbItemType[] = [
-    { type: "link", label: "Inicio", href:`${inicio}/${dni}/${idrol}/${idsubuni}` },
+  const breadcrumbData: BreadcrumbItemType[] = [
+    { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
     {
-      type: "dropdown",
-      label: "Sub configuraciones",
-      items: [
-        { label: "Usuarios", href: `${configuracion}/usuarios` },
-      ],
+      type: "page", label: "Sub configuraciones"
     },
     { type: "page", label: "Formularios" },
   ];
@@ -620,26 +566,25 @@ export default function Component() {
       <BreadcrumbWithDropdown items={breadcrumbData} />
       <h1 className="text-2xl font-bold  ">Formularios</h1>
       <div className="flex justify-between items-center gap-4 flex-wrap">
-        <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 "   
+        <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 "
           onClick={toggleModal}
         >
           <CirclePlus className="h-8 w-8 " />
           <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
           <p className="font-bold" >Nuevo</p>
         </Button>
-        
-      </div>
         <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar..."
-                type="text"
-                className="pl-8 w-[250px] bg-background"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                
-              />
-            </div>
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar..."
+            type="text"
+            className="pl-8 w-[250px] bg-background"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+
+          />
+        </div>
+      </div>
       <div className="bg-[#E3E6ED] rounded-lg  ">
         <DynamicTable
           configuration={configurationUser}
@@ -650,9 +595,9 @@ export default function Component() {
       <div className="flex justify-center space-x-2 mt-4">
         {renderPaginationButtons()}
       </div>
-      
-    <EditModal isOpen={isModalOpen} closeModal={toggleModal} onSaveForm={saveForm} editingForm={editingForm} />
-      
+
+      <EditModal isOpen={isModalOpen} closeModal={toggleModal} onSaveForm={saveForm} editingForm={editingForm} />
+
 
     </div>
   );
