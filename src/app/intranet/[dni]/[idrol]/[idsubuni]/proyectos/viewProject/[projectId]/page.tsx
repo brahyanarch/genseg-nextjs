@@ -132,16 +132,14 @@ export default function ProjectDetails() {
           <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 text-center">
             Escuela Profesional
           </h3>
-          <div className="flex items-center justify-center space-x-2">
-            
-            <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+          <div className="mt-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg shadow text-center">
               {escuela ? escuela : "... cargando escuela"}
-            </span>
+            
           </div>
 
           {/* Plan de Proyecto */}
-          <div className="space-y-6">
-            <div className="border border-gray-300 dark:border-gray-700 p-6 rounded-lg shadow-lg bg-gray-50 dark:bg-gray-800">
+          <div className="space-y-6 mt-3">
+            <div className="border w-full flex flex-col justify-center items-center border-gray-300 dark:border-gray-700 p-6 rounded-lg shadow-lg bg-gray-50 dark:bg-gray-800">
               <h3 className="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">
                 Plan de Proyecto
               </h3>

@@ -37,15 +37,15 @@ export default function Navbar() {
           {/* Menú para pantallas grandes */}
           <div className="hidden sm:flex sm:items-center">
             <Link
-              href="/GA"
+              href="/Actividades"
               className={clsx(
                 'px-3 py-4 rounded-md text-sm font-medium w-52  text-gray-700 hover:bg-gray-400 hover:text-gray-700',{
-                  'bg-gray-600 text-white': '/GA' === usePathname(),
+                  'bg-gray-600 text-white': '/Actividades' === usePathname(),
                 }
               )}
               
             >
-              Gestión Ambiental
+              Actividades
             </Link>
             <Link
               href="/SDG"

@@ -1,32 +1,15 @@
 'use client'
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
 import { TaskList } from '@/components/componentesProyecto/porjectInfo'
-import Image from 'next/image'
 import { useState, useEffect } from "react"
 import { API_PROJECT_ACTIVITIES, API_PROJECTS, API_URL, API_ESCUELA_PROFESIONAL } from "@/config/apiconfig";
 import { usePathname, useRouter, useParams } from "next/navigation"
 import Swal from 'sweetalert2';
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb"
 import {BreadcrumbItemType} from "@/tipos/typos"
-///
 interface ProjectDetails {
   plan: string;
   estado: string;
@@ -267,8 +250,8 @@ export default function EditProject() {
           </div>
 
           {/* Plan de Proyecto */}
-          <div className="space-y-6">
-            <div className="border border-gray-300 dark:border-gray-700 p-6 rounded-lg shadow-lg bg-gray-50 dark:bg-gray-800">
+          <div className="space-y-6 ">
+            <div className="border w-full flex flex-col justify-center items-center border-gray-300 dark:border-gray-700 p-6 rounded-lg shadow-lg bg-gray-50 dark:bg-gray-800">
               <h3 className="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">
                 Plan de Proyecto
               </h3>
@@ -278,14 +261,14 @@ export default function EditProject() {
                 rel="noopener noreferrer"
                 className="text-blue-600 dark:text-blue-400 hover:underline"
               >
-                Ver plan existente
+                Ver plan existente 
               </a>
             </div>
-            <div className="border border-gray-300 dark:border-gray-700 p-6 rounded-lg shadow-lg bg-gray-50 dark:bg-gray-800">
+            <div className="border w-full flex justify-center items-center border-gray-300 dark:border-gray-700 p-6 rounded-lg shadow-lg bg-gray-50 dark:bg-gray-800">
               <input
                 type="file"
                 onChange={(e) => setPlan(e.target.files?.[0] || null)}
-                className="block w-full px-4 py-3 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm file:bg-blue-500 file:text-white file:px-4 file:py-2 file:rounded-md focus:ring-2 focus:ring-blue-500"
+                className="block  px-4 py-3 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm file:bg-blue-500 file:text-white file:px-4 file:py-2 file:rounded-md focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>

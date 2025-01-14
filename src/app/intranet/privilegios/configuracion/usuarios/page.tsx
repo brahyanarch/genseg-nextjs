@@ -12,7 +12,8 @@ import Swal from 'sweetalert2';
 import { routeModule } from "next/dist/build/templates/pages";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import {BreadcrumbItemType} from '@/tipos/typos';
+import { BreadcrumbItemType } from '@/tipos/typos';
+import SkeletonTable from "@/components/skeletonTable";
 // Modal para agregar un nuevo Usuario
 export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) => {
   const [dni, setDni] = useState('');
@@ -34,7 +35,7 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     // Si estamos editando un usuario, no mostramos la confirmación
     if (!editingUser) {
       // Si no estamos editando, entonces mostramos la confirmación
@@ -50,13 +51,13 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
           confirmButton: 'bg-blue-500 text-white hover:bg-blue-600', // Estilo del botón de confirmar
         },
       });
-  
+
       if (!result.isConfirmed) {
         Swal.fire('Cancelado', 'El usuario no fue agregado.', 'info');
         return; // Si el usuario cancela, salimos de la función
       }
     }
-  
+
     // Aquí construimos el objeto con los datos a guardar
     const updatedUser = {
       dni: dni,  // dni del usuario
@@ -66,7 +67,7 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
       rol_id: idRol,  // rol_id, lo debes pasar como está en el objeto de usuario
       id_sub: idSubUni,  // subunidad_id_subuni
     };
-  
+
     try {
       const response = await fetch(editingUser ? `${API_CREATE_USERS}/${editingUser.dni}` : API_CREATE_USERS, {
         method: editingUser ? 'PUT' : 'POST',
@@ -75,7 +76,7 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
         },
         body: JSON.stringify(updatedUser),
       });
-  
+
       if (response.ok) {
         const savedUser = await response.json();
         onSaveUser(savedUser);
@@ -88,7 +89,7 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
       Swal.fire('Error', 'Error al conectar con la API: ' + error, 'error');
     }
   };
-  
+
 
 
   if (!isOpen) return null;
@@ -107,7 +108,7 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
           {editingUser ? "Editar Usuario" : "Agregar Usuario"}
         </h2>
         <form onSubmit={handleSubmit}>
-        <div className="mb-4">
+          <div className="mb-4">
             <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
               DNI
             </label>
@@ -257,7 +258,7 @@ export default function Component() {
   // Función para filtrar los datos basados en el término de búsqueda
   const getFilteredData = () => {
     if (!searchTerm) return sortedUsers;
-  
+
     return sortedUsers.filter((user) =>
       Object.values(user).some((value) =>
         value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
@@ -284,7 +285,7 @@ export default function Component() {
       key: "index",
       label: "ID",
       render: (item: User) => <>{Users.indexOf(item) + 1}</>,
-      
+
     },
     {
       key: "n_usu",
@@ -532,17 +533,6 @@ export default function Component() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="p-6 space-y-6">
-        <Skeleton className="h-4 w-12" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
   ///recortar rutas
   const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
     const partes = ruta.split('/'); // Divide la ruta en partes
@@ -554,46 +544,50 @@ export default function Component() {
   const configuracion = recortarRutaHastaSegmento(pathname, 'configuracion');
   const inicio = recortarRutaHastaSegmento(pathname, 'usuarios');
   //definimos valores para el breadCrumb
-  const breadcrumbData:BreadcrumbItemType[] = [
+  const breadcrumbData: BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: inicio },
     {
-      type: "dropdown",
-      label: "Configuración",
-      items: [
-        { label: "Permisos", href: `${configuracion}/permisos` },
-        { label: "Roles", href: `${configuracion}/roles` },
-        { label: "SubUnidades", href: `${configuracion}/subUnidades` },
-      ],
+      type: "page", label: "Configuración",
     },
     { type: "page", label: "Usuarios" },
   ];
   ////////////
+  if (loading) {
+    return (
+      <SkeletonTable />
+    )
+  }
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
   return (
     <div className=" w-[90%] mx-auto  py-4  space-y-4 text-gray-800  dark:text-white min-h-screen">
       <BreadcrumbWithDropdown items={breadcrumbData} />
       <div >
         <h1 className="text-2xl font-bold">Usuarios</h1>
       </div>
+      <div className="flex justify-between">
+        <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 " onClick={() => {
+          setEditingUser(null);
+          toggleModal();
+        }} >
+          <CirclePlus className="h-8 w-8 " />
+          <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
+          <p className="font-bold" >Nuevo</p>
+        </Button>
 
-      <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 " onClick={() => {
-        setEditingUser(null);
-        toggleModal();
-      }} >
-        <CirclePlus className="h-8 w-8 " />
-        <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
-        <p className="font-bold" >Nuevo</p>
-      </Button>
-      <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar..."
-                type="text"
-                className="pl-8 w-[250px] bg-background"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                
-              />
-            </div>
+        <div className="relative">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar..."
+            type="text"
+            className="pl-8 w-[250px] bg-background text-gray-800"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+
+          />
+        </div>
+      </div>
 
       <div className="bg-[#E3E6ED] rounded-lg ">
         <DynamicTable

@@ -1,6 +1,6 @@
 'use client';
 import { Button } from "@/components/ui/button";
-import { X, Edit, Trash2, CirclePlus } from "lucide-react";
+import { X, Edit, Trash2, CirclePlus, Search } from "lucide-react";
 import { useState, useEffect, useContext } from 'react';
 import { API_SUBUNIDADES } from "@/config/apiconfig";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,6 +11,8 @@ import { Subunidad } from "@/tipos/typos"
 import { usePathname } from "next/navigation";
 import Swal from 'sweetalert2';
 import { BreadcrumbItemType } from "@/tipos/typos";
+import SkeletonTable from "@/components/skeletonTable";
+import { Input } from "@/components/ui/input";
 // Modal para agregar un nuevo Permiso
 export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnidad }: any) => {
   const [name, setName] = useState('');
@@ -24,10 +26,10 @@ export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnida
   }, [editingSubUnidad]);
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-  
+
     // Si estamos en modo de edición, no necesitamos mostrar la alerta de confirmación, solo actualizar
     const isEdit = editingSubUnidad ? true : false;
-  
+
     // Si estamos agregando (no editando), preguntamos primero
     if (!isEdit) {
       const result = await Swal.fire({
@@ -40,16 +42,16 @@ export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnida
         confirmButtonText: 'Sí, guardar',
         cancelButtonText: 'Cancelar',
       });
-  
+
       // Si el usuario confirma la acción, proceder con la creación
       if (!result.isConfirmed) return;
     }
-  
+
     const updatedSubUnidad = {
       nombre: name,
       abreviatura: abbreviation,
     };
-  
+
     try {
       const response = await fetch(
         isEdit ? `${API_SUBUNIDADES}/${editingSubUnidad.id_subuni}` : API_SUBUNIDADES,
@@ -61,11 +63,11 @@ export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnida
           body: JSON.stringify(updatedSubUnidad),
         }
       );
-  
+
       if (response.ok) {
         const savedSubUnidad = await response.json();
         onSaveSubUnidad(savedSubUnidad);
-  
+
         // Muestra un mensaje de éxito usando SweetAlert2
         await Swal.fire(
           isEdit ? 'Actualizado!' : 'Guardado!',
@@ -82,9 +84,9 @@ export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnida
       await Swal.fire('Error', 'Error al conectar con la API: ' + error, 'error');
     }
   };
-  
-  
-  
+
+
+
 
   if (!isOpen) return null;
 
@@ -201,11 +203,11 @@ export default function Component() {
   // Función para filtrar los datos basados en el término de búsqueda
   const getFilteredData = () => {
     if (!searchTerm) return sortedData;
-  
+
     return sortedData.filter((user) =>
       Object.values(user).some((value) =>
         value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    
+
       )
     );
   };
@@ -396,17 +398,17 @@ export default function Component() {
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar',
     });
-  
+
     if (result.isConfirmed) {
       try {
         const response = await fetch(`${API_SUBUNIDADES}/${id}`, {
           method: 'DELETE',
         });
-  
+
         if (response.ok) {
           // Elimina la subunidad de la lista
           setData((prevSubUnidad) => prevSubUnidad.filter((subUnidad: any) => subUnidad.id_subuni !== id));
-          
+
           // Muestra un mensaje de éxito usando SweetAlert2
           await Swal.fire('Eliminado!', 'La subunidad ha sido eliminada correctamente.', 'success');
           fetchSubUnidad(); // Vuelve a obtener las subunidades
@@ -418,23 +420,8 @@ export default function Component() {
         // Muestra un mensaje de error si ocurre un problema en la conexión
         await Swal.fire('Error', 'Error al conectar con la API: ' + error, 'error');
       }
-    } 
+    }
   };
-  
-  
-  
-
-  if (loading) {
-    return (
-      <div className="p-6 space-y-6">
-        <Skeleton className="h-4 w-12" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
   ///recortar rutas
   const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
     const partes = ruta.split('/'); // Divide la ruta en partes
@@ -446,33 +433,47 @@ export default function Component() {
   const configuracion = recortarRutaHastaSegmento(pathname, 'configuracion');
   const inicio = recortarRutaHastaSegmento(pathname, 'usuarios');
   //definimos valores para el breadCrumb
-  const breadcrumbData:BreadcrumbItemType[] = [
+  const breadcrumbData: BreadcrumbItemType[] = [
     { type: "link", label: "Inicio", href: inicio },
     {
-      type: "dropdown",
-      label: "Configuración",
-      items: [
-        { label: "Permisos", href: `${configuracion}/permisos` },
-        { label: "Roles", href: `${configuracion}/roles` },
-        { label: "Usuarios", href: `${configuracion}/usuarios` },
-      ],
+      type: "page", label: "Configuración",
     },
-    { type: "page", label: "SubUbidades" },
+    { type: "page", label: "Sub Unidades" },
   ];
   ////////////
-
+  if (loading) {
+    return (
+      <SkeletonTable />
+    )
+  }
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   return (
     <div className="w-[90%] mx-auto  py-4  space-y-4 text-white min-h-screen">
       <BreadcrumbWithDropdown items={breadcrumbData} />
       <div>
-        <h1 className="text-2xl font-bold text-black dark:text-white">Sub Unidad</h1>
+        <h1 className="text-2xl font-bold text-black dark:text-white">Sub Unidades</h1>
       </div>
-      <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 " onClick={toggleModal} >
-        <CirclePlus className="h-8 w-8 " />
-        <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
-        <p className="font-bold" >Nuevo</p>
-      </Button>
+      <div className="flex justify-between">
+        <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-32 " onClick={toggleModal} >
+          <CirclePlus className="h-8 w-8 " />
+          <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
+          <p className="font-bold" >Nuevo</p>
+        </Button>
+        <div className="relative">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar..."
+            type="text"
+            className="pl-8 w-[250px] bg-background text-gray-800"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+
+          />
+        </div>
+      </div>
       <div className="bg-[#E3E6ED] rounded-lg">
         <DynamicTable
           configuration={configurationData}
