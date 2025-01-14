@@ -7,18 +7,9 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { API_ACTIVITIES } from "@/config/apiconfig";
 import { useParams } from "next/navigation";
+import {BreadcrumbItemType} from '@/tipos/typos'
 import StatusBadge from "@/components/componentesGraficos/estadosProyecto";
-interface items {
-    label: string;
-    href: string;
-    external?: boolean;
-  }
-  interface Data {   
-    type: string;
-    label: string;
-    href?: string;
-    items?: items[];
-  }
+
   
   type AllActivities = {
     Pendiente: number;
@@ -39,7 +30,7 @@ export default function Principal (){
     
 
     const pathname = usePathname();
-    const breadcrumbData:Data[] = [
+    const breadcrumbData:BreadcrumbItemType[] = [
         { type: "link", label: "Inicio", href: pathname },
         { type: "page", label: "Principal" },
       ];

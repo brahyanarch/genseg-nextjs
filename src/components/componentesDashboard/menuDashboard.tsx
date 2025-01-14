@@ -2,21 +2,23 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronLeft, ChevronRight, ChevronDown, LayoutDashboard, Settings, Settings2, FolderKanban, Bell } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, LayoutDashboard, StickyNote, Settings, Settings2, FolderKanban, Bell } from "lucide-react";
 import { useParams, usePathname } from "next/navigation";
 import Link from 'next/link'
 import clsx from 'clsx'
 
-const Menu = ({admi}) => {
+const Menu = ({admi}:{admi:boolean}) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isSubConfigOpen, setIsSubConfigOpen] = useState(false);
   const [isPaginaOpen, setIsPaginaOpen] = useState(false);
+  const [esCertificadoOpen, setEsCertificadoOpen] = useState(false);
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
   const toggleConfig = () => setIsConfigOpen(!isConfigOpen);
   const toggleSubConfig = () => setIsSubConfigOpen(!isSubConfigOpen);
   const togglePagina = () => setIsPaginaOpen(!isPaginaOpen);
+  const toggleCertificado = () => setEsCertificadoOpen(!esCertificadoOpen);
 
   const pathname = usePathname();
   const { idrol, idsubuni, dni } = useParams();
@@ -86,6 +88,7 @@ const Menu = ({admi}) => {
       onClick: togglePagina,
       isOpen: isPaginaOpen,
     },
+    
     // Condicionalmente incluir "Proyectos" y "Sub Configuraciones"
     ...(!admi
       ? [
@@ -110,6 +113,27 @@ const Menu = ({admi}) => {
             ],
             onClick: toggleSubConfig,
             isOpen: isSubConfigOpen,
+          },
+          {
+            icon: StickyNote,
+            label: "Certificados",
+            url: `#`,
+            subItems: [
+              {
+                label: "Ver Certificados",
+                url: `/intranet/${dni}/${idrol}/${idsubuni}/certificados/ver-certificados`,
+              },
+              {
+                label: "Solicitados",
+                url: `/intranet/${dni}/${idrol}/${idsubuni}/certificados/solicitados`,
+              },
+              {
+                label: "Plantillas",
+                url: `/intranet/${dni}/${idrol}/${idsubuni}/certificados/plantillas`,
+              },
+            ],
+            onClick: toggleCertificado,
+            isOpen: esCertificadoOpen,
           },
         ]
       : []),
