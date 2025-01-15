@@ -32,6 +32,7 @@ export default function ProjectForm() {
   /// Variables importantes
   const [escuelaProfesional, setEscuelaProfesional] = useState<string>("");
   const [planProyecto, setPlanProyecto] = useState<File | null>(null);
+  const [tipoProyecto, setTipoProyecto] = useState();
   const { idrol, idsubuni, dni } = useParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -72,7 +73,7 @@ export default function ProjectForm() {
     formData.append("dni", String(dni));
     formData.append("id_rol", String(idrol));
     formData.append("subunidad", String(idsubuni));
-    formData.append("idpe", String(escuelaProfesional));
+    formData.append("tipo", String(tipoProyecto));
 
     const xhr = new XMLHttpRequest();
     xhr.open('POST', API_PROJECTS, true);
@@ -121,7 +122,7 @@ export default function ProjectForm() {
         confirmButtonText: 'OK',
         customClass: {
           confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
-          
+
         },
       });
       setIsUploading(false);
@@ -145,15 +146,15 @@ export default function ProjectForm() {
   const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
 
   //definimos valores para el breadCrumb
-  const breadcrumbData:BreadcrumbItemType[] = [
-    { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}`},
+  const breadcrumbData: BreadcrumbItemType[] = [
+    { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
     { type: "link", label: "Proyectos", href: configuracion },
     { type: "page", label: "Insertar proyecto" },
   ];
 
   return (
     <div className="flex-1 bg-background py-4 pl-4 text-black dark:text-white">
-      
+
       <div className="flex gap-4 px-4 items-center mx-auto text-sm breadcrumbs mb-6 text-muted-foreground">
         <BreadcrumbWithDropdown items={breadcrumbData} />
       </div>
@@ -164,6 +165,23 @@ export default function ProjectForm() {
           </h1>
           <div className="space-y-4">
             {/* Insertar Plan */}
+            <div>
+              <label
+                htmlFor="selectOption"
+                className="block text-lg font-medium mb-2 block text-gray-700 dark:text-gray-300"
+              >
+                Tipo Proyecto
+              </label>
+              <select
+                id="selectOption"
+                value={tipoProyecto}
+                onChange={(e)=>setTipoProyecto(e.target.value)}
+                className="block w-[40%] px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-800 focus:border-gray-800 sm:text-sm"
+              >
+                <option value="SUBUNIDAD">Subunidad</option>
+                <option value="PROGRAMAESTUDIO">Programa de Estudio</option>
+              </select>
+            </div>
             <div>
               <label className="text-lg font-medium mb-2 block text-gray-700 dark:text-gray-300">
                 Insertar el plan
