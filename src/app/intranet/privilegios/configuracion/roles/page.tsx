@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { X, Edit, Trash2, List, CirclePlus, Search } from "lucide-react";
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
 import { API_ROLES } from "@/config/apiconfig";
-import { Skeleton } from "@/components/ui/skeleton";
 import DynamicTable from "@/components/DynamicTable";
 import { Rol } from "@/tipos/typos"
 import { AvisoContext } from '@/context/avisoContext'
@@ -15,7 +14,6 @@ import { BreadcrumbItemType } from '@/tipos/typos'
 
 // Notificaciones
 import Swal from 'sweetalert2';
-import { toast } from 'react-toastify';
 import SkeletonTable from "@/components/skeletonTable";
 // Modal para agregar un nuevo Rol
 
@@ -27,7 +25,6 @@ export const EditModal = ({
 }: any) => {
   const [name, setName] = useState("");
   const [abbreviation, setAbbreviation] = useState("");
-  const { mostrarAviso } = useContext<any>(AvisoContext);
   useEffect(() => {
     if (editingRole) {
       setName(editingRole.n_rol);
@@ -437,7 +434,7 @@ const ConfiRoles = () => {
   
             {selectedRoleId === item.id_rol && ( // Mostrar el modal solo si el ID coincide
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-background rounded-lg shadow-lg">
+                <div className="bg-background rounded-lg shadow-lg h-[70%] overflow-auto">
                   <PermissionsManager
                     onClose={closePermissionsManager} // Cerrar el modal
                     id_rol={selectedRoleId} // Pasar el ID del rol seleccionado como prop

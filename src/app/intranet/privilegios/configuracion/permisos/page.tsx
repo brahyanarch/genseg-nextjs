@@ -1,11 +1,9 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { X, Edit, Trash2, CirclePlus } from "lucide-react";
-import { useState, useEffect, useContext, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { API_PERMISOS } from "@/config/apiconfig";
-import { Skeleton } from "@/components/ui/skeleton";
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
-import { AvisoContext } from '@/context/avisoContext'
 import DynamicTable from "@/components/DynamicTable";
 import { Permisos } from "@/tipos/typos"
 import { usePathname } from "next/navigation";
@@ -20,12 +18,14 @@ import SkeletonTable from "@/components/skeletonTable";
 export const EditModal = ({ isOpen, closeModal, onSavePermission, editingPermission }: any) => {
   const [name, setName] = useState('');
   const [abbreviation, setAbbreviation] = useState('');
-  const { mostrarAviso } = useContext<any>(AvisoContext);
 
   useEffect(() => {
     if (editingPermission) {
       setName(editingPermission.n_per);
       setAbbreviation(editingPermission.abreviatura);
+    }else{
+      setName("");
+      setAbbreviation("");
     }
   }, [editingPermission]);
   const handleSubmit = async (e: any) => {
@@ -139,7 +139,7 @@ export const EditModal = ({ isOpen, closeModal, onSavePermission, editingPermiss
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="absolute inset-0 bg-black opacity-50"></div>
-      <div className="relative bg-gray-200 text-gray-800 dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow-xl w-[50%] h-[60%]">
+      <div className="relative bg-gray-800 p-6 rounded-lg shadow-xl w-[50%] h-[60%]">
         <button
           onClick={closeModal}
           className="absolute top-2 right-2 text-gray-400 hover:text-white"
@@ -199,8 +199,6 @@ export default function Component() {
   //const [Permisos, setPermisos] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPermission, setEditingPermission] = useState(null);
-  const { mostrarAviso } = useContext<any>(AvisoContext);
-
   const [Users, setUsers] = useState<Permisos[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

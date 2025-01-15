@@ -1,11 +1,9 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { X, Edit, Trash2, CirclePlus, Search } from "lucide-react";
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { API_SUBUNIDADES } from "@/config/apiconfig";
-import { Skeleton } from "@/components/ui/skeleton";
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
-import { AvisoContext } from '@/context/avisoContext'
 import DynamicTable from "@/components/DynamicTable";
 import { Subunidad } from "@/tipos/typos"
 import { usePathname } from "next/navigation";
@@ -17,11 +15,13 @@ import { Input } from "@/components/ui/input";
 export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnidad }: any) => {
   const [name, setName] = useState('');
   const [abbreviation, setAbbreviation] = useState('');
-  const { mostrarAviso } = useContext<any>(AvisoContext);
   useEffect(() => {
     if (editingSubUnidad) {
       setName(editingSubUnidad.n_subuni);
       setAbbreviation(editingSubUnidad.abreviatura);
+    }else{
+      setName(" ");
+      setAbbreviation(" ");
     }
   }, [editingSubUnidad]);
   const handleSubmit = async (e: any) => {
@@ -100,7 +100,7 @@ export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnida
         >
           <X size={24} />
         </button>
-        <h2 className="text-2xl font-bold mb-4 text-white">Agregar Permiso</h2>
+        <h2 className="text-2xl font-bold mb-4 text-white">{editingSubUnidad ? 'Editar Sub Unidad' : 'Agregar Sub Unidad'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
@@ -111,7 +111,7 @@ export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnida
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Permiso"
+              placeholder="Sub unidad"
               className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
             />
           </div>
@@ -151,13 +151,10 @@ export const EditModal = ({ isOpen, closeModal, onSaveSubUnidad, editingSubUnida
 
 export default function Component() {
   const [editingSubUnidad, setEditingSubUnidad] = useState(null);
-
   const [Data, setData] = useState<Subunidad[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingRole, setEditingRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { mostrarAviso } = useContext<any>(AvisoContext);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
@@ -430,7 +427,6 @@ export default function Component() {
     return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
   };
   //recortamos las rutas requeridas
-  const configuracion = recortarRutaHastaSegmento(pathname, 'configuracion');
   const inicio = recortarRutaHastaSegmento(pathname, 'usuarios');
   //definimos valores para el breadCrumb
   const breadcrumbData: BreadcrumbItemType[] = [

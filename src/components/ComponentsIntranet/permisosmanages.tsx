@@ -63,10 +63,12 @@ const PermissionsManager: React.FC<PermissionsManagerProps> = ({
     );
   };
 
-  // Depurar cambios en el estado de permisos
+  /*
+  / Depurar cambios en el estado de permisos
   useEffect(() => {
     console.log("Estado actualizado de permisos:", permissions);
   }, [permissions]);
+  */
 
   // Save changes to the backend
   const handleSave = async () => {

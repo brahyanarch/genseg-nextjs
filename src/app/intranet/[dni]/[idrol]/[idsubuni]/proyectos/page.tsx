@@ -147,7 +147,7 @@ export default function Component() {
 
   if (loading) {
     return (
-      <SkeletonTable/>
+      <SkeletonTable />
     );
   }
   if (error) {
@@ -254,19 +254,22 @@ export default function Component() {
       label: "Opciones",
       render: (item: Project) => (
         <>
-          <Button variant="ghost" size="icon" onClick={() => editProject(item.idproj)}>
-            <Edit className="h-5 w-5" strokeWidth={2.5} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => deleteProject(item.idproj)}
-          >
-            <Trash2 className="h-5 w-5" strokeWidth={2.5} />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => viewProject(item.idproj)} >
-            <Eye className="h-5 w-5" strokeWidth={2.5} />
-          </Button>
+          {checkPermission(permissions, "Editar proyecto") &&
+            (<Button variant="ghost" size="icon" onClick={() => editProject(item.idproj)}>
+              <Edit className="h-5 w-5" strokeWidth={2.5} />
+            </Button>)
+          }
+          {checkPermission(permissions, "Eliminar proyecto") &&
+            (<Button variant="ghost" size="icon" onClick={() => deleteProject(item.idproj)}>
+              <Trash2 className="h-5 w-5" strokeWidth={2.5} />
+            </Button>)
+          }
+          {
+            checkPermission(permissions, "Ver proyecto") && (
+              <Button variant="ghost" size="icon" onClick={() => viewProject(item.idproj)} >
+                <Eye className="h-5 w-5" strokeWidth={2.5} />
+              </Button>)
+          }
         </>
       ),
     },
@@ -388,27 +391,26 @@ export default function Component() {
         <div className="w-full border-t border-gray-300"></div>
       </div>
       <div className="flex justify-between items-center">
-      {
-       checkPermission(permissions, "Insertar proyecto") && (
-          <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-42 " onClick={insertProject} >
-            <CirclePlus className="h-8 w-8 " />
-            <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
-            <p className="font-bold" >Nuevo Proyecto</p>
-          </Button>
-        )
-      }
-      <p>{permissions[0]?.estado}</p>
-      <div className="relative">
-        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Buscar..."
-          type="text"
-          className="pl-8 w-[250px] bg-background"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+        {
+          checkPermission(permissions, "Insertar proyecto") && (
+            <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-42 " onClick={insertProject} >
+              <CirclePlus className="h-8 w-8 " />
+              <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
+              <p className="font-bold" >Nuevo Proyecto</p>
+            </Button>
+          )
+        }
+        <div className="relative">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar..."
+            type="text"
+            className="pl-8 w-[250px] bg-background"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
 
-        />
-      </div>
+          />
+        </div>
       </div>
       <div className="bg-[#E3E6ED] rounded-lg ">
         <label className='block text-lg text-center font-semibold text-gray-700 rounded-lg py-2 px-4 shadow-md'>Lista de todos los proyectos asociados que creaste</label>

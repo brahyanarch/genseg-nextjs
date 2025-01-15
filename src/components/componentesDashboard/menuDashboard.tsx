@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronLeft, ChevronRight, ChevronDown, LayoutDashboard, StickyNote, Settings, Settings2, FolderKanban, Bell } from "lucide-react";
 import { useParams, usePathname } from "next/navigation";
+import { usePermissions } from "@/context/PermissionContext";
+import { checkPermission } from "@/components/checkPermission";
 import Link from 'next/link'
 import clsx from 'clsx'
 
@@ -13,7 +15,8 @@ const Menu = ({admi}:{admi:boolean}) => {
   const [isSubConfigOpen, setIsSubConfigOpen] = useState(false);
   const [isPaginaOpen, setIsPaginaOpen] = useState(false);
   const [esCertificadoOpen, setEsCertificadoOpen] = useState(false);
-
+  //manejo de permisos
+   const permissions = usePermissions();
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
   const toggleConfig = () => setIsConfigOpen(!isConfigOpen);
   const toggleSubConfig = () => setIsSubConfigOpen(!isSubConfigOpen);
@@ -67,27 +70,29 @@ const Menu = ({admi}:{admi:boolean}) => {
           },
         ]
       : []),
-    {
-      icon: LayoutDashboard,
-      label: "Página",
-      url: `#`,
-      subItems: [
-        {
-          label: "Carrusel",
-          url: admi
-            ? `/intranet/privilegios/pagina/carrusel`
-            : `/intranet/${dni}/${idrol}/${idsubuni}/pagina/carrusel`,
-        },
-        {
-          label: "Avisos",
-          url: admi
-            ? `/intranet/privilegios/pagina/avisos`
-            : `/intranet/${dni}/${idrol}/${idsubuni}/pagina/avisos`,
-        },
-      ],
-      onClick: togglePagina,
-      isOpen: isPaginaOpen,
-    },
+    ...( checkPermission(permissions, "Pagina") || admi ?
+      [{
+        icon: LayoutDashboard,
+        label: "Página",
+        url: `#`,
+        subItems: [
+          {
+            label: "Carrusel",
+            url: admi
+              ? `/intranet/privilegios/pagina/carrusel`
+              : `/intranet/${dni}/${idrol}/${idsubuni}/pagina/carrusel`,
+          },
+          {
+            label: "Avisos",
+            url: admi
+              ? `/intranet/privilegios/pagina/avisos`
+              : `/intranet/${dni}/${idrol}/${idsubuni}/pagina/avisos`,
+          },
+        ],
+        onClick: togglePagina,
+        isOpen: isPaginaOpen,
+      }]:[]
+    ),
     
     // Condicionalmente incluir "Proyectos" y "Sub Configuraciones"
     ...(!admi
@@ -114,6 +119,10 @@ const Menu = ({admi}:{admi:boolean}) => {
             onClick: toggleSubConfig,
             isOpen: isSubConfigOpen,
           },
+          
+
+          ...(checkPermission(permissions, "Certificados") ? 
+          [
           {
             icon: StickyNote,
             label: "Certificados",
@@ -134,7 +143,8 @@ const Menu = ({admi}:{admi:boolean}) => {
             ],
             onClick: toggleCertificado,
             isOpen: esCertificadoOpen,
-          },
+          }]:[]),
+
         ]
       : []),
   ];
