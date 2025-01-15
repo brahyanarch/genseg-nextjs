@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { API_GET_PROJECTS } from "@/config/apiconfig";
 import { Edit, Trash2, Eye, CirclePlus } from "lucide-react";
 import DynamicTable from "@/components/DynamicTable";
@@ -12,6 +11,10 @@ import Swal from 'sweetalert2';
 import { BreadcrumbWithDropdown } from '@/components/breadcrumb';
 import { BreadcrumbItemType } from '@/tipos/typos';
 import StatusBadge from "@/components/componentesGraficos/estadosProyecto";
+import { usePermissions } from "@/context/PermissionContext";
+import { checkPermission } from "@/components/checkPermission";
+import SkeletonTable from '@/components/skeletonTable';
+
 interface Project {
   idproj: number;
   estado: "Completado" | "Pendiente" | "Archivado" | "Curso" | "nothing";
@@ -36,11 +39,13 @@ interface BreadcrumbWithDropdownProps {
 }
 export default function Component() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState(null);
   const pathname = usePathname();
   const router = useRouter();
   const { dni, idsubuni, idrol } = useParams();
+  ///permisos
+  const permissions = usePermissions();
   ///variables necesarios para la tabla dinámica
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(4);
@@ -142,57 +147,7 @@ export default function Component() {
 
   if (loading) {
     return (
-      <>
-        <div className="p-6 space-y-6">
-          {/* Breadcrumb skeleton */}
-          <div className="flex items-center gap-2 text-sm">
-            <Skeleton className="h-4 w-12" />
-            <Skeleton className="h-4 w-4" />
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-4" />
-            <Skeleton className="h-4 w-16" />
-          </div>
-
-          {/* Title skeleton */}
-          <div className="space-y-4">
-            <Skeleton className="h-8 w-32" />
-
-            {/* New button skeleton */}
-            <Button variant="outline" disabled className="gap-2">
-              <Skeleton className="h-4 w-12" />
-            </Button>
-          </div>
-
-          {/* Table skeleton */}
-          <div className="rounded-lg border">
-            {/* Header */}
-            <div className="grid grid-cols-[100px_1fr_100px] bg-muted p-4 gap-4">
-              <Skeleton className="h-4 w-8" />
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-4 w-20" />
-            </div>
-
-            {/* Table row */}
-            <div className="grid grid-cols-[100px_1fr_100px] p-4 gap-4 items-center">
-              <Skeleton className="h-4 w-6" />
-              <Skeleton className="h-4 w-32" />
-              <div className="flex gap-2">
-                <Skeleton className="h-8 w-8" />
-                <Skeleton className="h-8 w-8" />
-              </div>
-            </div>
-          </div>
-
-          {/* Pagination skeleton */}
-          <div className="flex justify-center gap-2 mt-4">
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-          </div>
-        </div>
-      </>
+      <SkeletonTable/>
     );
   }
   if (error) {
@@ -432,12 +387,17 @@ export default function Component() {
         </p>
         <div className="w-full border-t border-gray-300"></div>
       </div>
-
-      <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-42 " onClick={insertProject} >
-        <CirclePlus className="h-8 w-8 " />
-        <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
-        <p className="font-bold" >Nuevo Proyecto</p>
-      </Button>
+      <div className="flex justify-between items-center">
+      {
+       checkPermission(permissions, "Insertar proyecto") && (
+          <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-42 " onClick={insertProject} >
+            <CirclePlus className="h-8 w-8 " />
+            <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
+            <p className="font-bold" >Nuevo Proyecto</p>
+          </Button>
+        )
+      }
+      <p>{permissions[0]?.estado}</p>
       <div className="relative">
         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
@@ -448,6 +408,7 @@ export default function Component() {
           onChange={(e) => setSearchTerm(e.target.value)}
 
         />
+      </div>
       </div>
       <div className="bg-[#E3E6ED] rounded-lg ">
         <label className='block text-lg text-center font-semibold text-gray-700 rounded-lg py-2 px-4 shadow-md'>Lista de todos los proyectos asociados que creaste</label>

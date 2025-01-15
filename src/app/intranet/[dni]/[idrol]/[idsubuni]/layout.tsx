@@ -3,16 +3,33 @@ import Navbar from "@/components/componentesDashboard/navbarDashboard";
 import Menu from "@/components/componentesDashboard/menuDashboard";
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation"; // Para obtener parámetros de la URL
-import {  API_USERS } from "@/config/apiconfig"; // Rutas de las APIs
+import { API_USERS } from "@/config/apiconfig"; // Rutas de las APIs
 import { User } from "@/tipos/typos"; // Tipos de datos personalizados
-
+import { PermissionProvider } from '@/context/PermissionContext';
+import { API_URL } from "@/config/apiconfig";
 const Layout = ({ children }: { children: React.ReactNode }) => {
 
   const [isClient, setIsClient] = useState(false); // Indica si el cliente está renderizando
   const [User, setUser] = useState<User[]>([]); // Información del usuario
   const [darkMode, setDarkMode] = useState(false);
-
   const { idrol, idsubuni, dni } = useParams();
+  const [permissions, setPermissions] = useState<any[]>([]);
+  //obtener el id del rol
+
+  useEffect(() => {
+    const fetchPermissions = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/de_permisos/${idrol}`);
+        if (!response.ok) throw new Error("Error al obtener permisos");
+        const data = await response.json();
+        setPermissions(data);
+      } catch (error) {
+        console.error("Error al obtener permisos:", error);
+      }
+    };
+
+    fetchPermissions();
+  }, []);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -32,7 +49,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       } else {
         console.error("Respuesta de API no válida:", data);
       }
-    } catch (err:any) {
+    } catch (err: any) {
       console.error(err.message);
     }
   };
@@ -45,8 +62,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   if (!isClient) return null;
   console.log(User, " ");
   return (
+    <PermissionProvider permissions={permissions}>
     <div className="flex flex-col h-screen w-full bg-gray-200 dark:bg-gray-900">
-      
+
       <Navbar
         idrol={Number(idrol)} // Reemplaza con datos reales
         idsubuni={Number(idsubuni)} // Reemplaza con datos reales
@@ -60,6 +78,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         <main className="flex-1 overflow-auto bg-white dark:bg-gray-900">{children}</main>
       </div>
     </div>
+    </PermissionProvider>
   );
 };
 

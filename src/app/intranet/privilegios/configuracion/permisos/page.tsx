@@ -146,7 +146,7 @@ export const EditModal = ({ isOpen, closeModal, onSavePermission, editingPermiss
         >
           <X size={24} />
         </button>
-        <h2 className="text-2xl font-bold mb-4 text-white dark:text-gray-800">{editingPermission ? 'Editar Permiso' : 'Agregar Permiso'}</h2>
+        <h2 className="text-2xl font-bold mb-4 text-white dark:text-gray-100">{editingPermission ? 'Editar Permiso' : 'Agregar Permiso'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1 dark:text-gray-800">

@@ -240,6 +240,7 @@ const ConfiRoles = () => {
   const { mostrarAviso } = useContext<any>(AvisoContext);
   const [showPermissions, setShowPermissions] = useState(false) //para la interfaz de permisos asociados con los roles
   const [searchTerm, setSearchTerm] = useState("");
+  const idRol = null;
   //navegacion rutas
   const pathname = usePathname();
   const handleTogglePermissions = () => {
@@ -384,7 +385,7 @@ const ConfiRoles = () => {
       key: "id_rol",
       label: "ID",
       render: (item: Rol) => <>{Data.indexOf(item) + 1}</>,
-      sortable: true
+      sortable: true,
     },
     {
       key: "n_rol",
@@ -401,42 +402,55 @@ const ConfiRoles = () => {
     {
       key: "opciones",
       label: "Opciones",
-      render: (item: Rol) => (
-        <>
-          <Button variant="ghost" size="icon" onClick={() => openEditModal(item)}>
-            <Edit className="h-5 w-5" strokeWidth={2.5} />
-          </Button>
-
-
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => deleteRoles(item.id_rol)}  // Llama a la función deleteRoles con el ID del rol
-          >
-            <Trash2 className="h-5 w-5" strokeWidth={2.5} />
-          </Button>
-
-
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleTogglePermissions}
-          >
-            <List className="h-5 w-5" strokeWidth={2.5} />
-          </Button>
-          {showPermissions && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-background rounded-lg shadow-lg">
-                <PermissionsManager onClose={() => setShowPermissions(false)} id_rol={item.id_rol} />
+      render: (item: Rol) => {
+        const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null); // Nuevo estado para manejar el id del rol seleccionado
+  
+        const handleTogglePermissions = (id_rol: number) => {
+          setSelectedRoleId(id_rol); // Establecer el rol seleccionado
+        };
+  
+        const closePermissionsManager = () => {
+          setSelectedRoleId(null); // Limpiar el rol seleccionado al cerrar el modal
+        };
+  
+        return (
+          <>
+            <Button variant="ghost" size="icon" onClick={() => openEditModal(item)}>
+              <Edit className="h-5 w-5" strokeWidth={2.5} />
+            </Button>
+  
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => deleteRoles(item.id_rol)} // Llama a la función deleteRoles con el ID del rol
+            >
+              <Trash2 className="h-5 w-5" strokeWidth={2.5} />
+            </Button>
+  
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleTogglePermissions(item.id_rol)} // Asociar el ID del rol al modal
+            >
+              <List className="h-5 w-5" strokeWidth={2.5} />
+            </Button>
+  
+            {selectedRoleId === item.id_rol && ( // Mostrar el modal solo si el ID coincide
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-background rounded-lg shadow-lg">
+                  <PermissionsManager
+                    onClose={closePermissionsManager} // Cerrar el modal
+                    id_rol={selectedRoleId} // Pasar el ID del rol seleccionado como prop
+                  />
+                </div>
               </div>
-            </div>
-          )}
-        </>
-      ),
+            )}
+          </>
+        );
+      },
     },
   ];
+  
 
   // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;

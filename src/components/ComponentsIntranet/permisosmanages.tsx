@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { X } from "lucide-react";
 import { API_DETALLE_PERMISOS } from "@/config/apiconfig";
-import React, { useState, useEffect, useCallback } from "react";
-
+import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 interface PermissionDetail {
   id_per: number;
   n_per: string;
@@ -21,13 +20,16 @@ interface PermissionsManagerProps {
   id_rol: number;
 }
 
-const PermissionsManager: React.FC<PermissionsManagerProps> =({ onClose, id_rol }: PermissionsManagerProps)=> {
+const PermissionsManager: React.FC<PermissionsManagerProps> = ({
+  onClose,
+  id_rol,
+}) => {
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   // Fetch permissions from API
-  const fetchPermissions = useCallback(async () => {
+  const fetchPermissions = async () => {
     setLoading(true);
     setError(null);
 
@@ -44,11 +46,11 @@ const PermissionsManager: React.FC<PermissionsManagerProps> =({ onClose, id_rol 
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
     fetchPermissions();
-  }, [fetchPermissions]);
+  }, [id_rol]);
 
   // Handle checkbox state change
   const handleCheckboxChange = (id_dper: number) => {
@@ -61,22 +63,74 @@ const PermissionsManager: React.FC<PermissionsManagerProps> =({ onClose, id_rol 
     );
   };
 
+  // Depurar cambios en el estado de permisos
+  useEffect(() => {
+    console.log("Estado actualizado de permisos:", permissions);
+  }, [permissions]);
+
+  // Save changes to the backend
   const handleSave = async () => {
-    try {
-      await Promise.all(
-        permissions.map((permiso) =>
-          fetch(`${API_DETALLE_PERMISOS}/${permiso.id_dper}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
+    const result = await Swal.fire({
+      title: '¿Estás seguro de actualizar permisos?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, actualizar',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        cancelButton: 'bg-red-500 text-white hover:bg-red-600',
+        confirmButton: 'bg-blue-500 text-white hover:bg-blue-600',
+      },
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const responses = await Promise.all(
+          permissions.map((permiso) =>
+            fetch(`${API_DETALLE_PERMISOS}/toggle/${permiso.id_dper}/`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ estado: permiso.estado }),
+            })
+          )
+        );
+
+        const allSuccess = responses.every((res) => res.ok);
+        if (allSuccess) {
+          // Mostrar un SweetAlert de éxito
+          Swal.fire({
+            icon: 'success',
+            title: 'Permisos actualizados correctamente.',
+            confirmButtonText: 'OK',
+            customClass: {
+
+              confirmButton: 'bg-blue-500 text-white hover:bg-blue-600',
             },
-            body: JSON.stringify({ estado: permiso.estado }),
-          })
-        )
-      );
-      alert("Permisos actualizados con éxito.");
-    } catch (error) {
-      alert("Error al guardar los permisos.");
+          });
+          onClose();
+        } else {
+          // Si hay un error al guardar el rol
+          Swal.fire({
+            icon: 'error',
+            title: 'Error al actualizar permisos.',
+            confirmButtonText: 'OK',
+            customClass: {
+
+              confirmButton: 'bg-blue-500 text-white hover:bg-blue-600',
+            },
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al conectar con la API',
+          text: 'erro: ' + error,
+          confirmButtonText: 'OK',
+        });
+      }
+    } else {
+      onClose();
     }
   };
 
@@ -84,7 +138,12 @@ const PermissionsManager: React.FC<PermissionsManagerProps> =({ onClose, id_rol 
     <div className="w-full max-w-md mx-auto bg-white rounded-lg shadow-lg">
       <div className="p-4 border-b flex justify-between items-center">
         <h2 className="text-xl font-semibold">Gestión de Permisos</h2>
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onClick={onClose}
+        >
           <X className="h-4 w-4" />
         </Button>
       </div>
@@ -102,15 +161,22 @@ const PermissionsManager: React.FC<PermissionsManagerProps> =({ onClose, id_rol 
             </div>
 
             <div className="divide-y">
-            {permissions.map(({ id_dper, permisos, estado }) => (
-  <div key={id_dper} className="grid grid-cols-[80px_1fr_40px] px-4 py-2 items-center">
-    <div>{id_dper}</div>
-    <div>{permisos.n_per}</div> {/* Aquí se muestra el nombre del permiso */}
-    <div className="flex justify-center">
-      <Checkbox checked={estado} onChange={() => handleCheckboxChange(id_dper)} />
-    </div>
-  </div>
-))}
+              {permissions.map(({ id_dper, permisos, estado }) => (
+                <div
+                  key={id_dper}
+                  className="grid grid-cols-[80px_1fr_40px] px-4 py-2 items-center"
+                >
+                  <div>{id_dper}</div>
+                  <div>{permisos.n_per}</div>
+                  <div className="flex justify-center">
+                    <input
+                      type="checkbox"
+                      checked={estado} // Refleja el estado correctamente
+                      onChange={() => handleCheckboxChange(id_dper)}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
