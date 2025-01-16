@@ -7,12 +7,13 @@ import { Eye, Download } from 'lucide-react'
 import { FilterableTable } from '@/components/filterableTable'
 import { PaginationButtons } from '@/components/paginationButtons'
 import { SearchComponent } from '@/components/searchComponent'
+import { API_URL } from '@/config/apiconfig'
 
 interface Certificado {
   id: string
-  actividad: string
+  nombre: string
   tipo: string
-  codigoEstudiante: string
+  codigo: string
 }
 
 export default function ConsultaCertificados() {
@@ -25,6 +26,17 @@ export default function ConsultaCertificados() {
   const handleConsulta = async () => {
     // Aquí iría la lógica para consultar los certificados con el DNI
     // Por ahora, usaremos datos de ejemplo
+    try {
+      const response = await fetch(`${API_URL}/api/certificado/${dni}/`);
+      if (!response.ok) {
+        throw new Error('Error al consultar los certificados');
+      }
+      const data: Certificado[] = await response.json();
+      setCertificados(data);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+    /*
     const certificadosEjemplo: Certificado[] = [
       { id: '1', actividad: 'Curso de React', tipo: 'Participación', codigoEstudiante: 'E001' },
       { id: '2', actividad: 'Taller de Diseño UX', tipo: 'Aprobación', codigoEstudiante: 'E001' },
@@ -34,7 +46,7 @@ export default function ConsultaCertificados() {
       { id: '6', actividad: 'Curso de Python', tipo: 'Aprobación', codigoEstudiante: 'E001' },
       { id: '7', actividad: 'Taller de Data Science', tipo: 'Asistencia', codigoEstudiante: 'E001' },
     ]
-    setCertificados(certificadosEjemplo)
+    setCertificados(certificadosEjemplo)*/
     setCurrentPage(1)
     setSearchTerm('')
   }
@@ -68,7 +80,7 @@ export default function ConsultaCertificados() {
     {
       key: "actividad",
       label: "Actividad",
-      render: (item: Certificado) => item.actividad,
+      render: (item: Certificado) => item.nombre || 'Nombre Certificado',
       sortable: true,
     },
     {
@@ -78,9 +90,9 @@ export default function ConsultaCertificados() {
       sortable: true,
     },
     {
-      key: "codigoEstudiante",
-      label: "Código de Estudiante",
-      render: (item: Certificado) => item.codigoEstudiante,
+      key: "codigo",
+      label: "Código",
+      render: (item: Certificado) => item.codigo,
       sortable: true,
     },
     {
@@ -109,13 +121,17 @@ export default function ConsultaCertificados() {
     },
   ];
 
-  const filteredCertificados = useMemo(() => {
-    return certificados.filter((cert) =>
-      Object.values(cert).some((value) =>
-        value.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
-  }, [certificados, searchTerm]);
+
+const filteredCertificados = useMemo(() => {
+  return certificados.filter((cert) =>
+    Object.values(cert).some((value) => {
+      if (typeof value === 'string') { // Verifica si es una cadena
+        return value.toLowerCase().includes(searchTerm.toLowerCase());
+      }
+      return false; // Ignora otros tipos de valores
+    })
+  );
+}, [certificados, searchTerm]);
 
   const totalPages = Math.ceil(filteredCertificados.length / itemsPerPage)
   const paginatedData = filteredCertificados.slice(

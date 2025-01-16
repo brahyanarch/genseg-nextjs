@@ -53,7 +53,7 @@ export const FilterableTable: React.FC<FilterableTableProps> = ({ data, columns,
       {/* <FilterComponent config={filterConfig} onFilterChange={setFilters} /> */}
       <DynamicTable
         configuration={columns}
-        data={sortedData}
+        data={sortedData }
         onSort={handleSort}
       />
     </div>

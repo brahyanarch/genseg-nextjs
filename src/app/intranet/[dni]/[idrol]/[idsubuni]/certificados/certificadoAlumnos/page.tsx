@@ -146,8 +146,8 @@ export default function CertificatePage() {
         <div className="flex justify-between items-start gap-8 mb-8">
           {/* Actividades */}
           {activities.length > 0 && (
-            <div className='w-[60%]'>
-              <table className="w-full border-collapse">
+            <div className='w-[60%] '>
+              <table className="w-full border-collapse px-4">
                 <thead>
                   <tr className="border-b border-gray-600">
                     <th className="text-left py-2">ID</th>
@@ -157,7 +157,7 @@ export default function CertificatePage() {
                 </thead>
                 <tbody>
                   {activities.map((activity) => (
-                    <tr key={activity.id} className="border-b border-gray-700">
+                    <tr key={activity.id} className="border-b border-gray-700 px-4">
                       <td className="py-2">{activity.id}</td>
                       <td className="py-2">{activity.actividad.name}</td>
                       <td className="py-2 text-center">
@@ -175,11 +175,11 @@ export default function CertificatePage() {
 
           {/* Plantillas */}
           {templates.length > 0 && (
-            <div className='w-[40%]'>
+            <div className='w-[40%] h-96 overflow-auto'>
               <RadioGroup onValueChange={handleTemplateChange}>
                 <table className="w-full border-collapse">
                   <thead>
-                    <tr className="border-b border-gray-600">
+                    <tr className="border-b border-gray-600 px-4">
                       <th className="text-left py-2">ID</th>
                       <th className="text-left py-2">Plantilla</th>
                       <th className="py-2"></th>
@@ -187,7 +187,7 @@ export default function CertificatePage() {
                   </thead>
                   <tbody>
                     {templates.map((template) => (
-                      <tr key={template.idplantilla} className="border-b border-gray-700">
+                      <tr key={template.idplantilla} className="border-b border-gray-700 px-4">
                         <td className="py-2">{template.idplantilla}</td>
                         <td className="py-2">{template.nombre}</td>
                         <td className="py-2 text-center">
