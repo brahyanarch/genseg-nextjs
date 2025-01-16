@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,43 +12,25 @@ import { useParams } from 'next/navigation';
 // Tipos
 export interface Activity {
   id: number;
-  name: string;
-  checked: boolean;
+  actividad: {
+    name: string;
+  };
 }
 
 export interface Template {
-  id: number;
-  name: string;
-  selected: boolean;
+  idplantilla: number;
+  nombre: string;
 }
 
-export interface CertificateData {
-  activities: Activity[];
-  templates: Template[];
-}
-
-// Componente principal
 export default function CertificatePage() {
   const [code, setCode] = useState('');
   const [dni, setDni] = useState('');
   const [activities, setActivities] = useState<Activity[]>([]);
   const [templates, setTemplates] = useState<Template[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
+  const [selectedActivityIds, setSelectedActivityIds] = useState<number[]>([]);
 
   const { idsubuni } = useParams();
-
-  // Datos estáticos de ejemplo
-  const staticData: CertificateData = {
-    activities: [
-      { id: 1, name: 'Actividad 1', checked: false },
-      { id: 2, name: 'Actividad 2', checked: false },
-      { id: 3, name: 'Actividad 3', checked: false },
-    ],
-    templates: [
-      { id: 1, name: 'Plantilla 1', selected: false },
-      { id: 2, name: 'Plantilla 2', selected: true },
-      { id: 3, name: 'Plantilla 3', selected: false },
-    ],
-  };
 
   // Fetch de actividades
   const fetchActivitiesData = async () => {
@@ -62,14 +44,13 @@ export default function CertificatePage() {
       }
     } catch (error) {
       console.error('Error al obtener actividades:', error);
-      setActivities(staticData.activities); // Fallback
     }
   };
 
   // Fetch de plantillas
   const fetchTemplatesData = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/templates`);
+      const response = await fetch(`${API_URL}/api/plantilla/${idsubuni}`);
       if (response.ok) {
         const data = await response.json();
         setTemplates(data || []);
@@ -78,33 +59,57 @@ export default function CertificatePage() {
       }
     } catch (error) {
       console.error('Error al obtener plantillas:', error);
-      setTemplates(staticData.templates); // Fallback
     }
   };
 
+  useEffect(() => {
+    fetchTemplatesData();
+  }, []);
+
   // Manejo de cambio en Checkbox (actividades)
   const handleActivityChange = (id: number) => {
-    setActivities((prev) =>
-      prev.map((activity) =>
-        activity.id === id ? { ...activity, checked: !activity.checked } : activity
-      )
+    setSelectedActivityIds((prev) =>
+      prev.includes(id) ? prev.filter((activityId) => activityId !== id) : [...prev, id]
     );
   };
 
   // Manejo de cambio en RadioGroup (plantillas)
   const handleTemplateChange = (id: string) => {
-    const templateId = parseInt(id);
-    setTemplates((prev) =>
-      prev.map((template) =>
-        template.id === templateId
-          ? { ...template, selected: true }
-          : { ...template, selected: false }
-      )
-    );
+    setSelectedTemplateId(parseInt(id));
+  };
+  const enviarCertificado = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/certificado`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          codigo:  code,
+          dni: dni,
+          idplantilla: selectedTemplateId,
+          actividad_ids: selectedActivityIds,
+        }),
+      });
+
+      if (response.ok) {
+        alert('Certificado enviado con éxito');
+        enviarDatos();
+      } else {
+        alert('Error al enviar certificado');
+        enviarDatos();
+      }
+    } catch (error) {
+      console.error('Error al enviar certificado:', error);
+    }
   };
 
+  const enviarDatos = () => {
+    console.log(selectedTemplateId);
+    console.log(selectedActivityIds);
+  }
   return (
-    <div className="min-h-screen bg-[#1a1b1e] text-white p-6">
+    <div className="min-h-screen text-gray-800 dark:text-gray-100 p-6">
       <div className="max-w-4xl mx-auto">
         <nav className="text-sm mb-4">
           <span className="text-gray-400">Inicio {'>'} Certificado</span>
@@ -138,10 +143,10 @@ export default function CertificatePage() {
         </div>
 
         {/* Tablas */}
-        <div className="grid grid-cols-2 gap-8 mb-8">
+        <div className="flex justify-between items-start gap-8 mb-8">
           {/* Actividades */}
           {activities.length > 0 && (
-            <div>
+            <div className='w-[60%]'>
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b border-gray-600">
@@ -154,10 +159,10 @@ export default function CertificatePage() {
                   {activities.map((activity) => (
                     <tr key={activity.id} className="border-b border-gray-700">
                       <td className="py-2">{activity.id}</td>
-                      <td className="py-2">{activity.name}</td>
+                      <td className="py-2">{activity.actividad.name}</td>
                       <td className="py-2 text-center">
                         <Checkbox
-                          checked={activity.checked}
+                          checked={selectedActivityIds.includes(activity.id)}
                           onCheckedChange={() => handleActivityChange(activity.id)}
                         />
                       </td>
@@ -170,7 +175,7 @@ export default function CertificatePage() {
 
           {/* Plantillas */}
           {templates.length > 0 && (
-            <div>
+            <div className='w-[40%]'>
               <RadioGroup onValueChange={handleTemplateChange}>
                 <table className="w-full border-collapse">
                   <thead>
@@ -182,11 +187,14 @@ export default function CertificatePage() {
                   </thead>
                   <tbody>
                     {templates.map((template) => (
-                      <tr key={template.id} className="border-b border-gray-700">
-                        <td className="py-2">{template.id}</td>
-                        <td className="py-2">{template.name}</td>
+                      <tr key={template.idplantilla} className="border-b border-gray-700">
+                        <td className="py-2">{template.idplantilla}</td>
+                        <td className="py-2">{template.nombre}</td>
                         <td className="py-2 text-center">
-                          <RadioGroupItem value={template.id.toString()} />
+                          <RadioGroupItem
+                            value={template.idplantilla.toString()}
+                            checked={selectedTemplateId === template.idplantilla}
+                          />
                         </td>
                       </tr>
                     ))}
@@ -198,7 +206,9 @@ export default function CertificatePage() {
         </div>
 
         <div className="flex justify-center">
-          <Button size="lg">Brindar Certificado</Button>
+          <Button size="lg"
+          onClick={enviarCertificado}
+          >Brindar Certificado</Button>
         </div>
       </div>
     </div>

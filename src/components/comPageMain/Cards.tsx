@@ -46,9 +46,20 @@ export default function Card({ nombreAct, encargado, idActivity}: any) {
     </div>
   );
 }
-
+interface ActivityData{
+  idActivi: number;
+  name: string;
+  fInit: string;
+  fFin: string;
+  public: boolean;
+  project: {
+    usuario:{
+      nombre: string;
+    }
+  };
+}
 export function Cards() {
-  const [actividades, setActividades] = useState([]);
+  const [actividades, setActividades] = useState<ActivityData[]>([]);
 
      ///funcion para obtener los datos del estudiante(participante)
      const handleGetActivitiesPublic = async () => {
@@ -85,7 +96,7 @@ export function Cards() {
 
       {
         actividades.map((actividad, index) => (
-          <Card key={actividad.idActivi} nombreAct={actividad.name} encargado={actividad.project.usuario.n_usu} idActivity={actividad.idActivi} />
+          <Card key={actividad.idActivi} nombreAct={actividad.name} encargado={actividad.project.usuario.nombre} idActivity={actividad.idActivi} />
         ))
       }
 
