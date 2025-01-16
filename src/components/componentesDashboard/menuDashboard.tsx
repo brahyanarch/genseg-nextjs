@@ -2,21 +2,21 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronLeft, ChevronRight, ChevronDown, LayoutDashboard, StickyNote, Settings, Settings2, FolderKanban, Bell } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, LayoutDashboard, StickyNote, Settings, Settings2, FolderKanban, Bell, FileBarChart } from "lucide-react";
 import { useParams, usePathname } from "next/navigation";
 import { usePermissions } from "@/context/PermissionContext";
 import { checkPermission } from "@/components/checkPermission";
 import Link from 'next/link'
 import clsx from 'clsx'
 
-const Menu = ({admi}:{admi:boolean}) => {
+const Menu = ({ admi }: { admi: boolean }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isSubConfigOpen, setIsSubConfigOpen] = useState(false);
   const [isPaginaOpen, setIsPaginaOpen] = useState(false);
   const [esCertificadoOpen, setEsCertificadoOpen] = useState(false);
   //manejo de permisos
-   const permissions = usePermissions();
+  const permissions = usePermissions();
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
   const toggleConfig = () => setIsConfigOpen(!isConfigOpen);
   const toggleSubConfig = () => setIsSubConfigOpen(!isSubConfigOpen);
@@ -43,34 +43,40 @@ const Menu = ({admi}:{admi:boolean}) => {
     // Condicionalmente incluir "Configuración" solo si es administrador
     ...(admi
       ? [
-          {
-            icon: Settings,
-            label: "Configuración",
-            url: "#",
-            subItems: [
-              {
-                label: "Roles",
-                url: `/intranet/privilegios/configuracion/roles`,
-              },
-              {
-                label: "Permisos",
-                url: `/intranet/privilegios/configuracion/permisos`,
-              },
-              {
-                label: "Usuarios",
-                url: `/intranet/privilegios/configuracion/usuarios`,
-              },
-              {
-                label: "Sub unidad",
-                url: `/intranet/privilegios/configuracion/subUnidades`,
-              },
-            ],
-            onClick: toggleConfig,
-            isOpen: isConfigOpen,
-          },
-        ]
+        {
+          icon: FileBarChart,
+          label: "Reportes",
+          url: `/intranet/privilegios/reportes`,
+
+        },
+        {
+          icon: Settings,
+          label: "Configuración",
+          url: "#",
+          subItems: [
+            {
+              label: "Roles",
+              url: `/intranet/privilegios/configuracion/roles`,
+            },
+            {
+              label: "Permisos",
+              url: `/intranet/privilegios/configuracion/permisos`,
+            },
+            {
+              label: "Usuarios",
+              url: `/intranet/privilegios/configuracion/usuarios`,
+            },
+            {
+              label: "Sub unidad",
+              url: `/intranet/privilegios/configuracion/subUnidades`,
+            },
+          ],
+          onClick: toggleConfig,
+          isOpen: isConfigOpen,
+        },
+      ]
       : []),
-    ...( checkPermission(permissions, "Pagina") || admi ?
+    ...(checkPermission(permissions, "Pagina") || admi ?
       [{
         icon: LayoutDashboard,
         label: "Página",
@@ -91,64 +97,64 @@ const Menu = ({admi}:{admi:boolean}) => {
         ],
         onClick: togglePagina,
         isOpen: isPaginaOpen,
-      }]:[]
+      }] : []
     ),
-    
+
     // Condicionalmente incluir "Proyectos" y "Sub Configuraciones"
     ...(!admi
       ? [
-          {
-            icon: FolderKanban,
-            label: "Proyectos",
-            url: `/intranet/${dni}/${idrol}/${idsubuni}/proyectos`,
-          },
-          {
-            icon: Settings2,
-            label: "Sub Configuraciones",
-            url: `#`,
-            subItems: [
-              {
-                label: "Formularios",
-                url: `/intranet/${dni}/${idrol}/${idsubuni}/subConfiguraciones/Formularios`,
-              },
-              {
-                label: "Usuarios",
-                url: `/intranet/${dni}/${idrol}/${idsubuni}/subConfiguraciones/usuarios`,
-              },
-            ],
-            onClick: toggleSubConfig,
-            isOpen: isSubConfigOpen,
-          },
-          
+        {
+          icon: FolderKanban,
+          label: "Proyectos",
+          url: `/intranet/${dni}/${idrol}/${idsubuni}/proyectos`,
+        },
+        {
+          icon: Settings2,
+          label: "Sub Configuraciones",
+          url: `#`,
+          subItems: [
+            {
+              label: "Formularios",
+              url: `/intranet/${dni}/${idrol}/${idsubuni}/subConfiguraciones/Formularios`,
+            },
+            {
+              label: "Usuarios",
+              url: `/intranet/${dni}/${idrol}/${idsubuni}/subConfiguraciones/usuarios`,
+            },
+          ],
+          onClick: toggleSubConfig,
+          isOpen: isSubConfigOpen,
+        },
 
-          ...(checkPermission(permissions, "Certificados") ? 
+
+        ...(checkPermission(permissions, "Certificados") ?
           [
-          {
-            icon: StickyNote,
-            label: "Certificados",
-            url: `#`,
-            subItems: [
-              {
-                label: "Ver Certificados",
-                url: `/intranet/${dni}/${idrol}/${idsubuni}/certificados/ver-certificados`,
-              },
-              {
-                label: "Solicitados",
-                url: `/intranet/${dni}/${idrol}/${idsubuni}/certificados/solicitados`,
-              },
-              {
-                label: "Plantillas",
-                url: `/intranet/${dni}/${idrol}/${idsubuni}/certificados/plantillas`,
-              },
-            ],
-            onClick: toggleCertificado,
-            isOpen: esCertificadoOpen,
-          }]:[]),
+            {
+              icon: StickyNote,
+              label: "Certificados",
+              url: `#`,
+              subItems: [
+                {
+                  label: "Ver Certificados",
+                  url: `/intranet/${dni}/${idrol}/${idsubuni}/certificados/ver-certificados`,
+                },
+                {
+                  label: "Solicitados",
+                  url: `/intranet/${dni}/${idrol}/${idsubuni}/certificados/solicitados`,
+                },
+                {
+                  label: "Plantillas",
+                  url: `/intranet/${dni}/${idrol}/${idsubuni}/certificados/plantillas`,
+                },
+              ],
+              onClick: toggleCertificado,
+              isOpen: esCertificadoOpen,
+            }] : []),
 
-        ]
+      ]
       : []),
   ];
-  
+
 
   return (
     <aside

@@ -168,7 +168,7 @@ export default function ProjectForm() {
             <div>
               <label
                 htmlFor="selectOption"
-                className="block text-lg font-medium mb-2 block text-gray-700 dark:text-gray-300"
+                className="block text-lg font-medium mb-2 text-gray-700 dark:text-gray-300"
               >
                 Tipo Proyecto
               </label>

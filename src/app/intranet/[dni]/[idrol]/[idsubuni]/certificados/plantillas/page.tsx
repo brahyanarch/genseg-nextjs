@@ -1,25 +1,20 @@
 'use client'
-import { Search, X, PenSquare, Trash2, Circle, CirclePlus, FilePenLine } from "lucide-react";
-import { useState, useContext, useEffect } from 'react'
+import { Search, PenSquare, Trash2, CirclePlus } from "lucide-react";
+import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
 import DynamicTable from "@/components/DynamicTable";
-import { API_FORM , API_GET_FORM_BY_SUBUNI, API_URL} from "@/config/apiconfig";
-import { AvisoContext } from '@/context/avisoContext'
+import { API_URL } from "@/config/apiconfig";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
 import { BreadcrumbItemType } from "@/tipos/typos";
 import Swal from 'sweetalert2';
-import { set } from "date-fns";
+import SkeletonTable from "@/components/skeletonTable";
 type FormEntry = {
   idf: number;
-  nmForm: string;
-  estado: boolean;
-  abre: string;
-  Fcreate: string;
-  Fupdate: string;
+  nombre: string;
+  tipo: string;
+  createdAt: string;
 }
 ///datos locales para la prueba
 /*const forms: FormEntry[] = [
@@ -46,151 +41,11 @@ type FormEntry = {
   },
 ];*/
 // modal para editar o añadir  un formulario
-export const EditModal = ({isOpen,closeModal,onSaveForm,editingForm,}: any) => {
-  const [name, setName] = useState("");
-  const [abbreviation, setAbbreviation] = useState("");
-  const { mostrarAviso } = useContext<any>(AvisoContext);
-  const { dni, idrol, idsubuni } = useParams();
-  useEffect(() => {
-    if (editingForm) {
-      setName(editingForm.nmForm);
-      setAbbreviation(editingForm.abre);
-    }
-    else {
-      setName("");
-      setAbbreviation("");
-    }
-  }, [editingForm]);
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    const updatedForm = {
-      name: name,
-      abrev: abbreviation,
-      idsubunidad: idsubuni,
-    };
-    console.log(updatedForm, "datos del formulario");
-    try {
-      console.log("entro al try", updatedForm );
-      const response = await fetch(
-        editingForm ? `${API_URL}/api/form/${editingForm.idf}` : `${API_URL}/api/form`,
-        {
-          method: editingForm ? "PUT" : "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedForm),
-        }
-      );
-
-      if (response.ok) {
-        const savedRole = await response.json();
-        onSaveForm(savedRole);
-        mostrarAviso('succefull', 'Formulario guardado correctamente.');
-        // Mostrar un SweetAlert de éxito con el check
-        Swal.fire({
-          icon: 'success',
-          title: '¡Éxito!',
-          text: 'Rol actualizado correctamente.',
-          confirmButtonText: 'OK',
-        });
-
-        closeModal();
-      } else {
-        Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Hubo un problema al actualizar el Formulario.',
-              confirmButtonText: 'OK',
-            });
-      }
-    } catch (error) {
-      // Si el servidor no responde bien, mostrar un SweetAlert de error
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Hubo un problema al actualizar el rol.',
-        confirmButtonText: 'OK',
-      });
-    }
-  };
-
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="absolute inset-0 bg-black opacity-50"></div>
-      <div className="relative bg-gray-800 p-6 rounded-lg shadow-xl w-[50%] h-[60%]">
-        <button
-          onClick={closeModal}
-          className="absolute top-2 right-2 text-gray-400 hover:text-white"
-        >
-          <X size={24} />
-        </button>
-        <h2 className="text-2xl font-bold mb-4 text-white">
-          {editingForm ? "Editar Formulario" : "Agregar Formulario"}
-        </h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-300 mb-1"
-            >
-              Nombre
-            </label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Sub administrador"
-              className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
-            />
-          </div>
-          <div className="mb-8">
-            <label
-              htmlFor="abbreviation"
-              className="block text-sm font-medium text-gray-300 mb-1"
-            >
-              Abreviatura
-            </label>
-            <input
-              type="text"
-              id="abbreviation"
-              value={abbreviation}
-              onChange={(e) => setAbbreviation(e.target.value)}
-              placeholder="SubAdm"
-              className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
-            />
-          </div>
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={closeModal}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-            >
-              {editingForm ? "Actualizar" : "Guardar"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
-export default function Component() {
+export default function PlantillaCertificado() {
   const [form, setForm] = useState<FormEntry[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingForm, setEditingForm] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { mostrarAviso } = useContext<any>(AvisoContext);
   const pathname = usePathname();
   const router = useRouter();
   const { dni, idsubuni, idrol } = useParams();
@@ -202,12 +57,6 @@ export default function Component() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [searchTerm, setSearchTerm] = useState("");
 
-
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
-
-  
   if (error) {
     return <p>Error: {error}</p>;
   }
@@ -251,7 +100,7 @@ export default function Component() {
   // Función para filtrar los datos basados en el término de búsqueda
   const getFilteredData = () => {
     if (!searchTerm) return sortedProjects;
-  
+
     return sortedProjects.filter((user) =>
       Object.values(user).some((value) =>
         value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
@@ -267,81 +116,30 @@ export default function Component() {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
-
-  const toggleStateForm = async (idf: number) => {
-      try {
-        
-        // Realiza la petición PUT para actualizar el estado del usuario
-        const response = await fetch(`${API_URL}/api/form/toggle`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            idf: idf,
-            idsubuni: idsubuni,
-          }),
-        });
-        console.log("Respuesta del servidor:", response);
-  
-        if (response.ok) {
-          const updatedData = await response.json();
-          // Actualiza el estado local de los usuarios en el frontend
-          setForm(updatedData.allform);
-          console.log("Estado actualizado:", updatedData);
-          Swal.fire({
-            icon: 'success',
-            title: 'Estado actualizado',
-            text: 'El estado del usuario ha sido actualizado correctamente.',
-            confirmButtonText: 'OK',
-          });
-
-        } else {
-          const errorData = await response.json();
-          console.error("Error al actualizar el estado del usuario:", errorData.message);
-          Swal.fire({
-            icon: 'error',
-            title: 'Error al actualizar el estado',
-            text: 'Hubo un problema al actualizar el estado del usuario.',
-            confirmButtonText: 'OK',
-          });
-        }
-      } catch (error) {
-
-        console.error("Error al cambiar el estado del usuario:", error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al actualizar el estado',
-          text: 'Hubo un problema al actualizar el estado del usuario.',
-          confirmButtonText: 'OK',
-        });
-      }
-    };
-
   // Configuración de la tabla
   const configurationUser = [
     {
-      key: "idf",
+      key: "idp",
       label: "ID",
       render: (item: FormEntry) => <>{form.indexOf(item) + 1}</>,
       sortable: true,
     },
     {
-      key: "nmForm",
+      key: "nmPlantilla",
       label: "Nombre",
-      render: (item: FormEntry) => <div className="w-32 truncate">{item.nmForm}</ div>,
+      render: (item: FormEntry) => <div className="w-32 truncate">{item.nombre}</ div>,
       sortable: true,
     },
     {
-      key: "abre",
-      label: "Abreviatura",
-      render: (item: FormEntry) => <div className="w-32 truncate">{item.abre}</ div>,
+      key: "tipo",
+      label: "Tipo",
+      render: (item: FormEntry) => <div className="w-32 truncate">{item.tipo}</ div>,
       sortable: true,
     },
     {
       key: "Fcreate",
       label: "Fecha Creación",
-      render: (item: FormEntry) => new Date(item.Fcreate).toLocaleDateString(),
+      render: (item: FormEntry) => new Date(item.createdAt).toLocaleDateString(),
       sortable: true,
     },
     {
@@ -349,21 +147,11 @@ export default function Component() {
       label: "Opciones",
       render: (item: FormEntry) => (
         <>
-          <Button variant="ghost" size="icon" onClick={() => openEditModal(item)}>
+          <Button variant="ghost" size="icon" onClick={() => editPlantilla(item.idf)}>
             <PenSquare className="h-5 w-5" strokeWidth={2.5} />
           </Button>
           <Button variant="ghost" size="icon" onClick={() => deleteForm(item.idf)}>
             <Trash2 className="h-5 w-5" strokeWidth={2.5} />
-          </Button>
-          <Button variant="ghost" size="icon">
-            <Circle
-              className={`h-5 w-5 ${item.estado ? "fill-primary dark:fill-slate-950" : ""}`}
-              strokeWidth={2}
-              onClick={ item.estado ? () => {} : () => toggleStateForm(item.idf)}
-            />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => editForm(item.idf)} >
-            <FilePenLine className="h-5 w-5" strokeWidth={2.5} />
           </Button>
         </>
       ),
@@ -404,7 +192,7 @@ export default function Component() {
     // Rango de páginas cercanas a la actual
     const maxVisiblePages = 3;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, currentPage + Math.floor(maxVisiblePages / 2));
+    const endPage = Math.min(totalPages, currentPage + Math.floor(maxVisiblePages / 2));
 
     if (endPage - startPage < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
@@ -455,16 +243,16 @@ export default function Component() {
     return pageButtons;
   };
   //función para obtener datos desde la API
-  const fetchForms = async () => {
+  const fetchPlantillas = async () => {
     try {
-      const response = await fetch(`${API_GET_FORM_BY_SUBUNI}/${idsubuni}`);
+      const response = await fetch(`${API_URL}/plantilla/${idsubuni}`);
       if (!response.ok) {
         throw new Error("Error al obtener los Formularios");
       }
       const data = await response.json();
       setForm(data);
     } catch (err: any) {
-      
+
     } finally {
       setLoading(false);
     }
@@ -472,31 +260,17 @@ export default function Component() {
 
   // useEffect para obtener los roles desde la API al montar el componente
   useEffect(() => {
-    fetchForms();
+    fetchPlantillas();
   }, []);
 
-  const editForm = (idForm: number) => {
-    router.push(`${pathname}/editaPlantilla/${idForm}`);
+  const editPlantilla = (idPlant: number) => {
+    router.push(`${pathname}/editaPlantilla/${idPlant}`);
   };
+  //función para insertar una nueva plantilla
+  const insertPlantilla = () => {
+    router.push(`${pathname}/insertPlantilla`);
+  }
 
-  const openEditModal = (form: any) => {
-    setEditingForm(form);
-    setIsModalOpen(true);
-  };
-  //funcion para editar un Rol
-  const saveForm = (savedForm: any) => {
-    setForm((prevForms: any) => {
-      if (editingForm) {
-        return prevForms.map((form: any) =>
-          form.id_per === savedForm.idf ? savedForm : form
-        );
-      } else {
-        return [...prevForms, savedForm];
-      }
-    });
-    setEditingForm(null);
-    fetchForms();
-  };
   //función para eliminar un Rol
   const deleteForm = async (id: number) => {
     try {
@@ -515,7 +289,7 @@ export default function Component() {
           text: 'El formulario se ha creado correctamente.',
           confirmButtonText: 'OK',
         });
-        fetchForms();
+        fetchPlantillas();
       } else {
         // Si el servidor no responde bien, mostrar un SweetAlert de error
         Swal.fire({
@@ -538,77 +312,26 @@ export default function Component() {
 
   if (loading) {
     return (
-      <>
-        <div className="p-6 space-y-6">
-          {/* Breadcrumb skeleton */}
-          <div className="flex items-center gap-2 text-sm">
-            <Skeleton className="h-4 w-12" />
-            <Skeleton className="h-4 w-4" />
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-4" />
-            <Skeleton className="h-4 w-16" />
-          </div>
-
-          {/* Title skeleton */}
-          <div className="space-y-4">
-            <Skeleton className="h-8 w-32" />
-
-            {/* New button skeleton */}
-            <Button variant="outline" disabled className="gap-2">
-              <Skeleton className="h-4 w-12" />
-            </Button>
-          </div>
-
-          {/* Table skeleton */}
-          <div className="rounded-lg border">
-            {/* Header */}
-            <div className="grid grid-cols-[100px_1fr_100px] bg-muted p-4 gap-4">
-              <Skeleton className="h-4 w-8" />
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-4 w-20" />
-            </div>
-
-            {/* Table row */}
-            <div className="grid grid-cols-[100px_1fr_100px] p-4 gap-4 items-center">
-              <Skeleton className="h-4 w-6" />
-              <Skeleton className="h-4 w-32" />
-              <div className="flex gap-2">
-                <Skeleton className="h-8 w-8" />
-                <Skeleton className="h-8 w-8" />
-              </div>
-            </div>
-          </div>
-
-          {/* Pagination skeleton */}
-          <div className="flex justify-center gap-2 mt-4">
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-          </div>
-        </div>
-      </>
+      <SkeletonTable />
     );
   }
 
-   ///recortar rutas
-   const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
+  ///recortar rutas
+  const recortarRutaHastaSegmento = (ruta: string, segmento: string): string => {
     const partes = ruta.split('/'); // Divide la ruta en partes
     const indice = partes.indexOf(segmento); // Encuentra el índice del segmento clave
     if (indice === -1) return ruta; // Si no encuentra el segmento, retorna la ruta completa
     return partes.slice(0, indice + 1).join('/'); // Toma hasta el segmento + un nivel
   };
   //recortamos las rutas requeridas
-  const configuracion = recortarRutaHastaSegmento(pathname, 'subConfiguraciones');
   const inicio = recortarRutaHastaSegmento(pathname, 'intranet');
   //definimos valores para el breadCrumb
-  const breadcrumbData:BreadcrumbItemType[] = [
-    { type: "link", label: "Inicio", href:`${inicio}/${dni}/${idrol}/${idsubuni}` },
+  const breadcrumbData: BreadcrumbItemType[] = [
+    { type: "link", label: "Inicio", href: `${inicio}/${dni}/${idrol}/${idsubuni}` },
     {
       type: "page",
       label: "Certificados",
-      
+
     },
     { type: "page", label: "Plantillas" },
   ];
@@ -618,26 +341,25 @@ export default function Component() {
       <BreadcrumbWithDropdown items={breadcrumbData} />
       <h1 className="text-2xl font-bold  ">Plantillas</h1>
       <div className="flex justify-between items-center gap-4 flex-wrap">
-        <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-52 "   
-          onClick={toggleModal}
+        <Button variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-lg h-12 w-52 "
+          onClick={insertPlantilla}
         >
           <CirclePlus className="h-8 w-8 " />
           <span className="mx-2"></span> {/* Añadir margen entre los elementos */}
           <p className="font-bold" >Nueva Plantilla</p>
         </Button>
-        
-      </div>
         <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar..."
-                type="text"
-                className="pl-8 w-[250px] bg-background"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                
-              />
-            </div>
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar..."
+            type="text"
+            className="pl-8 w-[250px] bg-background"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+
+          />
+        </div>
+      </div>
       <div className="bg-[#E3E6ED] rounded-lg  ">
         <DynamicTable
           configuration={configurationUser}
@@ -648,10 +370,6 @@ export default function Component() {
       <div className="flex justify-center space-x-2 mt-4">
         {renderPaginationButtons()}
       </div>
-      
-    <EditModal isOpen={isModalOpen} closeModal={toggleModal} onSaveForm={saveForm} editingForm={editingForm} />
-      
-
     </div>
   );
 }
