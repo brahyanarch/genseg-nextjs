@@ -135,12 +135,12 @@ const Menu = ({ admi }: { admi: boolean }) => {
               url: `#`,
               subItems: [
                 {
-                  label: "Ver Certificados",
-                  url: `/intranet/${dni}/${idrol}/${idsubuni}/certificados/ver-certificados`,
+                  label: "Certificados Alumnos",
+                  url: `/intranet/${dni}/${idrol}/${idsubuni}/certificados/certificadoAlumnos`,
                 },
                 {
-                  label: "Solicitados",
-                  url: `/intranet/${dni}/${idrol}/${idsubuni}/certificados/solicitados`,
+                  label: "Certificados Terceros",
+                  url: `/intranet/${dni}/${idrol}/${idsubuni}/certificados/certificadoTerceros`,
                 },
                 {
                   label: "Plantillas",

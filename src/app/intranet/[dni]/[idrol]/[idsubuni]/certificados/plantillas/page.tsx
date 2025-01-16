@@ -11,36 +11,11 @@ import { BreadcrumbItemType } from "@/tipos/typos";
 import Swal from 'sweetalert2';
 import SkeletonTable from "@/components/skeletonTable";
 type FormEntry = {
-  idf: number;
+  idplantilla: number;
   nombre: string;
   tipo: string;
   createdAt: string;
 }
-///datos locales para la prueba
-/*const forms: FormEntry[] = [
-  {
-    idf: 1,
-    nmForm: "Formulario proyecto 2024",
-    Fcreate: "12-02-2024",
-    abre: "F120224",
-    estado: true,
-  },
-  {
-    idf: 2,
-    nmForm: "Formulario proyecto 2",
-    Fcreate: "13-02-2024",
-    abre: "F130224",
-    estado: false,
-  },
-  {
-    idf: 3,
-    nmForm: "Formulario proyecto 3",
-    Fcreate: "14-02-2024",
-    abre: "F140224",
-    estado: false,
-  },
-];*/
-// modal para editar o añadir  un formulario
 
 export default function PlantillaCertificado() {
   const [form, setForm] = useState<FormEntry[]>([]);
@@ -57,9 +32,74 @@ export default function PlantillaCertificado() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [searchTerm, setSearchTerm] = useState("");
 
-  if (error) {
-    return <p>Error: {error}</p>;
+
+  //función para obtener datos desde la API
+  const fetchPlantillas = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/plantilla/${idsubuni}`);
+      if (!response.ok) {
+        throw new Error("Error al obtener los Formularios");
+      }
+      const data = await response.json();
+      setForm(data);
+    } catch (err: any) {
+
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // useEffect para obtener los roles desde la API al montar el componente
+  useEffect(() => {
+    fetchPlantillas();
+  }, []);
+
+  const editPlantilla = (idPlant: number) => {
+    router.push(`${pathname}/editaPlantilla/${idPlant}`);
+  };
+  //función para insertar una nueva plantilla
+  const insertPlantilla = () => {
+    router.push(`${pathname}/insertPlantilla`);
   }
+
+  //función para eliminar un Rol
+  const deleteForm = async (id: number) => {
+    try {
+      const response = await fetch(`${API_URL}/api/form/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setForm((prevForms: any) =>
+          prevForms.filter((form: any) => form.idf !== id)
+        );
+        // Si el servidor no responde bien, mostrar un SweetAlert de error
+        Swal.fire({
+          icon: 'success',
+          title: 'Formulario eliminado correctamente',
+          text: 'El formulario se ha creado correctamente.',
+          confirmButtonText: 'OK',
+        });
+        fetchPlantillas();
+      } else {
+        // Si el servidor no responde bien, mostrar un SweetAlert de error
+        Swal.fire({
+          icon: 'error',
+          title: 'El formulario no se eliminio correctamente',
+          text: 'Hubo un problema al eliminar el formulario.',
+          confirmButtonText: 'OK',
+        });
+      }
+    } catch (error) {
+      // Si el servidor no responde bien, mostrar un SweetAlert de error
+      Swal.fire({
+        icon: 'error',
+        title: 'El formulario no se eliminio correctamente',
+        text: 'Hubo un problema al eliminar el formulario.',
+        confirmButtonText: 'OK',
+      });
+    }
+  };
   //Configuracion de la tabla dinámica
 
   // Función para acceder a propiedades anidadas
@@ -147,10 +187,10 @@ export default function PlantillaCertificado() {
       label: "Opciones",
       render: (item: FormEntry) => (
         <>
-          <Button variant="ghost" size="icon" onClick={() => editPlantilla(item.idf)}>
+          <Button variant="ghost" size="icon" onClick={() => editPlantilla(item.idplantilla)}>
             <PenSquare className="h-5 w-5" strokeWidth={2.5} />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => deleteForm(item.idf)}>
+          <Button variant="ghost" size="icon" onClick={() => deleteForm(item.idplantilla)}>
             <Trash2 className="h-5 w-5" strokeWidth={2.5} />
           </Button>
         </>
@@ -242,78 +282,15 @@ export default function PlantillaCertificado() {
 
     return pageButtons;
   };
-  //función para obtener datos desde la API
-  const fetchPlantillas = async () => {
-    try {
-      const response = await fetch(`${API_URL}/plantilla/${idsubuni}`);
-      if (!response.ok) {
-        throw new Error("Error al obtener los Formularios");
-      }
-      const data = await response.json();
-      setForm(data);
-    } catch (err: any) {
-
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // useEffect para obtener los roles desde la API al montar el componente
-  useEffect(() => {
-    fetchPlantillas();
-  }, []);
-
-  const editPlantilla = (idPlant: number) => {
-    router.push(`${pathname}/editaPlantilla/${idPlant}`);
-  };
-  //función para insertar una nueva plantilla
-  const insertPlantilla = () => {
-    router.push(`${pathname}/insertPlantilla`);
-  }
-
-  //función para eliminar un Rol
-  const deleteForm = async (id: number) => {
-    try {
-      const response = await fetch(`${API_URL}/api/form/${id}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        setForm((prevForms: any) =>
-          prevForms.filter((form: any) => form.idf !== id)
-        );
-        // Si el servidor no responde bien, mostrar un SweetAlert de error
-        Swal.fire({
-          icon: 'success',
-          title: 'Formulario eliminado correctamente',
-          text: 'El formulario se ha creado correctamente.',
-          confirmButtonText: 'OK',
-        });
-        fetchPlantillas();
-      } else {
-        // Si el servidor no responde bien, mostrar un SweetAlert de error
-        Swal.fire({
-          icon: 'error',
-          title: 'El formulario no se eliminio correctamente',
-          text: 'Hubo un problema al eliminar el formulario.',
-          confirmButtonText: 'OK',
-        });
-      }
-    } catch (error) {
-      // Si el servidor no responde bien, mostrar un SweetAlert de error
-      Swal.fire({
-        icon: 'error',
-        title: 'El formulario no se eliminio correctamente',
-        text: 'Hubo un problema al eliminar el formulario.',
-        confirmButtonText: 'OK',
-      });
-    }
-  };
+  
 
   if (loading) {
     return (
       <SkeletonTable />
     );
+  }
+  if (error) {
+    return <p>Error: {error}</p>;
   }
 
   ///recortar rutas
