@@ -1,92 +1,208 @@
 'use client'
 import { Button } from "@/components/ui/button"
-import { Edit, X, Trash2, CirclePlus } from "lucide-react"
+import { Edit, X, Trash2, CirclePlus, CheckIcon } from "lucide-react"
 import { useState, useEffect } from "react"
-import { API_USERS, API_CREATE_USERS } from "@/config/apiconfig";
-import { Skeleton } from "@/components/ui/skeleton";
+import { API_USERS, API_CREATE_USERS, API_URL, API_ROLES, API_SUBUNIDADES } from "@/config/apiconfig";
 import DynamicTable from "@/components/DynamicTable";
 import { BreadcrumbWithDropdown } from "@/components/breadcrumb";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { User } from "@/tipos/typos"
 import { usePathname } from "next/navigation";
 import Swal from 'sweetalert2';
-import { routeModule } from "next/dist/build/templates/pages";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { BreadcrumbItemType } from '@/tipos/typos';
 import SkeletonTable from "@/components/skeletonTable";
+import { Rol, Subunidad } from "@/tipos/typos";
+import { CaretSortIcon } from "@radix-ui/react-icons";
+import clsx from "clsx";
+//tipos de datos
+type ComboboxData = Rol | Subunidad;
+
+interface ComboboxDemoProps {
+  tipo: "rol" | "subunidad";
+  data: ComboboxData[];
+  value: number | null;
+  setValue: (value: number) => void;
+}
+//comboBox 
+export function ComboboxDemo({ data, value, setValue, tipo }: ComboboxDemoProps) {
+  const [open, setOpen] = useState(false);
+
+  const getDisplayText = (item: ComboboxData | undefined): string => {
+    if (!item) {
+      return "Valor no encontrado"; // Valor por defecto
+    }
+    return tipo === "rol"
+      ? (item as Rol).n_rol
+      : (item as Subunidad).n_subuni;
+  };
+
+  const getId = (item: ComboboxData): number => {
+    return tipo === "rol"
+      ? (item as Rol).id_rol
+      : (item as Subunidad).id_subuni;
+  };
+
+  return (
+    <>
+      {data && data.length > 0 && (
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className="w-[300px] justify-between bg-slate-100 text-gray-800"
+            >
+              {value !== null
+                ? getDisplayText(data.find((item) => getId(item) === value))
+                : `Seleccionar ${tipo === "rol" ? "un rol" : "una subunidad"}`}
+              <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[200px] p-0">
+            <Command>
+              <CommandList>
+                <CommandEmpty>No se encontraron resultados.</CommandEmpty>
+                <CommandGroup>
+                  {data.map((item) => (
+                    <CommandItem
+                      key={getId(item)}
+                      value={getId(item).toString()}
+                      onSelect={() => {
+                        setValue(getId(item));
+                        setOpen(false);
+                      }}
+                    >
+                      {getDisplayText(item)}
+                      <CheckIcon
+                        className={clsx(
+                          "ml-auto h-4 w-4",
+                          value === getId(item) ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      )}
+    </>
+  );
+}
+
+
+
 // Modal para agregar un nuevo Usuario
 export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) => {
-  const [dni, setDni] = useState('');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [idRol, setIdRol] = useState('');
-  const [idSubUni, setIdSubUni] = useState('');
+  const [roles, setRoles] = useState<Rol[]>([]);
+  const [subUnidades, setSubUnidades] = useState<Subunidad[]>([]);
+  const [dni, setDni] = useState("");
+  const [name, setName] = useState("");
+  const [aPaterno, setAPaterno] = useState("");
+  const [aMaterno, setAMaterno] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [idRol, setIdRol] = useState<number | null>(null);
+  const [idSubUni, setIdSubUni] = useState<number | null>(null);
+
   useEffect(() => {
     if (editingUser) {
       setDni(editingUser.dni);
-      setName(editingUser.usuario);
+      setName(editingUser.nombre);
+      setAPaterno(editingUser.APaterno);
+      setAMaterno(editingUser.AMaterno);
       setEmail(editingUser.email);
-      setPassword(editingUser.password)
+      setPassword(editingUser.password);
       setIdRol(editingUser.rol_id);
-      setIdSubUni(editingUser.id_sub)
+      setIdSubUni(editingUser.subunidad_id_subuni);
+    } else {
+      setDni("");
+      setName("");
+      setAPaterno("");
+      setAMaterno("");
+      setEmail("");
+      setPassword("");
+      setIdRol(null);
+      setIdSubUni(null);
     }
   }, [editingUser]);
+  useEffect(() => {
+    const fetchRoles = async () => {
+      const response = await fetch(`${API_ROLES}`);
+      const data = await response.json();
+      setRoles(data);
+    };
 
+    const fetchSubUnits = async () => {
+      const response = await fetch(`${API_SUBUNIDADES}`);
+      const data = await response.json();
+      setSubUnidades(data);
+    };
+
+    fetchRoles();
+    fetchSubUnits();
+  }, []);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Si estamos editando un usuario, no mostramos la confirmación
-    if (!editingUser) {
-      // Si no estamos editando, entonces mostramos la confirmación
-      const result = await Swal.fire({
-        title: '¿Estás seguro de agregar un nuevo usuario?',
-        text: 'Agregarás un nuevo usuario en el sistema',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, agregar usuario',
-        cancelButtonText: 'Cancelar',
-        customClass: {
-          cancelButton: 'bg-red-500 text-white hover:bg-red-600', // Personalizando el botón de cancelar
-          confirmButton: 'bg-blue-500 text-white hover:bg-blue-600', // Estilo del botón de confirmar
-        },
-      });
+    const result = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: editingUser ? "Guardar los cambios del usuario" : "Agregar un nuevo usuario",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, confirmar",
+      cancelButtonText: "Cancelar",
+    });
 
-      if (!result.isConfirmed) {
-        Swal.fire('Cancelado', 'El usuario no fue agregado.', 'info');
-        return; // Si el usuario cancela, salimos de la función
-      }
-    }
+    if (!result.isConfirmed) return;
 
-    // Aquí construimos el objeto con los datos a guardar
     const updatedUser = {
       dni: dni,  // dni del usuario
-      usuario: name,  // nombre del usuario
+      nombre: name,  // nombre del usuario
       email: email,  // email del usuario
       password: password,
       rol_id: idRol,  // rol_id, lo debes pasar como está en el objeto de usuario
       id_sub: idSubUni,  // subunidad_id_subuni
+      aPaterno: aPaterno,
+      aMaterno: aMaterno
     };
 
     try {
-      const response = await fetch(editingUser ? `${API_CREATE_USERS}/${editingUser.dni}` : API_CREATE_USERS, {
-        method: editingUser ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedUser),
-      });
+      const response = await fetch(
+        editingUser ? `${API_CREATE_USERS}/${dni}` : API_CREATE_USERS,
+        {
+          method: editingUser ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedUser),
+        }
+      );
 
       if (response.ok) {
         const savedUser = await response.json();
         onSaveUser(savedUser);
-        Swal.fire('Guardado!', 'El usuario se ha guardado correctamente.', 'success');
+        Swal.fire("¡Éxito!", "Usuario guardado correctamente", "success");
         closeModal();
       } else {
-        Swal.fire('Error', 'Hubo un problema al guardar el usuario.', 'error');
+        throw new Error("Error al guardar el usuario");
       }
     } catch (error) {
-      Swal.fire('Error', 'Error al conectar con la API: ' + error, 'error');
+      Swal.fire("Error", "Hubo un problema al guardar el usuario", "error");
     }
   };
 
@@ -97,7 +213,7 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="absolute inset-0 bg-black opacity-50"></div>
-      <div className="relative bg-gray-800 p-6 rounded-lg shadow-xl w-[50%] h-[80%]">
+      <div className="relative bg-gray-800 p-6 rounded-lg shadow-xl w-[50%] h-[80%] overflow-auto">
         <button
           onClick={closeModal}
           className="absolute top-2 right-2 text-gray-400 hover:text-white"
@@ -117,7 +233,7 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
               id="name"
               value={dni}
               onChange={(e) => setDni(e.target.value)}
-              placeholder="Permiso"
+              placeholder="DNI"
               className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
             />
           </div>
@@ -130,7 +246,33 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Permiso"
+              placeholder="Nombre completo"
+              className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
+            />
+          </div>
+          <div className="mb-2">
+            <label htmlFor="aPaterno" className="block text-sm font-medium text-gray-300 mb-1">
+              Apellido Paterno
+            </label>
+            <input
+              type="text"
+              id="aPaterno"
+              value={aPaterno}
+              onChange={(e) => setAPaterno(e.target.value)}
+              placeholder="apellido paterno"
+              className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
+            />
+          </div>
+          <div className="mb-2">
+            <label htmlFor="aMaterno" className="block text-sm font-medium text-gray-300 mb-1">
+              Apellido Materno
+            </label>
+            <input
+              type="text"
+              id="aMaterno"
+              value={aMaterno}
+              onChange={(e) => setAMaterno(e.target.value)}
+              placeholder="apellido materno"
               className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
             />
           </div>
@@ -143,10 +285,11 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
               id="abbreviation"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Ins o Vacío"
+              placeholder="email"
               className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
             />
           </div>
+         { !editingUser ? (
           <div className="mb-2">
             <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
               Password
@@ -156,35 +299,23 @@ export const EditModal = ({ isOpen, closeModal, onSaveUser, editingUser }: any) 
               id="name"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Permiso"
+              placeholder="contraseña"
               className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
             />
           </div>
+          ): null
+          }
           <div className="mb-2">
             <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
               Id Rol
             </label>
-            <input
-              type="text"
-              id="name"
-              value={idRol}
-              onChange={(e) => setIdRol(e.target.value)}
-              placeholder="Permiso"
-              className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
-            />
+            <ComboboxDemo data={roles} value={idRol} setValue={setIdRol} tipo={"rol"} />
           </div>
           <div className="mb-4">
             <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
               Id Sub Unidad
             </label>
-            <input
-              type="text"
-              id="name"
-              value={idSubUni}
-              onChange={(e) => setIdSubUni(e.target.value)}
-              placeholder="Permiso"
-              className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
-            />
+            <ComboboxDemo data={subUnidades} value={idSubUni} setValue={setIdSubUni} tipo={"subunidad"} />
           </div>
           <div className="flex justify-end space-x-4">
             <button
