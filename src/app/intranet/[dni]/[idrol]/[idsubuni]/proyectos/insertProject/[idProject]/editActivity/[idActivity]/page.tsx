@@ -376,6 +376,10 @@ export default function ActivityForm() {
           {questions.map((question) => {
             switch (question.type) {
               case "text":
+                                // Obtener la respuesta específica basada en idp
+                                const respuesta = answers[question.id]?.find(
+                                  (respuesta) => respuesta.idp === question.id
+                                );
                 return (
                   <div key={question.id} className="space-y-4">
                     <label className="text-lg font-semibold text-gray-900 dark:text-gray-300">{question.questionText}</label>
@@ -389,7 +393,7 @@ export default function ActivityForm() {
                         }
                       )}
                       placeholder="Escribe tu respuesta"
-                      value={answers[question.id]?.[0]?.resTxt || answers[question.id]
+                      value={respuesta?.resTxt  || answers[question.id]
                       }
                       onChange={(e) => handleChange(question.id, e.target.value)}
                       required

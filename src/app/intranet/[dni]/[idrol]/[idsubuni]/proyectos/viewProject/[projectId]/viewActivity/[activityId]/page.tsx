@@ -32,14 +32,14 @@ interface Asistente {
   asistio: boolean;
 }
 ////
-interface ActivityData{
+interface ActivityData {
   idActivi: number;
   name: string;
   fInit: string;
   fFin: string;
   public: boolean;
   project: {
-    usuario:{
+    usuario: {
       nombre: string;
     }
   };
@@ -94,24 +94,24 @@ export function Card() {
 
       {/* Contenido de la tarjeta */}
       {
-        currentActivity  && (
-        <div className="p-4">
-          <h3 className="text-base font-semibold text-blue-700">{currentActivity?.project?.usuario?.nombre} <span className="text-gray-500 font-light text-xs">Encargad@</span></h3>
-          <p className="text-xl font-bold text-gray-900">{currentActivity.name}</p>
-          <p className="text-gray-600 mt-2 font-normal">
-            Some quick example text to build on the card title and make up the bulk of the card's content.
-          </p>
+        currentActivity && (
+          <div className="p-4">
+            <h3 className="text-base font-semibold text-blue-700">{currentActivity?.project?.usuario?.nombre} <span className="text-gray-500 font-light text-xs">Encargad@</span></h3>
+            <p className="text-xl font-bold text-gray-900">{currentActivity.name}</p>
+            <p className="text-gray-600 mt-2 font-normal">
+              Some quick example text to build on the card title and make up the bulk of the card's content.
+            </p>
 
-          {/* Botones */}
-          <div className="mt-4 flex justify-between items-center ">
-            <button className="bg-white-800 h-[40px] w-[130px] hover:bg-blue-700 hover:text-white text-blue-500 border-[1px] border-blue-500 font-medium py-2 px-4 rounded">
-              Ver más
-            </button>
-            <button className="bg-blue-500 h-[40px] w-[130px] hover:bg-blue-700  text-white font-medium py-2 px-4 rounded">
-              Participar
-            </button>
+            {/* Botones */}
+            <div className="mt-4 flex justify-between items-center ">
+              <button className="bg-white-800 h-[40px] w-[130px] hover:bg-blue-700 hover:text-white text-blue-500 border-[1px] border-blue-500 font-medium py-2 px-4 rounded">
+                Ver más
+              </button>
+              <button className="bg-blue-500 h-[40px] w-[130px] hover:bg-blue-700  text-white font-medium py-2 px-4 rounded">
+                Participar
+              </button>
+            </div>
           </div>
-        </div>
 
         )
       }
@@ -318,7 +318,7 @@ export default function ActivityForm() {
       label: "Asistencia",
       render: (item: Asistente) => (
         <>
-          <Checkbox checked={item.asistio} onClick={() => handleAsistance(!item.asistio, item.alumno.idest)}  />
+          <Checkbox checked={item.asistio} onClick={() => handleAsistance(!item.asistio, item.alumno.idest)} />
         </>
       ),
     },
@@ -498,7 +498,11 @@ export default function ActivityForm() {
   const renderQuestionResponse = (question) => {
     switch (question.type) {
       case "text":
-        return answers[question.id]?.[0]?.resTxt || "Sin respuesta";
+        // Obtener la respuesta específica basada en idp
+        const respuesta = answers[question.id]?.find(
+          (respuesta) => respuesta.idp === question.id
+        );
+        return respuesta?.resTxt || "Sin respuesta";
       case "date":
         return formatDate(answers[question.id]?.[0]?.resdate) || "Sin respuesta";
       case "multipleChoice":
@@ -508,7 +512,11 @@ export default function ActivityForm() {
           </span>
         ));
       case "singleChoice":
-        return answers[question.id]?.[0]?.opcuni?.txtOpc || "Sin respuesta";
+        // Obtener la respuesta específica basada en idp
+        const respuesta1 = answers[question.id]?.find(
+          (respuesta) => respuesta.idp === question.id
+        );
+        return respuesta1.opcuni?.txtOpc || "Sin respuesta";
       case "dropdown":
         return answers[question.id]?.[0]?.opcdes?.txtOpc || "Sin respuesta";
       case "archive":

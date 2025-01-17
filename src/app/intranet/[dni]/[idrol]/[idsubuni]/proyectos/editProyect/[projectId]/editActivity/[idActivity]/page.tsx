@@ -162,14 +162,14 @@ export default function ActivityForm() {
           formData.append(`${key}`, value);
         } else if (Array.isArray(value) && value[0]) {
           // Manejar múltiples valores de idomul
-    const multipleIdomul = value.map(v => v.idomul).filter(Boolean);
+          const multipleIdomul = value.map(v => v.idomul).filter(Boolean);
           // Asignar el primer valor válido
           responses[key] =
             value[0].idou ??
             value[0].resTxt ??
             (value[0].resdate ? formatDate(value[0].resdate) : null) ??
             value[0].idodes ??
-            (multipleIdomul.length > 0 ? multipleIdomul : null)  ??
+            (multipleIdomul.length > 0 ? multipleIdomul : null) ??
             value; // Puedes definir un valor por defecto si todos fallan
         } else {
           responses[key] = value;
@@ -368,6 +368,10 @@ export default function ActivityForm() {
           {questions.map((question) => {
             switch (question.type) {
               case "text":
+                // Obtener la respuesta específica basada en idp
+                const respuesta = answers[question.id]?.find(
+                  (respuesta) => respuesta.idp === question.id
+                );
                 return (
                   <div key={question.id} className="space-y-4">
                     <label className="text-lg font-semibold text-gray-900 dark:text-gray-300">{question.questionText}</label>
@@ -381,7 +385,7 @@ export default function ActivityForm() {
                         }
                       )}
                       placeholder="Escribe tu respuesta"
-                      value={answers[question.id]?.[0]?.resTxt || answers[question.id]
+                      value={respuesta?.resTxt || answers[question.id]
                       }
                       onChange={(e) => handleChange(question.id, e.target.value)}
                       required
